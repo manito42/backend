@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { ApplicationModule } from './app/app.module';
+import { ApplicationModule } from './app.module';
 import { INestApplication } from '@nestjs/common/interfaces/nest-application.interface';
 
 const app: Promise<INestApplication> = NestFactory.create(ApplicationModule);
