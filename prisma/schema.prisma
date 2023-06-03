@@ -10,13 +10,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  ADMIN
+  USER
+}
+
 // users model
 model User {
   id                  Int              @id @default(autoincrement())
   email               String           @unique @db.VarChar(255)
   nickname            String           @unique @db.VarChar(128)
   profileImage        String           @map("profile_image") @db.Text
-  isMentor            Boolean          @map("is_mentor") @db.TinyInt
+  role                UserRole         @default(ADMIN)
+  isMentor            Boolean          @default(false) @map("is_mentor") @db.TinyInt
   createdAt           DateTime         @default(now()) @map("created_at") @db.Timestamp(0)
   updatedAt           DateTime?        @updatedAt @map("updated_at") @db.Timestamp(0)
   mentorProfile       MentorProfile?
@@ -37,25 +43,37 @@ model MentorProfile {
   userId           Int        @unique @map("user_id")
   shortDescription String?    @db.VarChar(255)
   description      String?    @db.Text
+  isHide           Boolean    @default(false) @db.TinyInt
   hashtags         Hashtag[]  @relation("profiles_hashtags")
   categories       Category[] @relation("profiles_categories")
+  createdAt        DateTime   @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt        DateTime?  @updatedAt @map("updated_at") @db.Timestamp(0)
 
   @@map("mentor_profiles")
 }
 
+enum ReservationStatus {
+  REQUEST
+  ACCEPT
+  REJECT
+  CANCEL
+  COMPLETE
+}
+
 // reservations model
 model Reservation {
-  id             Int              @id @default(autoincrement())
-  mentor         User             @relation("BeReservedAsMentor", fields: [mentorId], references: [id])
-  mentorId       Int              @map("mentor_id")
-  mentee         User             @relation("ReservedAsMentee", fields: [menteeId], references: [id])
-  menteeId       Int              @map("mentee_id")
-  requestMessage String?          @map("request_message") @db.Text
-  isAccepted     Boolean          @default(false) @map("is_accepted") @db.TinyInt
-  isConnected    Boolean          @default(false) @map("is_connected") @db.TinyInt
-  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamp(0)
-  updatedAt      DateTime?        @updatedAt @map("updated_at") @db.Timestamp(0)
-  hashtags       Hashtag[]        @relation("reservations_hashtags")
+  id             Int               @id @default(autoincrement())
+  mentor         User              @relation("BeReservedAsMentor", fields: [mentorId], references: [id])
+  mentorId       Int               @map("mentor_id")
+  mentee         User              @relation("ReservedAsMentee", fields: [menteeId], references: [id])
+  menteeId       Int               @map("mentee_id")
+  category       Category          @relation(fields: [categoryId], references: [id])
+  categoryId     Int               @map("category_id")
+  requestMessage String?           @map("request_message") @db.Text
+  status         ReservationStatus @default(REQUEST) @map("status")
+  createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt      DateTime?         @updatedAt @map("updated_at") @db.Timestamp(0)
+  hashtags       Hashtag[]         @relation("reservations_hashtags")
   mentorFeedback MentorFeedback[]
   menTeeFeedback MenteeFeedback[]
 
@@ -75,9 +93,8 @@ model MenteeFeedback {
   content       String?     @db.Text
   createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamp(0)
   updatedAt     DateTime?   @updatedAt @map("updated_at") @db.Timestamp(0)
-  Hashtag       Hashtag?    @relation(fields: [hashtagId], references: [id])
-  hashtagId     Int?
 
+  @@unique([menteeId, reservationId])
   @@map("mentee_feedbacks")
 }
 
@@ -94,27 +111,26 @@ model MentorFeedback {
   createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamp(0)
   updatedAt     DateTime?   @updatedAt @map("updated_at") @db.Timestamp(0)
 
+  @@unique([mentorId, reservationId])
   @@map("mentor_feedbacks")
 }
 
 // hashtags model
 model Hashtag {
-  id             Int              @id @default(autoincrement())
-  name           String           @unique @map("tag_name") @db.VarChar(255)
-  profiles       MentorProfile[]  @relation("profiles_hashtags")
-  reservations   Reservation[]    @relation("reservations_hashtags")
-  MenteeFeedback MenteeFeedback[]
+  id           Int             @id @default(autoincrement())
+  name         String          @unique @map("tag_name") @db.VarChar(32)
+  profiles     MentorProfile[] @relation("profiles_hashtags")
+  reservations Reservation[]   @relation("reservations_hashtags")
 
   @@map("hashtags")
 }
 
 // categories model
 model Category {
-  id            Int             @id @default(autoincrement())
-  name          String          @unique @db.VarChar(255)
-  createdAt     DateTime        @default(now()) @map("created_at") @db.Timestamp(0)
-  updatedAt     DateTime?       @updatedAt @map("updated_at") @db.Timestamp(0)
-  mentorProfile MentorProfile[] @relation("profiles_categories")
+  id             Int             @id @default(autoincrement())
+  name           String          @unique @db.VarChar(32)
+  mentorProfiles MentorProfile[] @relation("profiles_categories")
+  reservations   Reservation[]
 
   @@map("categories")
 }
@@ -123,3 +139,4 @@ model Category {
 // profiles_hashtags model
 // reservations_hashtags model
 // profiles_categories model
+// reservations_categories model
