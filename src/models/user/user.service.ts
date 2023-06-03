@@ -1,58 +1,66 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../database/services/prisma.service';
-import { UserGetIncludes } from './queries/userGet.query';
-import { User } from '@prisma/client';
-import { UserCreateDto } from './dto/userCreate.dto';
-import { UserUpdateDto } from './dto/userUpdate.dto';
+import { UserSelectQuery } from './queries/userSelect.query';
+import { UserCreatePayloadDto } from './dto/request/userCreatePayload.dto';
+import { UserUpdatePayloadDto } from './dto/request/userUpdatePayload.dto';
+import { UserGetResponseDto } from './dto/response/userGetResponse.dto';
+import { GetUserQueryDto } from './dto/request/userQuery.dto';
 
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
-  async getUsers(take: number, page: number): Promise<Array<User>> {
-    // we have to check fail conditions here
+  async findMany(query: GetUserQueryDto): Promise<Array<UserGetResponseDto>> {
+    const { take, page } = query;
     return this.prisma.user.findMany({
       skip: take * page,
       take: take,
-      include: UserGetIncludes,
+      select: UserSelectQuery,
     });
   }
 
-  async getUserById(id: number): Promise<User> {
-    // we have to check there are no user -> 404
+  async findById(id: number): Promise<UserGetResponseDto> {
     return this.prisma.user.findUnique({
       where: {
         id: id,
       },
-      include: UserGetIncludes,
+      select: UserSelectQuery,
     });
   }
 
-  async createUser(payload: UserCreateDto): Promise<User> {
-    // we have to check fail conditions here
+  async findByEmail(email: string): Promise<UserGetResponseDto> {
+    return this.prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+      select: UserSelectQuery,
+    });
+  }
+
+  async findByNickname(nickname: string): Promise<UserGetResponseDto> {
+    return this.prisma.user.findUnique({
+      where: {
+        nickname: nickname,
+      },
+      select: UserSelectQuery,
+    });
+  }
+
+  // only for admin
+  async create(payload: UserCreatePayloadDto): Promise<UserGetResponseDto> {
     return this.prisma.user.create({
       data: payload,
-      include: UserGetIncludes,
+      select: UserSelectQuery,
     });
   }
 
-  async updateUser(id: number, payload: UserUpdateDto): Promise<User> {
+  async update(id: number, payload: UserUpdatePayloadDto): Promise<UserGetResponseDto> {
     // we have to check fail conditions here
     return this.prisma.user.update({
       where: {
         id: id,
       },
       data: payload,
-      include: UserGetIncludes,
+      select: UserSelectQuery,
     });
-  }
-
-  async verifyNickname(nickname: string): Promise<void> {
-    // we have to check fail conditions here
-    const user = await this.prisma.user.findUnique({
-      where: {
-        nickname: nickname,
-      },
-    });
-    if (!user) throw new ConflictException();
   }
 }

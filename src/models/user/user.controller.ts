@@ -1,49 +1,56 @@
 import {
+  BadRequestException,
   Body,
+  ConflictException,
   Controller,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
   Query,
 } from '@nestjs/common';
-import { User } from '@prisma/client';
+
 import { UserService } from './user.service';
-import { UserCreateDto } from './dto/userCreate.dto';
-import { UserUpdateDto } from './dto/userUpdate.dto';
+import { UserCreatePayloadDto } from './dto/request/userCreatePayload.dto';
+import { UserUpdatePayloadDto } from './dto/request/userUpdatePayload.dto';
+import { UserGetResponseDto } from './dto/response/userGetResponse.dto';
+import { GetUserQueryDto } from './dto/request/userQuery.dto';
 
 @Controller('/users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('/')
-  async getUsers(
-    @Query('take') take: number = 20,
-    @Query('page') page: number = 0,
-  ): Promise<Array<User>> {
-    return await this.userService.getUsers(take, page);
+  async getUsers(@Query() query: GetUserQueryDto): Promise<Array<UserGetResponseDto>> {
+    return await this.userService.findMany(query);
   }
 
   @Get('/:id')
-  async getUserById(@Param('id') id: number): Promise<User> {
-    return await this.userService.getUserById(id);
+  async getUserById(@Param('id') id: number): Promise<UserGetResponseDto> {
+    if (id < 0) throw new BadRequestException();
+    const user = await this.userService.findById(id);
+    if (!user) throw new NotFoundException();
+    return user;
   }
 
   @Post('/')
-  async createUser(@Body() payload: UserCreateDto): Promise<User> {
-    return await this.userService.createUser(payload);
+  async create(@Body() payload: UserCreatePayloadDto): Promise<UserGetResponseDto> {
+    return await this.userService.create(payload);
   }
 
   @Patch('/:id')
-  async updateUser(
+  async update(
     @Param('id') id: number,
-    @Body() payload: UserUpdateDto,
-  ): Promise<User> {
-    return await this.userService.updateUser(id, payload);
+    @Body() payload: UserUpdatePayloadDto,
+  ): Promise<UserGetResponseDto> {
+    if (id < 0) throw new BadRequestException();
+    return await this.userService.update(id, payload);
   }
 
   @Get('/verify_nickname/:nickname')
   async verifyNickname(@Param('nickname') nickname: string): Promise<void> {
-    return await this.userService.verifyNickname(nickname);
+    const user = await this.userService.findByNickname(nickname);
+    if (user) throw new ConflictException();
   }
 }
