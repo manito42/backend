@@ -1,0 +1,1463 @@
+openapi: 3.0.0
+servers:
+  - description: 42 MANITO API SERVER
+    url: "http://localhost:3000"
+
+info:
+  version: "1.0.0"
+  title: 42-manito-api
+  description: 42 manito api server
+
+paths:
+  /auth:
+    get:
+      summary: verify access token
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthGet'
+        '401':
+          description: Unauthorized
+  /auth/42:
+    get:
+      summary: 42 OAuth2 (redirected to 42 API)
+      responses:
+        '301':
+          description: Moved Permanently (OK)
+        '302':
+          description: Found (OK)
+        '401':
+          description: Unauthorized (API verification failed)
+  /auth/42/callback:
+    get:
+      summary: 42 OAuth2 callback (verify or create user and return token)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthCallbackGet'
+        '401':
+          description: Unauthorized
+
+  /users:
+    get:
+      summary: Get all users
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: take
+          description: take `take` Users (`min = 1, max = 100, default = 20`)
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: page
+          description: skip `take * page` Users and take `take` Users (`skip >= 0`)
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UsersGet'
+    post:
+      summary: Create a new user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersGet'
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '409':
+          description: already exists
+
+  /users/{id}:
+    get:
+      summary: Get a user by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersGet'
+        '400':
+          description: Invalid request parameter id
+        '404':
+          description: User not found
+    patch:
+      summary: Update user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersGet'
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '409':
+          description: already exists
+
+  /users/verify_nickname/{nickname}:
+    get:
+      summary: Verify nickname
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: nickname
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid nickname
+        '409':
+          description: Nickname not found
+
+  /mentor_profiles:
+    get:
+      summary: Get all mentor profiles
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: take
+          description: take `take` Users (min = 1, max = 100, default = 20)
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: page
+          description: skip `take * page` Users and take `take` Users (>= 0)
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: hashtag_id
+          description: filter by hashtag
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: category_id
+          description: filter by category
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MentorProfileGet'
+    post:
+      summary: Create a new mentor profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MentorProfileCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MentorProfileGet'
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '409':
+          description: already exists
+
+  /mentor_profiles/{id}:
+    get:
+      summary: Get a mentor profile by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid request parameter id
+        '404':
+          description: Mentor profile not found
+    patch:
+      summary: Update mentor profile
+      description: |
+        update mentor profiles.
+        **NOTE**: **hashtags** and **categories** are replaced with the new ones
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MentorProfileUpdate'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MentorProfileGet'
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '409':
+          description: already exists
+
+  /reservations:
+    get:
+      summary: Get all reservations
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: take
+          description: take `take` Users (min = 1, max = 100, default = 20)
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: page
+          description: skip `take * page` Users and take `take` Users (>= 0)
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: hashtag_id
+          description: filter by hashtag
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: category_id
+          description: filter by category
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservationGet'
+    post:
+      summary: Create a new reservation
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationGet'
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '409':
+          description: already exists
+
+  /reservations/{id}:
+    get:
+      summary: Get a reservation by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationGet'
+        '400':
+          description: Invalid request parameter id
+        '404':
+          description: Reservation not found
+    patch:
+      summary: Update reservation
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationUpdate'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationGet'
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '409':
+          description: already exists
+
+  /hashtags:
+    get:
+      summary: Get all hashtags
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: take
+          description: take `take` Users (min = 1, max = 100, default = 20)
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: page
+          description: skip `take * page` Users and take `take` Users (>= 0)
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: profile_id
+          description: filter by profile_id
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: reservation_id
+          description: filter by reservation_id
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: search
+          description: search by hashtag (%LIKE%)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HashtagGet'
+    post:
+      summary: Create a new hashtag
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HashtagCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HashtagGet'
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '409':
+          description: already exists
+
+  /mentee_feedbacks:
+    get:
+      summary: Get all mentee feedbacks
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: take
+          description: take `take` Users (min = 1, max = 100, default = 20)
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: page
+          description: skip `take * page` Users and take `take` Users (>= 0)
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: mentee_id
+          description: filter by mentee_id
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: mentor_id
+          description: filter by mentor_id
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: reservation_id
+          description: filter by reservation_id
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MenteeFeedbackGet'
+
+    post:
+      summary: Create a new mentee feedback
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MenteeFeedbackCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenteeFeedbackGet'
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '409':
+          description: already exists
+
+  /mentee_feedbacks/{id}:
+    get:
+      summary: Get a mentee feedback by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenteeFeedbackGet'
+        '400':
+          description: Invalid request parameter id
+        '404':
+          description: Mentee feedback not found
+
+
+  /mentor_feedbacks:
+    get:
+      summary: Get all mentor feedbacks
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: take
+          description: take `take` Users (min = 1, max = 100, default = 20)
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: page
+          description: skip `take * page` Users and take `take` Users (>= 0)
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: mentee_id
+          description: filter by mentee_id
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: mentor_id
+          description: filter by mentor_id
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: reservation_id
+          description: filter by reservation_id
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MentorFeedbackGet'
+    post:
+      summary: Create a new mentor feedback
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MentorFeedbackCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MentorFeedbackGet'
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '409':
+          description: already exists
+
+  /mentor_feedbacks/{id}:
+    get:
+      summary: Get a mentor feedback by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MentorFeedbackGet'
+        '400':
+          description: Invalid request parameter id
+        '404':
+          description: Mentor feedback not found
+
+  /categories:
+    get:
+      summary: Get all categories
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CategoryGet'
+
+  /search/mentor/{search_string}:
+    get:
+      summary: Search mentor by string
+      parameters:
+        - in: path
+          name: search_string
+          required: true
+          description: "search mentor profiles that contains search string in nickname or hashtags"
+          schema:
+            type: string
+        - in: query
+          name: take
+          description: take `take` Users `min = 1, max = 100, default = 20`
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: page
+          description: skip `take * page` Users and take `take` Users `take >= 0`
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: search_by_user_nickname
+          description: search by nickname `default = true`
+          schema:
+            type: string
+            format: "true | false"
+        - in: query
+          name: search_by_hashtag_name
+          description: search by tag name `default = true`
+          schema:
+            type: string
+            format: "true | false"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SearchMentorGet'
+  /home:
+    get:
+      summary: Get main page mentor profiles (random)
+      parameters:
+        - in: query
+          name: take
+          description: take `take` Users `min = 1, max = 100, default = 20`
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: page
+          description: skip `take * page` Users and take `take` Users `take >= 0`
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SearchMentorGet'
+        '404':
+          description: Category not found
+
+  /home/{category_id}:
+    get:
+      summary: Get main page mentor profiles by category
+      description: "내부 알고리즘에 의해서 선정된 상위 프로필이 제공됩니다."
+      parameters:
+        - in: query
+          name: take
+          description: take `take` Users `min = 1, max = 100, default = 20`
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: page
+          description: skip `take * page` Users and take `take` Users `take >= 0`
+          schema:
+            type: integer
+            format: int32
+        - in: path
+          name: category_id
+          required: true
+          description: "category id"
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SearchMentorGet'
+        '404':
+          description: Category not found
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        email:
+          type: string
+        nickname:
+          type: string
+        profileImage:
+          type: string
+        isMentor:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        mentorProfile:
+          $ref: '#/components/schemas/MentorProfile'
+        menteeReservations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reservation'
+        mentorReservations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reservation'
+        menteeFeedbacksTo:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenteeFeedback'
+        menteeFeedbacksFrom:
+          type: array
+          items:
+            $ref: '#/components/schemas/MentorFeedback'
+        mentorFeedbacksTo:
+          type: array
+          items:
+            $ref: '#/components/schemas/MentorFeedback'
+        mentorFeedbacksFrom:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenteeFeedback'
+    MentorProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        user:
+          $ref: '#/components/schemas/User'
+        userId:
+          type: integer
+          format: int32
+        hashtags:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProfileHashtag'
+        shortDescription:
+          type: string
+        description:
+          type: string
+    Reservation:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        mentor:
+          $ref: '#/components/schemas/User'
+        mentorId:
+          type: integer
+          format: int32
+        mentee:
+          $ref: '#/components/schemas/User'
+        menteeId:
+          type: integer
+          format: int32
+        requestMessage:
+          type: string
+        isAccepted:
+          type: boolean
+        isFinished:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        hashtags:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReservationHashtag'
+        mentorFeedback:
+          type: array
+          items:
+            $ref: '#/components/schemas/MentorFeedback'
+        menTeeFeedback:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenteeFeedback'
+        Hashtag:
+          $ref: '#/components/schemas/Hashtag'
+        hashtagId:
+          type: integer
+          format: int32
+    MenteeFeedback:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        mentee:
+          $ref: '#/components/schemas/User'
+        menteeId:
+          type: integer
+          format: int32
+        mentor:
+          $ref: '#/components/schemas/User'
+        mentorId:
+          type: integer
+          format: int32
+        reservation:
+          $ref: '#/components/schemas/Reservation'
+        reservationId:
+          type: integer
+          format: int32
+        rating:
+          type: number
+          format: float
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        Hashtag:
+          $ref: '#/components/schemas/Hashtag'
+        hashtagId:
+          type: integer
+          format: int32
+
+    MentorFeedback:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        mentee:
+          $ref: '#/components/schemas/User'
+        menteeId:
+          type: integer
+          format: int32
+        mentor:
+          $ref: '#/components/schemas/User'
+        mentorId:
+          type: integer
+          format: int32
+        reservation:
+          $ref: '#/components/schemas/Reservation'
+        reservationId:
+          type: integer
+          format: int32
+        rating:
+          type: number
+          format: float
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    Hashtag:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        profiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenteeFeedback'
+        reservations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reservation'
+        ProfileHashtag:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProfileHashtag'
+        ReservationHashtag:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReservationHashtag'
+    ProfileHashtag:
+      type: object
+      properties:
+        profile:
+          $ref: '#/components/schemas/MentorProfile'
+        profileId:
+          type: integer
+          format: int32
+        hashtag:
+          $ref: '#/components/schemas/Hashtag'
+        hashtagId:
+          type: integer
+          format: int32
+    ReservationHashtag:
+      type: object
+      properties:
+        reservation:
+          $ref: '#/components/schemas/Reservation'
+        reservationId:
+          type: integer
+          format: int32
+        hashtag:
+          $ref: '#/components/schemas/Hashtag'
+        hashtagId:
+          type: integer
+          format: int32
+    # DTOs
+    ## Auth
+    AuthGet:
+      type: object
+      properties:
+        id:
+          type: number
+          description: "required"
+        nickname:
+          type: string
+          description: "required"
+        profileImage:
+          type: string
+          description: "required"
+        role:
+          type: string
+          format: enum
+          enum:
+            - ADMIN
+            - USER
+    AuthCallbackGet:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: "required"
+    ## User
+    UserCreate:
+      type: object
+      description: "only for admin"
+      properties:
+        email:
+          type: string
+          format: email
+          description: "required"
+        nickname:
+          type: string
+          description: "required"
+        profileImage:
+          type: string
+          description: "required"
+        role:
+          description: "required"
+          type: string
+          format: enum
+          enum:
+            - ADMIN
+            - USER
+
+    UserUpdate:
+      type: object
+      properties:
+        profileImage:
+          type: string
+          description: "optional"
+        isMentor:
+          type: boolean
+          description: "optional"
+
+    UsersGet:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        email:
+          type: string
+          format: email
+        nickname:
+          type: string
+        profileImage:
+          type: string
+        isMentor:
+          type: boolean
+        role:
+          description: "required"
+          type: string
+          format: enum
+          enum:
+            - ADMIN
+            - USER
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        mentorProfile:
+          $ref: '#/components/schemas/MentorProfileSimpleGet'
+
+    ## MentorProfile
+    MentorProfileCreate:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int32
+          description: "required, user id"
+
+    MentorProfileGet:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        shortDescription:
+          type: string
+        description:
+          type: string
+        isHide:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        hashtags:
+          type: array
+          items:
+            $ref: '#/components/schemas/HashtagGet'
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryGet'
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int32
+            nickname:
+              type: string
+            profileImage:
+              type: string
+
+
+
+    MentorProfileSimpleGet:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        shortDescription:
+          type: string
+        description:
+          type: string
+        isHide:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        hashtags:
+          type: array
+          items:
+            $ref: '#/components/schemas/HashtagGet'
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryGet'
+
+    MentorProfileUpdate:
+      type: object
+      properties:
+        isHide:
+          type: boolean
+          description: "optional, default false"
+        shortDescription:
+          type: string
+          description: 'optional, 0 < len < 50'
+        description:
+          type: string
+          description: 'optional, 0 < len < 1000'
+        hashtags:
+          type: array
+          description: 'optional, number of hashtag <= 5'
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int32
+        categories:
+          type: array
+          description: 'optional'
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int32
+    ## Reservation
+    ReservationCreate:
+      type: object
+      properties:
+        mentorId:
+          type: integer
+          format: int32
+          description: "required, mentor id"
+        menteeId:
+          type: integer
+          format: int32
+          description: "required, mentee id"
+        categoryId:
+          type: integer
+          format: int32
+          description: "required, category id"
+        requestMessage:
+          type: string
+          description: "optional, request message `length <= 1000`"
+        hashtags:
+          type: array
+          description: "number of hashtag <= 5"
+          items:
+            $ref: '#/components/schemas/HashtagGet'
+      required:
+        - mentorId
+        - menteeId
+
+    ReservationGet:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: "reservation id"
+        mentorId:
+          type: integer
+          format: int32
+        menteeId:
+          type: integer
+          format: int32
+        categoryId:
+          type: integer
+          format: int32
+        requestMessage:
+          type: string
+        status:
+          type: string
+          format: enum
+          enum:
+            - "REQUESTED"
+            - "ACCEPTED"
+            - "FINISHED"
+            - "CANCELED"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        hashtags:
+          type: array
+          items:
+            $ref: '#/components/schemas/HashtagGet'
+
+    ReservationUpdate:
+      type: object
+      properties:
+        requestMessage:
+          type: string
+          description: "optional, request message"
+        status:
+          description: "optional, status"
+          type: string
+          format: enum
+          enum:
+            - "REQUESTED"
+            - "ACCEPTED"
+            - "FINISHED"
+            - "CANCELED"
+        categoryId:
+          type: integer
+          format: int32
+          description: "optional, category id"
+        hashtags:
+          type: array
+          description: "optional, hashtags item max 5"
+          items:
+            $ref: '#/components/schemas/HashtagUpdate'
+
+    ## Hashtag
+    HashtagGet:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+
+    HashtagCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "required, 0 < len < 20"
+      required:
+        - name
+
+    HashtagUpdate:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+      required:
+        - id
+
+    ## MenteeFeedback
+    MenteeFeedbackGet:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        menteeId:
+          type: integer
+          format: int32
+        mentorId:
+          type: integer
+          format: int32
+        reservationId:
+          type: integer
+          format: int32
+        rating:
+          type: number
+          format: float
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    MenteeFeedbackCreate:
+      type: object
+      properties:
+        menteeId:
+          type: integer
+          format: int32
+          description: "required, mentee id"
+        mentorId:
+          type: integer
+          format: int32
+          description: "required, mentor id"
+        reservationId:
+          type: integer
+          format: int32
+          description: "required, reservation id"
+        rating:
+          type: number
+          format: float
+          description: "required, 0 <= rating <= 5"
+        content:
+          type: string
+          description: "optional, 0 < len < 1000"
+      required:
+        - menteeId
+        - mentorId
+        - reservationId
+        - rating
+
+    ## MentorFeedback
+    MentorFeedbackGet:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        menteeId:
+          type: integer
+          format: int32
+        mentorId:
+          type: integer
+          format: int32
+        reservationId:
+          type: integer
+          format: int32
+        rating:
+          type: number
+          format: float
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    MentorFeedbackCreate:
+      type: object
+      properties:
+        menteeId:
+          type: integer
+          format: int32
+          description: "required, mentee id"
+        mentorId:
+          type: integer
+          format: int32
+          description: "required, mentor id"
+        reservationId:
+          type: integer
+          format: int32
+          description: "required, reservation id"
+        rating:
+          type: number
+          format: float
+          description: "required, 0 <= rating <= 5"
+        content:
+          type: string
+          description: "optional, 0 < len < 1000"
+      required:
+        - menteeId
+        - mentorId
+        - reservationId
+        - rating
+    ## Category
+    CategoryGet:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+
+    ## Search/Mentor
+    SearchMentorGet:
+      type: object
+      properties:
+        nickname:
+          type: string
+          description: "mentor nickname"
+        profileImage:
+          type: string
+          description: "mentor profile image"
+        mentorProfile:
+          $ref: '#/components/schemas/MentorProfileSimpleGet'
+
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
