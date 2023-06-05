@@ -1,0 +1,74 @@
+name: NestJS CI
+
+on:
+  pull_request:
+    branches: [ master, develop ]
+    types:
+      - opened
+      - edited
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0.33
+        env:
+          MYSQL_ROOT_PASSWORD: 1234
+          MYSQL_DATABASE: manito
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js 18.16
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.16
+      - name: Create .env file
+        run: |
+          echo DATABASE_URL="mysql://root:1234@mysql:3306/manito" >> .env
+          echo ACCESS_URL="http://localhost:3000" >> .env
+          echo APP_HOST="localhost" >> .env
+          echo APP_PORT="3000" >> .env
+          echo JWT_SECRET="secret" >> .env
+          echo JWT_EXPIRES_IN="3600" >> .env
+          echo FT_SECRET=${{ secrets.FT_SECRET }} >> .env
+          echo FT_CLIENT=${{ secrets.FT_CLIENT }} >> .env
+          echo FT_CALLBACK=${{ secrets.FT_CALLBACK }} >> .env
+          echo LOG_DIR="./logs" >> .env
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Prisma Generate
+        env:
+          DATABASE_URL: mysql://root:1234@localhost:3306/manito
+        run: npx prisma generate
+
+      - name: Run Tests
+        env:
+          DATABASE_URL: mysql://root:1234@localhost:3306/manito
+        run: npm run test
+
+      - name: Run Coverage
+        id: cov
+        env:
+          DATABASE_URL: mysql://root:1234@localhost:3306/manito
+        run: npm run test:cov
+
+      - name: Comment PR
+        if: ${{ always() }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const issue_number = context.issue.number;
+            const output = `#### Test Result  \n${steps.cov.outputs.stdout}\n${steps.cov.outputs.stderr}\n`;
+            github.issues.createComment({
+              issue_number: issue_number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output,
+            });
