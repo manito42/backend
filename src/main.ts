@@ -9,10 +9,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: winstonLogger,
   });
+  const PORT = process.env.APP_PORT || 3000;
   app.useGlobalPipes(new ValidationPipe(ValidationOptions));
   app.useGlobalFilters(new PrismaClientExceptionFilter());
   // 추후 변경할 것
   app.enableCors();
-  await app.listen(3000);
+  await app.listen(PORT);
 }
 bootstrap();
