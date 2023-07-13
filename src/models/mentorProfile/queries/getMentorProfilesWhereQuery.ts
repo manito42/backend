@@ -45,9 +45,5 @@ export function getMentorProfilesSearchWhereQuery(
     };
     orArray.push(userWhereObject);
   }
-  console.log('searchHashtag: ', searchHashtag);
-  console.log('searchNickname: ', searchNickname);
-  console.log('search: ', search);
-  console.log(whereObject);
   return whereObject;
 }
