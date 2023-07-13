@@ -1,4 +1,4 @@
-import { IsInt, IsOptional, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, Max, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class GetSearchQueryDto {
@@ -20,14 +20,16 @@ export class GetSearchQueryDto {
   page?: number = 0;
 
   @IsOptional()
-  @IsString()
-  @MinLength(1)
-  @MaxLength(20)
-  search_by_hashtag_name?: boolean;
+  @IsBoolean({ message: "search_by_hashtag_name must be 'true' or 'false'" })
+  @Transform(({ value }) => {
+    return value === 'true';
+  })
+  search_by_hashtag_name?: boolean = true;
 
   @IsOptional()
-  @IsString()
-  @MinLength(1)
-  @MaxLength(20)
-  search_by_user_nickname?: boolean;
+  @IsBoolean({ message: "search_by_user_nickname must be 'true' or 'false'" })
+  @Transform(({ value }) => {
+    return value === 'true';
+  })
+  search_by_user_nickname?: boolean = true;
 }
