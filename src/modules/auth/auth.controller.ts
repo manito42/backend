@@ -27,6 +27,7 @@ export class AuthController {
     if (!user) throw new InternalServerErrorException();
     const accessToken = await this.authService.createToken(user);
     return {
+      uid: user.id,
       accessToken: accessToken,
     };
   }
