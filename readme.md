@@ -20,3 +20,10 @@ $ docker compose up -d
 $ docker exec -it $container_name sh
 docker conatiner > $ npx prisma generate
 ```
+
+## Seeding
+```bash
+# must be in docker container.
+$ docker exec -it $container_name sh
+docker conatiner > $ npx ts-node ./src/database/seeders/seeder.ts
+```
