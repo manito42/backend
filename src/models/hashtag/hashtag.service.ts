@@ -23,10 +23,14 @@ export class HashtagService {
       select: HashtagGetSelectQuery,
     });
   }
+
+  async findByName(name: string): Promise<HashtagGetResponseDto> {
+    return this.prisma.hashtag.findUnique({ where: { name: name } });
+  }
+
   async create(payload: HashtagCreatePayloadDto): Promise<HashtagGetResponseDto> {
     return this.prisma.hashtag.create({
       data: { name: payload.name },
-      select: HashtagGetSelectQuery,
     });
   }
 }
