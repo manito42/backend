@@ -3,7 +3,7 @@ export interface IReservationResponse {
   mentorId: number;
   menteeId: number;
   categoryId: number;
-  requestMessage: string;
+  requestMessage?: string;
   status: string;
   hashtags: {
     id: number;

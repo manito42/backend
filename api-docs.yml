@@ -151,6 +151,54 @@ paths:
         '409':
           description: already exists
 
+  /users/{id}/reservations:
+    get:
+      summary: Get a user reservations by ID
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: take
+          description: take `take` Users (`min = 1, max = 100, default = 20`)
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: page
+          description: skip `take * page` Users and take `take` Users (`skip >= 0`)
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: as_mentor
+          description: find `reservations` that reserved as mentor `(default = "true")`
+          schema:
+            type: string
+            format: boolean
+        - in: query
+          name: as_mentee
+          description: find `reservations` that reserved as mentee `(default = "true")`
+          schema:
+            type: string
+            format: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersReservationsGet'
+        '400':
+          description: Invalid request parameter id
+        '404':
+          description: User not found
+
   /users/verify_nickname/{nickname}:
     get:
       summary: Verify nickname
@@ -1037,6 +1085,9 @@ components:
     AuthCallbackGet:
       type: object
       properties:
+        uid:
+          type: integer
+          description: "user id"
         accessToken:
           type: string
           description: "required"
@@ -1103,6 +1154,18 @@ components:
           format: date-time
         mentorProfile:
           $ref: '#/components/schemas/MentorProfileSimpleGet'
+
+    UsersReservationsGet:
+      type: object
+      properties:
+        menteeReservations:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserReservationGet'
+        mentorReservations:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserReservationGet'
 
     ## MentorProfile
     MentorProfileCreate:
@@ -1255,6 +1318,40 @@ components:
           format: int32
         requestMessage:
           type: string
+        status:
+          type: string
+          format: enum
+          enum:
+            - "REQUESTED"
+            - "ACCEPTED"
+            - "FINISHED"
+            - "CANCELED"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        hashtags:
+          type: array
+          items:
+            $ref: '#/components/schemas/HashtagGet'
+    UserReservationGet:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: "reservation id"
+        mentorId:
+          type: integer
+          format: int32
+        menteeId:
+          type: integer
+          format: int32
+        categoryId:
+          type: integer
+          format: int32
         status:
           type: string
           format: enum
