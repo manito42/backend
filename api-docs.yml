@@ -1322,10 +1322,11 @@ components:
           type: string
           format: enum
           enum:
-            - "REQUESTED"
-            - "ACCEPTED"
-            - "FINISHED"
-            - "CANCELED"
+            - "REQUEST"
+            - "ACCEPT"
+            - "CANCEL"
+            - "PENDING"
+            - "COMPLETE"
         createdAt:
           type: string
           format: date-time

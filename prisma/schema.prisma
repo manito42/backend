@@ -58,6 +58,7 @@ enum ReservationStatus {
   ACCEPT
   REJECT
   CANCEL
+  PENDING
   COMPLETE
 }
 
