@@ -5,6 +5,8 @@ export interface IMentorProfileResponse {
   createdAt: Date;
   updatedAt: Date;
   isHide: boolean;
+
+  mentoringCount: number;
   hashtags: {
     id: number;
     name: string;

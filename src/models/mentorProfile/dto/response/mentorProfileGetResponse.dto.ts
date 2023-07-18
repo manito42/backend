@@ -5,6 +5,7 @@ export class MentorProfileGetResponseDto implements IMentorProfileResponse {
   isHide: boolean;
   shortDescription: string;
   description: string;
+  mentoringCount: number;
   createdAt: Date;
   updatedAt: Date;
   hashtags: {

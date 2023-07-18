@@ -15,6 +15,7 @@ export class UserGetResponseDto implements IUserResponse {
     description: string;
     createdAt: Date;
     updatedAt: Date;
+    mentoringCount: number;
     isHide: boolean;
     hashtags: {
       id: number;

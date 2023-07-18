@@ -15,6 +15,7 @@ export class MentorProfileFactory {
       createdAt: faker.date.past(),
       updatedAt: faker.date.future(),
       isHide: faker.datatype.boolean(),
+      mentoringCount: faker.number.int({ min: 0, max: 10 }),
       hashtags: HashtagFactory.getHashtags(3),
       categories: CategoryFactory.getCategories(3),
       user: {
@@ -32,6 +33,7 @@ export class MentorProfileFactory {
       description: faker.lorem.paragraph(),
       createdAt: faker.date.past(),
       updatedAt: faker.date.future(),
+      mentoringCount: faker.number.int({ min: 0, max: 10 }),
       isHide: faker.datatype.boolean(),
       hashtags: HashtagFactory.getHashtags(3),
       categories: CategoryFactory.getCategories(3),
