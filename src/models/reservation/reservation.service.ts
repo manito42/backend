@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../../database/services/prisma.service';
 import { ReservationGetResponseDto } from './dto/response/reservationGetResponse.dto';
 import { ReservationSelectQuery } from './queries/reservationSelect.query';
@@ -29,14 +29,23 @@ export class ReservationService {
   }
 
   async create(payload: ReservationCreatePayloadDto) {
-    if (payload.menteeId === payload.mentorId) throw new BadRequestException();
-    const mentor = await this.prisma.user.findUnique({ where: { id: payload.mentorId } });
+    const { menteeId, mentorId } = payload;
+    if (menteeId === mentorId) throw new BadRequestException();
+    const mentor = await this.prisma.user.findUnique({ where: { id: mentorId } });
     if (!mentor || !mentor.isMentor) throw new BadRequestException();
+    const existMentoringCount = await this.prisma.reservation.count({
+      where: {
+        mentorId: mentorId,
+        menteeId: menteeId,
+        OR: [{ status: 'ACCEPT' }, { status: 'REQUEST' }],
+      },
+    });
+    if (existMentoringCount !== 0) throw new ConflictException();
 
     return this.prisma.reservation.create({
       data: {
-        menteeId: payload.menteeId,
-        mentorId: payload.mentorId,
+        menteeId: menteeId,
+        mentorId: mentorId,
         categoryId: payload.categoryId,
         requestMessage: payload.requestMessage,
         hashtags: {
