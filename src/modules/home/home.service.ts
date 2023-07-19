@@ -12,7 +12,6 @@ export class HomeService {
   getRecentUpdatedMentorSortQuery() {
     return {
       updatedAt: 'desc',
-      createdAt: 'desc',
     };
   }
 
