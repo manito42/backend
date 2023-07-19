@@ -604,8 +604,6 @@ paths:
   /hashtags:
     get:
       summary: Get all hashtags
-      security:
-        - NormalUser: []
       parameters:
         - in: query
           name: take
