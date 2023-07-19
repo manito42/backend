@@ -6,10 +6,7 @@ import { UserGetResponseDto } from '../../models/user/dto/response/userGetRespon
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly userService: UserService,
-    private readonly jwtService: JwtService,
-  ) {}
+  constructor(private readonly userService: UserService, private readonly jwtService: JwtService) {}
 
   async verifyOrCreateUser(user: any): Promise<UserGetResponseDto> {
     const { nickname } = user;
@@ -29,6 +26,6 @@ export class AuthService {
       role: user.role,
       profileImage: user.profileImage,
     };
-    return this.jwtService.signAsync(payload);
+    return this.jwtService.sign(payload);
   }
 }
