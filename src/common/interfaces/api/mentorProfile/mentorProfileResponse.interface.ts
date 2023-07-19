@@ -7,6 +7,8 @@ export interface IMentorProfileResponse {
   isHide: boolean;
 
   mentoringCount: number;
+  ratingSum: number;
+
   hashtags: {
     id: number;
     name: string;

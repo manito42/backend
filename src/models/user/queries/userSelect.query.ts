@@ -4,6 +4,8 @@ export const UserSelectQuery = {
   email: true,
   profileImage: true,
   isMentor: true,
+  mentoringCount: true,
+  ratingSum: true,
   role: true,
   createdAt: true,
   updatedAt: true,
@@ -16,6 +18,7 @@ export const UserSelectQuery = {
       updatedAt: true,
       isHide: true,
       mentoringCount: true,
+      ratingSum: true,
       hashtags: {
         select: {
           id: true,

@@ -6,6 +6,8 @@ export class UserGetResponseDto implements IUserResponse {
   nickname: string;
   profileImage: string;
   isMentor: boolean;
+  mentoringCount: number;
+  ratingSum: number;
   role: string;
   createdAt: Date;
   updatedAt: Date;
@@ -16,6 +18,7 @@ export class UserGetResponseDto implements IUserResponse {
     createdAt: Date;
     updatedAt: Date;
     mentoringCount: number;
+    ratingSum: number;
     isHide: boolean;
     hashtags: {
       id: number;

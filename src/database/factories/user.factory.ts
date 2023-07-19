@@ -14,6 +14,8 @@ export class UserFactory {
       nickname: faker.internet.userName(),
       profileImage: faker.internet.avatar(),
       role: admin ? 'ADMIN' : 'USER',
+      mentoringCount: 0,
+      ratingSum: 0,
       isMentor: faker.datatype.boolean(),
       createdAt: faker.date.past(),
       updatedAt: faker.date.future(),

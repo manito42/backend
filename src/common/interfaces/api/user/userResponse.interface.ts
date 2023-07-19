@@ -5,6 +5,8 @@ export interface IUserResponse {
   profileImage: string;
   role: string;
   isMentor: boolean;
+  mentoringCount: number;
+  ratingSum: number;
   createdAt: Date;
   updatedAt: Date;
   mentorProfile?: {
@@ -14,6 +16,7 @@ export interface IUserResponse {
     createdAt: Date;
     updatedAt: Date;
     mentoringCount: number;
+    ratingSum: number;
     isHide: boolean;
     hashtags: {
       id: number;
