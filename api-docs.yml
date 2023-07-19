@@ -76,7 +76,7 @@ paths:
     post:
       summary: Create a new user
       security:
-        - NormalUser: []
+        - AdminUser: []
       requestBody:
         required: true
         content:
@@ -123,7 +123,7 @@ paths:
     patch:
       summary: Update user
       security:
-        - NormalUser: []
+        - OwnerUser: []
       parameters:
         - name: id
           in: path
@@ -155,7 +155,7 @@ paths:
     get:
       summary: Get a user reservations by ID
       security:
-        - NormalUser: [ ]
+        - OwnerUser: [ ]
       parameters:
         - name: id
           in: path
@@ -202,8 +202,6 @@ paths:
   /users/verify_nickname/{nickname}:
     get:
       summary: Verify nickname
-      security:
-        - NormalUser: []
       parameters:
         - name: nickname
           in: path
@@ -1727,6 +1725,11 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: "User Role >= USER"
+    OwnerUser:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "User Role >= ResourceOwner"
     AdminUser:
       type: http
       scheme: bearer
