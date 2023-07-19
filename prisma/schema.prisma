@@ -78,8 +78,8 @@ model Reservation {
   createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamp(0)
   updatedAt      DateTime?         @updatedAt @map("updated_at") @db.Timestamp(0)
   hashtags       Hashtag[]         @relation("reservations_hashtags")
-  mentorFeedback MentorFeedback[]
-  menTeeFeedback MenteeFeedback[]
+  mentorFeedback MentorFeedback?
+  menteeFeedback MenteeFeedback?
 
   @@map("reservations")
 }
@@ -92,7 +92,7 @@ model MenteeFeedback {
   mentor        User        @relation("MenteeFeedbackFrom", fields: [mentorId], references: [id])
   mentorId      Int         @map("mentor_id")
   reservation   Reservation @relation(fields: [reservationId], references: [id])
-  reservationId Int         @map("reservation_id")
+  reservationId Int         @unique @map("reservation_id")
   rating        Float       @default(0.0) @db.Float
   content       String?     @db.Text
   createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamp(0)
@@ -110,7 +110,7 @@ model MentorFeedback {
   mentor        User        @relation("MentorFeedbackTo", fields: [mentorId], references: [id])
   mentorId      Int         @map("mentor_id")
   reservation   Reservation @relation(fields: [reservationId], references: [id])
-  reservationId Int         @map("reservation_id")
+  reservationId Int         @unique @map("reservation_id")
   rating        Float       @default(0.0) @db.Float
   createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamp(0)
   updatedAt     DateTime?   @updatedAt @map("updated_at") @db.Timestamp(0)

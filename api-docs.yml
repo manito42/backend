@@ -187,6 +187,12 @@ paths:
           schema:
             type: string
             format: boolean
+        - in: query
+          name: active
+          description: find all active (`REQUEST`, `ACCEPT`, `PENDING`) user's `reservations` `(default ="false")`
+          schema:
+            type: string
+            format: boolean
       responses:
         '200':
           description: OK
@@ -1305,11 +1311,11 @@ components:
         menteeReservations:
           type: array
           items:
-            $ref: '#/components/schemas/UserReservationGet'
+            $ref: '#/components/schemas/ReservationGet'
         mentorReservations:
           type: array
           items:
-            $ref: '#/components/schemas/UserReservationGet'
+            $ref: '#/components/schemas/ReservationGet'
 
     ## MentorProfile
     MentorProfileCreate:
@@ -1475,6 +1481,10 @@ components:
             - "CANCEL"
             - "PENDING"
             - "COMPLETE"
+        mentorFeedback:
+          $ref: '#/components/schemas/MentorFeedbackGet'
+        menteeFeedback:
+          $ref: '#/components/schemas/MenteeFeedbackGet'
         createdAt:
           type: string
           format: date-time

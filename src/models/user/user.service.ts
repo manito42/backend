@@ -8,7 +8,7 @@ import { GetUserQueryDto } from './dto/request/userQuery.dto';
 import { ReservationStatus } from '@prisma/client';
 import { UserReservationGetDto } from './dto/response/userReservationGet.dto';
 import { GetUserReservationQueryDto } from './dto/request/userReservationQuery.dto';
-import { UserReservationSelectQuery } from './queries/userReservationSelect.query';
+import { ReservationSelectQuery } from '../reservation/queries/reservationSelect.query';
 
 @Injectable()
 export class UserService {
@@ -72,16 +72,19 @@ export class UserService {
     id: number,
     query: GetUserReservationQueryDto,
   ): Promise<UserReservationGetDto> {
-    const { take, page, as_mentor, as_mentee } = query;
+    const { take, page, as_mentor, as_mentee, active } = query;
     let menteeReservations;
     let mentorReservations;
     if (as_mentee) {
+      let whereQuery = { menteeId: id };
+      if (active)
+        whereQuery['OR'] = [
+          { status: ReservationStatus.REQUEST },
+          { status: ReservationStatus.ACCEPT },
+        ];
       menteeReservations = await this.prisma.reservation.findMany({
-        where: {
-          menteeId: id,
-          OR: [{ status: ReservationStatus.REQUEST }, { status: ReservationStatus.ACCEPT }],
-        },
-        select: UserReservationSelectQuery,
+        where: whereQuery,
+        select: ReservationSelectQuery,
         take: take,
         skip: take * page,
         orderBy: {
@@ -90,16 +93,16 @@ export class UserService {
       });
     }
     if (as_mentor) {
+      let whereQuery = { mentorId: id };
+      if (active)
+        whereQuery['OR'] = [
+          { status: ReservationStatus.REQUEST },
+          { status: ReservationStatus.ACCEPT },
+          { status: ReservationStatus.PENDING },
+        ];
       mentorReservations = await this.prisma.reservation.findMany({
-        where: {
-          mentorId: id,
-          OR: [
-            { status: ReservationStatus.REQUEST },
-            { status: ReservationStatus.ACCEPT },
-            { status: ReservationStatus.PENDING },
-          ],
-        },
-        select: UserReservationSelectQuery,
+        where: whereQuery,
+        select: ReservationSelectQuery,
         take: take,
         skip: take * page,
         orderBy: {

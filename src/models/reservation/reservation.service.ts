@@ -28,7 +28,7 @@ export class ReservationService {
     });
   }
 
-  async create(payload: ReservationCreatePayloadDto) {
+  async create(payload: ReservationCreatePayloadDto): Promise<ReservationGetResponseDto> {
     const { menteeId, mentorId } = payload;
     if (menteeId === mentorId) throw new BadRequestException('can not reserve myself');
     const mentor = await this.prisma.mentorProfile.findUnique({ where: { userId: mentorId } });

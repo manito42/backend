@@ -11,6 +11,29 @@ export const ReservationSelectQuery = {
       name: true,
     },
   },
+  mentorFeedback: {
+    select: {
+      id: true,
+      mentorId: true,
+      menteeId: true,
+      reservationId: true,
+      rating: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  },
+  menteeFeedback: {
+    select: {
+      id: true,
+      mentorId: true,
+      menteeId: true,
+      reservationId: true,
+      content: true,
+      rating: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  },
   createdAt: true,
   updatedAt: true,
 };

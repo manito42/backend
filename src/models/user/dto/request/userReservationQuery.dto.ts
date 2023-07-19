@@ -31,4 +31,11 @@ export class GetUserReservationQueryDto {
     return value === 'true';
   })
   as_mentor?: boolean = true;
+
+  @IsOptional()
+  @IsBoolean({ message: "all must be 'true' or 'false'" })
+  @Transform(({ value }) => {
+    return value === 'true';
+  })
+  active?: boolean = false;
 }
