@@ -15,6 +15,7 @@ import { JwtConfigModule } from './config/jwt/config.module';
 import { AppConfigModule } from './config/app/config.module';
 import { SearchModule } from './modules/search/search.module';
 import { HomeModule } from './modules/home/home.module';
+import { DevModule } from './modules/dev/dev.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { HomeModule } from './modules/home/home.module';
     SearchModule,
     HomeModule,
     AuthModule,
+    DevModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger],
