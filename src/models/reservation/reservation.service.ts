@@ -30,9 +30,10 @@ export class ReservationService {
 
   async create(payload: ReservationCreatePayloadDto) {
     const { menteeId, mentorId } = payload;
-    if (menteeId === mentorId) throw new BadRequestException();
+    if (menteeId === mentorId) throw new BadRequestException('can not reserve myself');
     const mentor = await this.prisma.user.findUnique({ where: { id: mentorId } });
-    if (!mentor || !mentor.isMentor) throw new BadRequestException();
+    if (!mentor || !mentor.isMentor)
+      throw new BadRequestException('requested mentorID is not mentor');
     const existMentoringCount = await this.prisma.reservation.count({
       where: {
         mentorId: mentorId,
@@ -40,7 +41,7 @@ export class ReservationService {
         OR: [{ status: 'ACCEPT' }, { status: 'REQUEST' }],
       },
     });
-    if (existMentoringCount !== 0) throw new ConflictException();
+    if (existMentoringCount !== 0) throw new ConflictException('already exists active reservation');
 
     return this.prisma.reservation.create({
       data: {

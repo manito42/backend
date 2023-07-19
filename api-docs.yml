@@ -13,7 +13,7 @@ paths:
     get:
       summary: verify access token
       security:
-        - bearerAuth: []
+        - NormalUser: []
       responses:
         '200':
           description: OK
@@ -50,7 +50,7 @@ paths:
     get:
       summary: Get all users
       security:
-        - bearerAuth: []
+        - NormalUser: []
       parameters:
         - in: query
           name: take
@@ -76,7 +76,7 @@ paths:
     post:
       summary: Create a new user
       security:
-        - bearerAuth: []
+        - NormalUser: []
       requestBody:
         required: true
         content:
@@ -101,7 +101,7 @@ paths:
     get:
       summary: Get a user by ID
       security:
-        - bearerAuth: []
+        - NormalUser: []
       parameters:
         - name: id
           in: path
@@ -123,7 +123,7 @@ paths:
     patch:
       summary: Update user
       security:
-        - bearerAuth: []
+        - NormalUser: []
       parameters:
         - name: id
           in: path
@@ -155,7 +155,7 @@ paths:
     get:
       summary: Get a user reservations by ID
       security:
-        - bearerAuth: [ ]
+        - NormalUser: [ ]
       parameters:
         - name: id
           in: path
@@ -203,7 +203,7 @@ paths:
     get:
       summary: Verify nickname
       security:
-        - bearerAuth: []
+        - NormalUser: []
       parameters:
         - name: nickname
           in: path
@@ -222,7 +222,7 @@ paths:
     get:
       summary: Get all mentor profiles
       security:
-        - bearerAuth: []
+        - NormalUser: []
       parameters:
         - in: query
           name: take
@@ -260,7 +260,7 @@ paths:
     post:
       summary: Create a new mentor profile
       security:
-        - bearerAuth: []
+        - NormalUser: []
       requestBody:
         required: true
         content:
@@ -285,7 +285,7 @@ paths:
     get:
       summary: Get a mentor profile by ID
       security:
-        - bearerAuth: []
+        - NormalUser: []
       parameters:
         - name: id
           in: path
@@ -306,7 +306,7 @@ paths:
         update mentor profiles.
         **NOTE**: **hashtags** and **categories** are replaced with the new ones
       security:
-        - bearerAuth: []
+        - NormalUser: []
       parameters:
         - name: id
           in: path
@@ -338,7 +338,7 @@ paths:
     get:
       summary: Get all reservations
       security:
-        - bearerAuth: []
+        - NormalUser: []
       parameters:
         - in: query
           name: take
@@ -376,7 +376,7 @@ paths:
     post:
       summary: Create a new reservation
       security:
-        - bearerAuth: []
+        - NormalUser: []
       requestBody:
         required: true
         content:
@@ -401,9 +401,10 @@ paths:
     get:
       summary: Get a reservation by ID
       security:
-        - bearerAuth: []
+        - NormalUser: []
       parameters:
         - name: id
+          description: "reservation id"
           in: path
           required: true
           schema:
@@ -422,11 +423,16 @@ paths:
           description: Reservation not found
     patch:
       summary: Update reservation
+      description: |
+        **ROLE**\
+        \
+        only for `ADMIN` user
       security:
-        - bearerAuth: []
+        - AdminUser: []
       parameters:
         - name: id
           in: path
+          description: "reservation id"
           required: true
           schema:
             type: integer
@@ -451,11 +457,147 @@ paths:
         '409':
           description: already exists
 
+  /reservations/{id}/cancel:
+    patch:
+      summary: cancel reservation
+      description: |
+        **ROLE**\
+        \
+        only for `mentor` or `mentee` user that related with reservation
+      security:
+        - NormalUser: [ ]
+      parameters:
+        - name: id
+          in: path
+          description: "reservation id"
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationGet'
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '409':
+          description: already exists
+
+  /reservations/{id}/accept:
+    patch:
+      summary: accept reservation
+      description: |
+        **ROLE**\
+        \
+        only for `mentor` user that related with reservation
+      security:
+        - NormalUser: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "reservation id"
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationGet'
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '409':
+          description: already exists
+
+  /reservations/{id}/mentor_completion:
+    patch:
+      summary: complete reservation as mentor
+      description: |
+        **ROLE**\
+        \
+        only for `mentor` user that related with reservation
+      security:
+        - NormalUser: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "reservation id"
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompleteReservationAsMentor'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationGet'
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '409':
+          description: already exists
+
+  /reservations/{id}/mentee_completion:
+    patch:
+      summary: complete reservation as mentee
+      description: |
+        **ROLE**\
+        \
+        only for `mentee` user that related with reservation
+      security:
+        - NormalUser: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "reservation id"
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompleteReservationAsMentee'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationGet'
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '409':
+          description: already exists
+
   /hashtags:
     get:
       summary: Get all hashtags
       security:
-        - bearerAuth: []
+        - NormalUser: []
       parameters:
         - in: query
           name: take
@@ -498,7 +640,7 @@ paths:
     post:
       summary: Create a new hashtag
       security:
-        - bearerAuth: []
+        - NormalUser: []
       requestBody:
         required: true
         content:
@@ -527,7 +669,7 @@ paths:
     get:
       summary: Get all mentee feedbacks
       security:
-        - bearerAuth: []
+        - NormalUser: []
       parameters:
         - in: query
           name: take
@@ -572,7 +714,7 @@ paths:
     post:
       summary: Create a new mentee feedback
       security:
-        - bearerAuth: []
+        - NormalUser: []
       requestBody:
         required: true
         content:
@@ -597,7 +739,7 @@ paths:
     get:
       summary: Get a mentee feedback by ID
       security:
-        - bearerAuth: []
+        - NormalUser: []
       parameters:
         - name: id
           in: path
@@ -622,7 +764,7 @@ paths:
     get:
       summary: Get all mentor feedbacks
       security:
-        - bearerAuth: []
+        - NormalUser: []
       parameters:
         - in: query
           name: take
@@ -666,7 +808,7 @@ paths:
     post:
       summary: Create a new mentor feedback
       security:
-        - bearerAuth: []
+        - NormalUser: []
       requestBody:
         required: true
         content:
@@ -691,7 +833,7 @@ paths:
     get:
       summary: Get a mentor feedback by ID
       security:
-        - bearerAuth: []
+        - NormalUser: []
       parameters:
         - name: id
           in: path
@@ -715,7 +857,7 @@ paths:
     get:
       summary: Get all categories
       security:
-        - bearerAuth: []
+        - NormalUser: []
       responses:
         '200':
           description: OK
@@ -1401,6 +1543,23 @@ components:
           items:
             $ref: '#/components/schemas/HashtagUpdate'
 
+    CompleteReservationAsMentee:
+      type: object
+      properties:
+        rating:
+          type: number
+          description: "rating, 0.5 * n, (0 <= n < 10) "
+        content:
+          description: "reservation feedback, (length <= 300)"
+          type: string
+
+    CompleteReservationAsMentor:
+      type: object
+      properties:
+        rating:
+          type: number
+          description: "rating, 0.5 * n, (0 <= n < 10) "
+
     ## Hashtag
     HashtagGet:
       type: object
@@ -1563,7 +1722,13 @@ components:
 
 
   securitySchemes:
-    bearerAuth:
+    NormalUser:
       type: http
       scheme: bearer
       bearerFormat: JWT
+      description: "User Role >= USER"
+    AdminUser:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "User Role >= ADMIN"

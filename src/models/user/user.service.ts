@@ -93,7 +93,11 @@ export class UserService {
       mentorReservations = await this.prisma.reservation.findMany({
         where: {
           mentorId: id,
-          OR: [{ status: ReservationStatus.REQUEST }, { status: ReservationStatus.ACCEPT }],
+          OR: [
+            { status: ReservationStatus.REQUEST },
+            { status: ReservationStatus.ACCEPT },
+            { status: ReservationStatus.PENDING },
+          ],
         },
         select: UserReservationSelectQuery,
         take: take,

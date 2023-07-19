@@ -56,7 +56,6 @@ model MentorProfile {
 enum ReservationStatus {
   REQUEST
   ACCEPT
-  REJECT
   CANCEL
   PENDING
   COMPLETE
