@@ -335,8 +335,10 @@ paths:
   /reservations:
     get:
       summary: Get all reservations
-      security:
-        - NormalUser: []
+      description: |
+        **ROLE**\
+        \
+        only for `ADMIN` user
       parameters:
         - in: query
           name: take
@@ -399,7 +401,11 @@ paths:
     get:
       summary: Get a reservation by ID
       security:
-        - NormalUser: []
+        - OwnerUser: []
+      description: |
+        **ROLE**\
+        \
+        only for `OWNER` user
       parameters:
         - name: id
           description: "reservation id"
@@ -463,7 +469,7 @@ paths:
         \
         only for `mentor` or `mentee` user that related with reservation
       security:
-        - NormalUser: [ ]
+        - OwnerUser: [ ]
       parameters:
         - name: id
           in: path
@@ -494,7 +500,7 @@ paths:
         \
         only for `mentor` user that related with reservation
       security:
-        - NormalUser: [ ]
+        - OwnerUser: [ ]
       parameters:
         - name: id
           in: path
@@ -525,7 +531,7 @@ paths:
         \
         only for `mentor` user that related with reservation
       security:
-        - NormalUser: [ ]
+        - OwnerUser: [ ]
       parameters:
         - name: id
           in: path
@@ -562,7 +568,7 @@ paths:
         \
         only for `mentee` user that related with reservation
       security:
-        - NormalUser: [ ]
+        - OwnerUser: [ ]
       parameters:
         - name: id
           in: path
