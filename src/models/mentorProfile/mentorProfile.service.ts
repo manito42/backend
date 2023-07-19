@@ -30,10 +30,15 @@ export class MentorProfileService {
   }
 
   async create(payload: MentorProfileCreatePayloadDto): Promise<MentorProfileGetResponseDto> {
-    // it must be checked query failed
-    return this.prisma.mentorProfile.create({
-      data: payload,
-      select: MentorProfileSelectQuery,
+    return await this.prisma.$transaction(async (prisma) => {
+      await prisma.user.update({
+        where: { id: payload.userId },
+        data: { isMentor: true },
+      });
+      return await prisma.mentorProfile.create({
+        data: payload,
+        select: MentorProfileSelectQuery,
+      });
     });
   }
 
