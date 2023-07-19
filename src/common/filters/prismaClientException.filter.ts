@@ -7,11 +7,11 @@ import { Prisma } from '@prisma/client';
 export class PrismaClientExceptionFilter extends BaseExceptionFilter {
   logger = new Logger('PrismaClientExceptionFilter');
   catch(exception, host: ArgumentsHost) {
-    this.logger.error(exception.message);
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
 
     if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+      this.logger.error(exception.code);
       switch (exception.code) {
         case 'P2002': {
           // Unique constraint failed -> already exists
@@ -47,17 +47,28 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
         }
         default: {
           // other query fail -> internal server error
-          super.catch(exception, host);
+          this.logger.error(exception);
+          response.status(400).json({
+            statusCode: 400,
+            message: 'Bad request',
+          });
+          return;
         }
       }
     } else if (exception instanceof HttpException) {
+      this.logger.error(exception);
       const status = exception.getStatus();
+      const message = exception.getResponse()['message'].toString();
       response.status(status).json({
         statusCode: status,
-        message: exception.message,
+        message: message,
       });
     } else {
-      super.catch(exception, host);
+      this.logger.error(exception);
+      response.status(500).json({
+        statusCode: 500,
+        message: 'Internal Error',
+      });
     }
   }
 }
