@@ -862,8 +862,6 @@ paths:
   /categories:
     get:
       summary: Get all categories
-      security:
-        - NormalUser: []
       responses:
         '200':
           description: OK
