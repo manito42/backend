@@ -2,7 +2,7 @@ import { Seeder } from './seeder.class';
 
 const USER_COUNT = 20;
 const HASHTAG_COUNT = 100;
-const RESERVATION_COUNT = 1000;
+const RESERVATION_COUNT = 0;
 
 // 사용법: await sleep(1000)
 
