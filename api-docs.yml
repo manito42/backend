@@ -772,7 +772,7 @@ paths:
     get:
       summary: Get all mentor feedbacks
       security:
-        - NormalUser: []
+        - AdminUser: []
       parameters:
         - in: query
           name: take
@@ -816,7 +816,7 @@ paths:
     post:
       summary: Create a new mentor feedback
       security:
-        - NormalUser: []
+        - AdminUser: []
       requestBody:
         required: true
         content:
