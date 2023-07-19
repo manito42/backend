@@ -44,7 +44,7 @@ model MentorProfile {
   shortDescription String?    @db.VarChar(255)
   description      String?    @db.Text
   isHide           Boolean    @default(false) @db.TinyInt
-  mentoringCount   Int        @default(0) @db.Int
+  mentoringCount   Int        @default(0) @map("mentoring_count") @db.Int
   hashtags         Hashtag[]  @relation("profiles_hashtags")
   categories       Category[] @relation("profiles_categories")
   createdAt        DateTime   @default(now()) @map("created_at") @db.Timestamp(0)
