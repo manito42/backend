@@ -21,7 +21,7 @@ model User {
   email               String           @unique @db.VarChar(255)
   nickname            String           @unique @db.VarChar(128)
   profileImage        String           @map("profile_image") @db.Text
-  role                UserRole         @default(ADMIN)
+  role                UserRole         @default(USER)
   isMentor            Boolean          @default(false) @map("is_mentor") @db.TinyInt
   createdAt           DateTime         @default(now()) @map("created_at") @db.Timestamp(0)
   updatedAt           DateTime?        @updatedAt @map("updated_at") @db.Timestamp(0)
