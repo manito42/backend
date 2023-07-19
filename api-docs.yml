@@ -677,7 +677,7 @@ paths:
     get:
       summary: Get all mentee feedbacks
       security:
-        - NormalUser: []
+        - AdminUser: []
       parameters:
         - in: query
           name: take
@@ -722,7 +722,7 @@ paths:
     post:
       summary: Create a new mentee feedback
       security:
-        - NormalUser: []
+        - AdminUser: []
       requestBody:
         required: true
         content:
