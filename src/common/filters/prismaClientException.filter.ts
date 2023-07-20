@@ -56,13 +56,13 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
         }
       }
     } else if (exception instanceof HttpException) {
-      this.logger.error(exception);
       const status = exception.getStatus();
       const message = exception.getResponse()['message'].toString();
       response.status(status).json({
         statusCode: status,
         message: message,
       });
+      if (status >= 500) this.logger.error(exception);
     } else {
       this.logger.error(exception);
       response.status(500).json({
