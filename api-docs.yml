@@ -1394,6 +1394,48 @@ components:
           items:
             $ref: '#/components/schemas/CategoryGet'
 
+    HomeGet:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        shortDescription:
+          type: string
+        description:
+          type: string
+        isHide:
+          type: boolean
+        mentoringCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        hashtags:
+          type: array
+          items:
+            $ref: '#/components/schemas/HashtagGet'
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryGet'
+        user:
+          $ref: '#/components/schemas/UserSimpleGet'
+
+    UserSimpleGet:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        nickname:
+          type: string
+        profileImage:
+          type: string
+
     MentorProfileUpdate:
       type: object
       properties:
@@ -1719,16 +1761,7 @@ components:
 
     ## Search/Mentor
     SearchMentorGet:
-      type: object
-      properties:
-        nickname:
-          type: string
-          description: "mentor nickname"
-        profileImage:
-          type: string
-          description: "mentor profile image"
-        mentorProfile:
-          $ref: '#/components/schemas/MentorProfileSimpleGet'
+      $ref: '#/components/schemas/HomeGet'
 
 
   securitySchemes:
