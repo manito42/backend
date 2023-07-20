@@ -32,7 +32,7 @@ export class HomeController {
       ...query,
     };
     const sortQuery = this.homeService.getHomeProfileSortQuery();
-    const profiles = await this.mentorProfileService.findMany(profileQuery, sortQuery);
+    const profiles = await this.mentorProfileService.findManyWithoutHide(profileQuery, sortQuery);
     return this.homeService.random(profiles);
   }
 }

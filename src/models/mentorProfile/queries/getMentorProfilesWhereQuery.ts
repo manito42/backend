@@ -18,6 +18,26 @@ export function getMentorProfilesWhereQuery(hashtagId?: number, categoryId?: num
   return whereObject;
 }
 
+export function getMentorProfileRevealsWhereQuery(hashtagId?: number, categoryId?: number) {
+  const whereObject = { isHide : false};
+  if (hashtagId !== undefined) {
+    whereObject['hashtags'] = {
+      some: {
+        id: hashtagId,
+      },
+    };
+  }
+  if (categoryId !== undefined) {
+    whereObject['categories'] = {
+      some: {
+        id: categoryId,
+      },
+    };
+  }
+
+  return whereObject;
+}
+
 export function getMentorProfilesSearchWhereQuery(
   searchHashtag: boolean,
   searchNickname: boolean,

@@ -6,6 +6,7 @@ import { MentorProfileCreatePayloadDto } from './dto/request/mentorProfileCreate
 import { MentorProfileUpdatePayloadDto } from './dto/request/mentorProfileUpdatePayload.dto';
 import { GetMentorProfileQueryDto } from './dto/request/mentorProfileQuery.dto';
 import {
+  getMentorProfileRevealsWhereQuery,
   getMentorProfilesSearchWhereQuery,
   getMentorProfilesWhereQuery,
 } from './queries/getMentorProfilesWhereQuery';
@@ -25,6 +26,20 @@ export class MentorProfileService {
       skip: page * take,
       select: MentorProfileSelectQuery,
       where: getMentorProfilesWhereQuery(hashtag_id, category_id),
+      orderBy: sort,
+    });
+  }
+
+  async findManyWithoutHide(
+    query: GetMentorProfileQueryDto,
+    sort?,
+  ): Promise<Array<MentorProfileGetResponseDto>> {
+    const { page, take, hashtag_id, category_id } = query;
+    return this.prisma.mentorProfile.findMany({
+      take: take,
+      skip: page * take,
+      select: MentorProfileSelectQuery,
+      where: getMentorProfileRevealsWhereQuery(hashtag_id, category_id),
       orderBy: sort,
     });
   }
