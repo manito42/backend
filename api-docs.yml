@@ -1268,9 +1268,6 @@ components:
         profileImage:
           type: string
           description: "optional"
-        isMentor:
-          type: boolean
-          description: "optional"
 
     UsersGet:
       type: object
