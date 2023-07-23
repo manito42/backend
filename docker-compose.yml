@@ -17,12 +17,15 @@ services:
         source: .
         target: /app
     working_dir: /app
+    environment:
+      - TZ=Asia/Seoul
     command: npm run start:dev
 
   mysql:
     image: mysql:8.0.33
     container_name: mysql_dev
     environment:
+      TZ: Asia/Seoul
       MYSQL_ROOT_PASSWORD: 1234
       MYSQL_DATABASE: manito
       MYSQL_USER: manito
