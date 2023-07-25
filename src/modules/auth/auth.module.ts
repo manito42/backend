@@ -10,10 +10,12 @@ import { JwtStrategy } from '../../common/guards/jwt/jwt.strategy';
 import { UserModule } from '../../models/user/user.module';
 import { JwtConfigModule } from '../../config/jwt/config.module';
 import { JwtConfigService } from '../../config/jwt/config.service';
+import { AppConfigModule } from '../../config/app/config.module';
 
 @Module({
   imports: [
     FtConfigModule,
+    AppConfigModule,
     UserModule,
     JwtConfigModule,
     JwtModule.registerAsync({
