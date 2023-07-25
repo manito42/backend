@@ -17,4 +17,8 @@ export class AppConfigService {
   get host(): string {
     return this.configService.get<string>('app.host');
   }
+
+  get accessUrl(): string {
+    return this.configService.get<string>('app.accessUrl');
+  }
 }
