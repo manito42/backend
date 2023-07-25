@@ -39,12 +39,8 @@ paths:
     get:
       summary: 42 OAuth2 callback (verify or create user and return token)
       responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthCallbackGet'
+        '302':
+          description: Redirect to front home
         '401':
           description: Unauthorized
 
@@ -1767,20 +1763,19 @@ components:
     SearchMentorGet:
       $ref: '#/components/schemas/HomeGet'
 
-
   securitySchemes:
     NormalUser:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+      type: apiKey
+      in: cookie
+      name : "Authorization"
       description: "User Role >= USER"
     OwnerUser:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+      type: apiKey
+      in: cookie
+      name : "Authorization"
       description: "User Role >= ResourceOwner"
     AdminUser:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+      type: apiKey
+      in: cookie
+      name : "Authorization"
       description: "User Role >= ADMIN"

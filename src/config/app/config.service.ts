@@ -21,4 +21,8 @@ export class AppConfigService {
   get accessUrl(): string {
     return this.configService.get<string>('app.accessUrl');
   }
+
+  get apiUrl(): string {
+    return this.configService.get<string>('app.apiUrl');
+  }
 }

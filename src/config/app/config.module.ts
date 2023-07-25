@@ -20,6 +20,7 @@ import { ENV_FILE } from '../envFile.constant';
         APP_HOST: Joi.string().default('localhost'),
         APP_PORT: Joi.number().default(3000),
         ACCESS_URL: Joi.string(),
+        API_URL: Joi.string(),
       }),
     }),
   ],
