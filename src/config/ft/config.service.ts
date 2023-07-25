@@ -19,8 +19,8 @@ export class FtConfigService {
   }
 
   get callback(): string {
-    return `${this.configService.get<string>(
-      'ACCESS_URL',
-    )}/${this.configService.get<string>('ft.callback')}`;
+    return `${this.configService.get<string>('API_URL')}/${this.configService.get<string>(
+      'ft.callback',
+    )}`;
   }
 }
