@@ -1,4 +1,4 @@
-import { Hashtag, ReservationStatus } from '@prisma/client';
+import { ReservationStatus } from '@prisma/client';
 
 export interface IReservationCreateRequest {
   mentorId: number;
@@ -6,7 +6,7 @@ export interface IReservationCreateRequest {
   categoryId: number;
   requestMessage?: string;
   status?: ReservationStatus;
-  hashtags?: Array<Hashtag>;
+  hashtags?: Array<{ id: number }>;
 }
 
 export interface IReservationUpdateRequest {

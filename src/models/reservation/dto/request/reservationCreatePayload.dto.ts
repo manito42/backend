@@ -1,5 +1,4 @@
 import { ArrayMaxSize, IsNumber, IsOptional, MaxLength } from 'class-validator';
-import { Hashtag } from '@prisma/client';
 import { IReservationCreateRequest } from '../../../../common/interfaces/api/reservation/reservationRequest.interface';
 
 export class ReservationCreatePayloadDto implements IReservationCreateRequest {
@@ -14,5 +13,7 @@ export class ReservationCreatePayloadDto implements IReservationCreateRequest {
   requestMessage?: string;
   @IsOptional()
   @ArrayMaxSize(5, { message: '해시태그는 5개 이하로 입력해주세요.' })
-  hashtags?: Array<Hashtag>;
+  hashtags?: Array<{
+    id: number;
+  }>;
 }

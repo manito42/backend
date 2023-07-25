@@ -1486,7 +1486,7 @@ components:
           type: array
           description: "number of hashtag <= 5"
           items:
-            $ref: '#/components/schemas/HashtagGet'
+            $ref: '#/components/schemas/HashtagId'
       required:
         - mentorId
         - menteeId
@@ -1618,6 +1618,13 @@ components:
           format: int32
         name:
           type: string
+
+    HashtagId:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
 
     HashtagCreate:
       type: object
