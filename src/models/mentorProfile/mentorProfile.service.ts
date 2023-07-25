@@ -84,11 +84,10 @@ export class MentorProfileService {
     });
   }
 
-  async update(id: number, userId: number, payload: MentorProfileUpdatePayloadDto) {
+  async update(id: number, payload: MentorProfileUpdatePayloadDto) {
     return this.prisma.mentorProfile.update({
       where: {
         id: id,
-        userId: userId,
       },
       data: {
         shortDescription: payload.shortDescription,

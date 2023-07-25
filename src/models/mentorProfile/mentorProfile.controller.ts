@@ -38,7 +38,7 @@ export class MentorProfileController {
   /**
    * @access >= OWNER
    */
-   @Post('/')
+  @Post('/')
   @UseGuards(JwtGuard)
   async create(
     @GetUserRole() role: UserRole,
@@ -72,9 +72,11 @@ export class MentorProfileController {
     @Body() payload: MentorProfileUpdatePayloadDto,
   ): Promise<MentorProfileGetResponseDto> {
     if (id < 0) throw new BadRequestException();
-    const profile = await this.mentorProfileService.update(id, userId, payload);
-    if (role !== UserRole.ADMIN && !profile) throw new UnauthorizedException();
+    const profile = await this.mentorProfileService.findById(id);
     if (!profile) throw new NotFoundException();
-    return profile;
+    if (role !== UserRole.ADMIN && profile.user.id !== userId) throw new UnauthorizedException();
+    const updatedProfile = await this.mentorProfileService.update(id, payload);
+    if (!updatedProfile) throw new NotFoundException();
+    return updatedProfile;
   }
 }
