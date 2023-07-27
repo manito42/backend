@@ -9,11 +9,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   // passport-jwt strategy 를 통해서 jwt token 을 검증 & payload 를 추출
   constructor(private jwtConfigService: JwtConfigService) {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        (req): string => {
-          return req?.cookies?.Authentication;
-        },
-      ]),
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken,
       ignoreExpiration: false,
       secretOrKey: jwtConfigService.secret,
     });

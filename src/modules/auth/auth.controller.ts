@@ -25,10 +25,7 @@ export class AuthController {
     const user = await this.authService.verifyOrCreateUser(req.user);
     if (!user) throw new InternalServerErrorException();
     const accessToken = await this.authService.createToken(user);
-    res.cookie('Authentication', accessToken, {
-      httpOnly: true,
-    });
-    res.redirect(`${this.appConfigService.accessUrl}?uid=${user.id}`);
+    res.redirect(`${this.appConfigService.accessUrl}/SignIn?uid=${user.id}?token=${accessToken}`);
   }
 
   // 정상적으로 토큰을 발급받았다면, 에러가 발생하지 않습니다.
