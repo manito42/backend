@@ -42,10 +42,11 @@ export class MentorProfileController {
   @UseGuards(JwtGuard)
   async create(
     @GetUserRole() role: UserRole,
-    @GetUserId() userId: number,
+    @GetUserId() tokenUserId: number,
     @Body() payload: MentorProfileCreatePayloadDto,
   ): Promise<MentorProfileGetResponseDto> {
-    if (role !== UserRole.ADMIN && userId !== payload.userId) throw new UnauthorizedException();
+    if (role !== UserRole.ADMIN && tokenUserId !== payload.userId)
+      throw new UnauthorizedException();
     return await this.mentorProfileService.create(payload);
   }
 
@@ -67,14 +68,12 @@ export class MentorProfileController {
   @UseGuards(JwtGuard)
   async update(
     @GetUserRole() role: UserRole,
-    @GetUserId() userId: number,
+    @GetUserId() tokenUserId: number,
     @Param('id') id: number,
     @Body() payload: MentorProfileUpdatePayloadDto,
   ): Promise<MentorProfileGetResponseDto> {
     if (id < 0) throw new BadRequestException();
-    const profile = await this.mentorProfileService.findById(id);
-    if (!profile) throw new NotFoundException();
-    if (role !== UserRole.ADMIN && profile.user.id !== userId) throw new UnauthorizedException();
+    if (role !== UserRole.ADMIN && tokenUserId !== id) throw new UnauthorizedException();
     const updatedProfile = await this.mentorProfileService.update(id, payload);
     if (!updatedProfile) throw new NotFoundException();
     return updatedProfile;

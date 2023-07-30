@@ -50,7 +50,7 @@ export class MentorProfileService {
         where: { id: payload.userId },
         data: { isMentor: true },
       });
-      return await prisma.mentorProfile.create({
+      return prisma.mentorProfile.create({
         data: payload,
         select: MentorProfileSelectQuery,
       });
@@ -60,7 +60,7 @@ export class MentorProfileService {
   async findById(id: number): Promise<MentorProfileGetResponseDto> {
     return this.prisma.mentorProfile.findUnique({
       where: {
-        id: id,
+        userId: id,
       },
       select: MentorProfileSelectQuery,
     });
@@ -84,10 +84,10 @@ export class MentorProfileService {
     });
   }
 
-  async update(id: number, payload: MentorProfileUpdatePayloadDto) {
+  async update(userId: number, payload: MentorProfileUpdatePayloadDto) {
     return this.prisma.mentorProfile.update({
       where: {
-        id: id,
+        userId: userId,
       },
       data: {
         shortDescription: payload.shortDescription,
