@@ -19,7 +19,7 @@ export function getMentorProfilesWhereQuery(hashtagId?: number, categoryId?: num
 }
 
 export function getMentorProfileRevealsWhereQuery(hashtagId?: number, categoryId?: number) {
-  const whereObject = { isHide : false};
+  const whereObject = { isHide: false };
   if (hashtagId !== undefined) {
     whereObject['hashtags'] = {
       some: {

@@ -18,7 +18,7 @@ export class HomeController {
     @Query() query: GetHomeQueryDto,
   ): Promise<Array<MentorProfileGetResponseDto>> {
     const sortQuery = this.homeService.getHomeProfileSortQuery();
-    const profiles = await this.mentorProfileService.findMany(query, sortQuery);
+    const profiles = await this.mentorProfileService.findManyWithoutHide(query, sortQuery);
     return this.homeService.random(profiles);
   }
 
