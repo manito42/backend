@@ -188,19 +188,12 @@ export class ReservationController {
           reservationId: reservationId,
           menteeId: reservation.menteeId,
           mentorId: reservation.mentorId,
-          rating: payload.rating,
         },
       });
       await prisma.mentorProfile.update({
         where: { userId: reservation.mentorId },
         data: {
           mentoringCount: { increment: 1 },
-        },
-      });
-      await prisma.user.update({
-        where: { id: reservation.menteeId },
-        data: {
-          ratingSum: { increment: payload.rating },
         },
       });
       return prisma.reservation.update({
@@ -237,14 +230,7 @@ export class ReservationController {
           reservationId: reservationId,
           menteeId: reservation.menteeId,
           mentorId: reservation.mentorId,
-          rating: payload.rating,
           content: payload.content,
-        },
-      });
-      await prisma.mentorProfile.update({
-        where: { userId: reservation.mentorId },
-        data: {
-          ratingSum: { increment: payload.rating },
         },
       });
       await prisma.user.update({

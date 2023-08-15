@@ -1,5 +1,4 @@
 import { ArrayMaxSize, IsOptional, MaxLength, MinLength } from 'class-validator';
-import { Category, Hashtag } from '@prisma/client';
 import { IMentorProfileUpdateRequest } from '../../../../common/interfaces/api/mentorProfile/mentorProfileRequest.interface';
 
 export class MentorProfileUpdatePayloadDto implements IMentorProfileUpdateRequest {

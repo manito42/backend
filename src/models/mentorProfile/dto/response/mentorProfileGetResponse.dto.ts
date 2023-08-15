@@ -2,11 +2,11 @@ import { IMentorProfileResponse } from '../../../../common/interfaces/api/mentor
 
 export class MentorProfileGetResponseDto implements IMentorProfileResponse {
   id: number;
+  userId: number;
   isHide: boolean;
   shortDescription: string;
   description: string;
   mentoringCount: number;
-  ratingSum: number;
   createdAt: Date;
   updatedAt: Date;
   hashtags: {

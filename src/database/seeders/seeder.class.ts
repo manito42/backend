@@ -78,11 +78,7 @@ export class Seeder {
   async seedMentorProfiles(prisma: PrismaClient) {
     console.debug('seeding mentorProfiles');
     console.debug('creating mentorProfiles');
-    const mentors = await prisma.user.findMany({
-      where: {
-        isMentor: true,
-      },
-    });
+    const mentors = await prisma.user.findMany({});
     const hashtags = await prisma.hashtag.findMany({ take: 3 });
     const mentorProfiles = MentorProfileFactory.getCreateMentorProfiles(mentors);
     await prisma.mentorProfile.createMany({
@@ -120,7 +116,7 @@ export class Seeder {
   async seedReservations(count: number, prisma: PrismaClient) {
     console.debug('seeding reservations');
     const users = await prisma.user.findMany({});
-    const mentors = await prisma.user.findMany({ where: { isMentor: true } });
+    const mentors = await prisma.user.findMany({ take: 10 });
     const reservationData = ReservationFactory.getCreateReservations(count, users, mentors);
     console.debug('creating reservations');
     await prisma.reservation.createMany({

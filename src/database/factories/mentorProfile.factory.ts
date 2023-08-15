@@ -8,15 +8,16 @@ export class MentorProfileFactory {
   constructor() {}
 
   static getMentorProfile(): IMentorProfileResponse {
+    const userId = faker.number.int({ min: 1, max: 1000 });
     return {
-      id: faker.number.int({ min: 1, max: 1000 }),
+      id: userId,
+      userId: userId,
       shortDescription: faker.lorem.sentence(),
       description: faker.lorem.paragraph(),
       createdAt: faker.date.past(),
       updatedAt: faker.date.future(),
       isHide: faker.datatype.boolean(),
       mentoringCount: 0,
-      ratingSum: 0.0,
       hashtags: HashtagFactory.getHashtags(3),
       categories: CategoryFactory.getCategories(3),
       user: {

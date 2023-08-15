@@ -51,9 +51,12 @@ export class UserService {
 
   // only for admin
   async create(payload: UserCreatePayloadDto): Promise<UserGetResponseDto> {
-    return this.prisma.user.create({
-      data: payload,
-      select: UserSelectQuery,
+    return await this.prisma.$transaction(async (prisma) => {
+      const user = await prisma.user.create({
+        data: payload,
+      });
+      await prisma.mentorProfile.create({ data: { userId: user.id } });
+      return prisma.user.findUnique({ where: { id: user.id }, select: UserSelectQuery });
     });
   }
 

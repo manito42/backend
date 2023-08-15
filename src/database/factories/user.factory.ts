@@ -15,15 +15,10 @@ export class UserFactory {
       profileImage: faker.internet.avatar(),
       role: admin ? 'ADMIN' : 'USER',
       mentoringCount: 0,
-      ratingSum: 0,
-      isMentor: faker.datatype.boolean(),
       createdAt: faker.date.past(),
       updatedAt: faker.date.future(),
+      mentorProfile: mentorProfile,
     };
-
-    if (user.isMentor) {
-      user['mentorProfile'] = mentorProfile;
-    }
     return user;
   }
 
@@ -40,7 +35,6 @@ export class UserFactory {
       email: email ? email : faker.internet.email(),
       nickname: nickname ? nickname : faker.internet.userName(),
       profileImage: faker.internet.avatar(),
-      isMentor: faker.datatype.boolean(),
       role: UserRole.USER,
     };
   }
@@ -80,7 +74,6 @@ export class UserFactory {
     return {
       nickname: faker.internet.userName(),
       profileImage: faker.internet.avatar(),
-      isMentor: faker.datatype.boolean(),
     };
   }
 }
