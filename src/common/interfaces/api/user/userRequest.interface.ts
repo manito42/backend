@@ -9,5 +9,4 @@ export interface IUserCreateRequest {
 
 export interface IUserUpdateRequest {
   profileImage?: string;
-  isMentor?: boolean;
 }

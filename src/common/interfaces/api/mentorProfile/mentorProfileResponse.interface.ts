@@ -1,14 +1,12 @@
 export interface IMentorProfileResponse {
   id: number;
+  userId: number;
   shortDescription: string;
   description: string;
   createdAt: Date;
   updatedAt: Date;
   isHide: boolean;
-
   mentoringCount: number;
-  ratingSum: number;
-
   hashtags: {
     id: number;
     name: string;

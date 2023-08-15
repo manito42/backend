@@ -44,19 +44,6 @@ export class MentorProfileService {
     });
   }
 
-  async create(payload: MentorProfileCreatePayloadDto): Promise<MentorProfileGetResponseDto> {
-    return await this.prisma.$transaction(async (prisma) => {
-      await prisma.user.update({
-        where: { id: payload.userId },
-        data: { isMentor: true },
-      });
-      return prisma.mentorProfile.create({
-        data: payload,
-        select: MentorProfileSelectQuery,
-      });
-    });
-  }
-
   async findById(id: number): Promise<MentorProfileGetResponseDto> {
     return this.prisma.mentorProfile.findUnique({
       where: {

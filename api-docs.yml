@@ -257,29 +257,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MentorProfileGet'
-    post:
-      summary: Create a new mentor profile
-      security:
-        - OwnerUser: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/MentorProfileCreate'
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MentorProfileGet'
-        '400':
-          description: Invalid request body
-        '401':
-          description: Unauthorized
-        '409':
-          description: already exists
 
   /mentor_profiles/{id}:
     get:
@@ -992,8 +969,6 @@ components:
           type: string
         profileImage:
           type: string
-        isMentor:
-          type: boolean
         createdAt:
           type: string
           format: date-time
@@ -1280,8 +1255,6 @@ components:
           type: string
         profileImage:
           type: string
-        isMentor:
-          type: boolean
         role:
           description: "required"
           type: string
@@ -1325,6 +1298,9 @@ components:
         id:
           type: integer
           format: int32
+        userId:
+          type: integer
+          format: int32
         shortDescription:
           type: string
         description:
@@ -1357,8 +1333,6 @@ components:
               type: string
             profileImage:
               type: string
-
-
 
     MentorProfileSimpleGet:
       type: object

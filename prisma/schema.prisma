@@ -22,12 +22,11 @@ model User {
   nickname            String           @unique @db.VarChar(128)
   profileImage        String           @map("profile_image") @db.Text
   role                UserRole         @default(USER)
-  isMentor            Boolean          @default(false) @map("is_mentor") @db.TinyInt
   mentoringCount      Int              @default(0) @map("mentoring_count") @db.Int
-  ratingSum           Float            @default(0.0) @map("rating_sum") @db.Float
   createdAt           DateTime         @default(now()) @map("created_at") @db.Timestamp(0)
   updatedAt           DateTime?        @updatedAt @map("updated_at") @db.Timestamp(0)
   mentorProfile       MentorProfile?
+  mentorProfileId     Int?             @unique @map("mentor_profile_id")
   menteeReservations  Reservation[]    @relation("ReservedAsMentee")
   mentorReservations  Reservation[]    @relation("BeReservedAsMentor")
   menteeFeedbacksTo   MenteeFeedback[] @relation("MenteeFeedbackTo")
@@ -45,8 +44,7 @@ model MentorProfile {
   userId           Int        @unique @map("user_id")
   shortDescription String?    @db.VarChar(255)
   description      String?    @db.Text
-  isHide           Boolean    @default(false) @db.TinyInt
-  ratingSum        Float      @default(0.0) @map("rating_sum") @db.Float
+  isHide           Boolean    @default(true) @db.TinyInt
   mentoringCount   Int        @default(0) @map("mentoring_count") @db.Int
   hashtags         Hashtag[]  @relation("profiles_hashtags")
   categories       Category[] @relation("profiles_categories")

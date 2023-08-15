@@ -36,21 +36,6 @@ export class MentorProfileController {
   }
 
   /**
-   * @access >= OWNER
-   */
-  @Post('/')
-  @UseGuards(JwtGuard)
-  async create(
-    @GetUserRole() role: UserRole,
-    @GetUserId() tokenUserId: number,
-    @Body() payload: MentorProfileCreatePayloadDto,
-  ): Promise<MentorProfileGetResponseDto> {
-    if (role !== UserRole.ADMIN && tokenUserId !== payload.userId)
-      throw new UnauthorizedException();
-    return await this.mentorProfileService.create(payload);
-  }
-
-  /**
    * @access ALL
    */
   @Get('/:id')

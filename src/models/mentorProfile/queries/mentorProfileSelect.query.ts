@@ -1,10 +1,10 @@
 export const MentorProfileSelectQuery = {
   id: true,
   isHide: true,
+  userId: true,
   shortDescription: true,
   description: true,
   mentoringCount: true,
-  ratingSum: true,
   createdAt: true,
   updatedAt: true,
   hashtags: {
