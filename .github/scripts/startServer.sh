@@ -1,7 +1,5 @@
 #! /bin/bash
 
-screen -dm /bin/bash
-
 # Start the server
 echo "Starting server..."
 cd /home/ubuntu
