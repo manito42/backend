@@ -6,8 +6,7 @@ on:
   pull_request:
     branches:
       - develop
-    types:
-      - [opened, synchronize, reopened]
+    types: [review_requested]
 
 env:
   AWS_REGION: ap-northeast-2
@@ -59,7 +58,7 @@ jobs:
 
         #Code Deploy를 사용해 S3 bucket에 소스코드 업로드
       - name: S3 업로드
-        run: aws deploy push --application-name 42manito-development-cd --description "upload test server file in s3" --s3-location s3://manito42-code-deploy-bucket-test/server.zip --source dist
+        run: aws deploy push --application-name 42manito-development-cd --description "upload test server file in s3" --s3-location s3://manito42-code-deploy-bucket-test/server.zip --source .
 
       - name: Create CodeDeploy Deployment
         id: create-deployment
