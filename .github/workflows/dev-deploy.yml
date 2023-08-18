@@ -58,6 +58,7 @@ jobs:
 
       # prisma migrate를 실행.
       - name: prisma migrate
+        # deploy는 현재 ./prisma/migrations 폴더에 있는 마이그레이션 파일들을 읽어서 DB에 적용합니다.
         run : npx prisma migrate deploy
 
 
