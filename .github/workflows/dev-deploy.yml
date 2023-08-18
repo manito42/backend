@@ -52,6 +52,16 @@ jobs:
       - name: build server
         run: npm run build
 
+      # prisma client를 생성.
+      - name: prisma generate
+        run: npx prisma generate
+
+      # prisma migrate를 실행.
+      - name: prisma migrate
+        # deploy는 현재 ./prisma/migrations 폴더에 있는 마이그레이션 파일들을 읽어서 DB에 적용합니다.
+        run : npx prisma migrate deploy
+
+
       #sonarQube관련 처리 여기서 해야할수도.
 
       - name: Configure AWS credentials
