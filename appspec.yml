@@ -1,0 +1,20 @@
+#code deploy agent는 github action의 create-deployment이후 ApplicationStart를 수행합니다.
+version: 0.0
+
+#어떤 OS위한 배포파일인가?
+os: linux
+
+#다운받은 배포파일은 임시폴더에 저장되는데, 이를 어디로 옮길것인지?
+files:
+  - source: /
+    destination: /home/ubuntu
+    overwrite: yes
+
+#배포시 발생하는 생명주기마다 원하는 스크립트 실행 후크 제공
+#실행할 스크립트들은 scripts폴더 내에 두고 보관한다.
+#실행권한을 추가해야한다.
+#git update-index --chmod=+x <스크립트 파일 이름>
+hooks:
+  #어플리케이션 시작할 때 사용하는 스크립트
+  ApplicationStart:
+    - location: .github/scripts/startServer.sh
