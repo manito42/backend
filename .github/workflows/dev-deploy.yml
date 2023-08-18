@@ -33,9 +33,9 @@ jobs:
       - name: Install Secret
         env:
           # github repository 안의 ENV_PROD 환경변수 사용
-          ENV_PROD: ${{ secrets.ENV_DEV }}
+          ENV_DEV: ${{ secrets.ENV_DEV }}
         run: |
-          echo "$ENV_DEV"  >> .env.dev
+          echo "$ENV_DEV"  >> .env
 
         # nodejs환경기반
       - name: Use Node.js
@@ -48,6 +48,8 @@ jobs:
 
       - name: build server
         run: npm run build
+
+      #sonarQube관련 처리 여기서 해야할수도.
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@master
