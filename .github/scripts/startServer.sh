@@ -3,6 +3,8 @@
 echo "change directory"
 cd /home/ubuntu
 
+ls -al
+
 # prisma migrate를 실행하기 위해 prisma를 설치합니다.
 npm install prisma --save-dev
 
