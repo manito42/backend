@@ -3,10 +3,9 @@
 name: Dev Deploy to AWS
 
 on:
-  pull_request:
+  push:
     branches:
       - develop
-    types: [opened, synchronize, reopened]
 
 env:
   AWS_REGION: ap-northeast-2
@@ -40,7 +39,7 @@ jobs:
       #sonarQube관련 처리 여기서 해야할수도.
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@master
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
