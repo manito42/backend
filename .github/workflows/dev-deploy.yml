@@ -37,12 +37,6 @@ jobs:
         run: |
           echo "$ENV_DEV"  >> .env
 
-        # nodejs환경기반
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18.16.1'
-
       #sonarQube관련 처리 여기서 해야할수도.
 
       - name: Configure AWS credentials
