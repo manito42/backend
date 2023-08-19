@@ -46,12 +46,6 @@ jobs:
         with:
           node-version: '18.16.1'
 
-      - name: install Dependency
-        run: npm i
-
-      - name: build server
-        run: npm run build
-
       #sonarQube관련 처리 여기서 해야할수도.
 
       - name: Configure AWS credentials
