@@ -3,13 +3,10 @@
 name: Dev Deploy to AWS
 
 on:
-#  pull_request:
-#    branches:
-#      - develop
-#    types: [review_requested]
-   push:
-     branches:
-       - develop
+  pull_request:
+    branches:
+      - develop
+    types: [opened, synchronize, reopened]
 
 env:
   AWS_REGION: ap-northeast-2
