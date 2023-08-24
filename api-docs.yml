@@ -1,9 +1,9 @@
 openapi: 3.0.0
 servers:
   - description: 42 MANITO API DEV SERVER
-    url: "http://54.180.216.13"
+    url: "https://api.dev.42manito.com/"
   - description: 42 MANITO API SERVER
-    url: "http://not_available.see.later"
+    url: "https://api.42manito.com/"
 
 info:
   version: "1.0.0"
