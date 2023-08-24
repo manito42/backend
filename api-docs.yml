@@ -14,6 +14,8 @@ paths:
   /auth:
     get:
       summary: verify access token
+      tags:
+        - Auth
       security:
         - NormalUser: []
       responses:
@@ -28,6 +30,8 @@ paths:
   /auth/42:
     get:
       summary: 42 OAuth2 (redirected to 42 API)
+      tags:
+        - Auth
       responses:
         '301':
           description: Moved Permanently (OK)
@@ -38,6 +42,8 @@ paths:
   /auth/42/callback:
     get:
       summary: 42 OAuth2 callback (verify or create user and return token)
+      tags:
+        - Auth
       responses:
         '302':
           description: Redirect to front home
@@ -47,6 +53,8 @@ paths:
   /users:
     get:
       summary: Get all users
+      tags:
+        - Users
       security:
         - NormalUser: []
       parameters:
@@ -73,6 +81,8 @@ paths:
                   $ref: '#/components/schemas/UsersGet'
     post:
       summary: Create a new user
+      tags:
+        - Users
       security:
         - AdminUser: []
       requestBody:
@@ -98,6 +108,8 @@ paths:
   /users/{id}:
     get:
       summary: Get a user by ID
+      tags:
+        - Users
       security:
         - NormalUser: []
       parameters:
@@ -120,6 +132,8 @@ paths:
           description: User not found
     patch:
       summary: Update user
+      tags:
+        - Users
       security:
         - OwnerUser: []
       parameters:
@@ -152,6 +166,8 @@ paths:
   /users/{id}/reservations:
     get:
       summary: Get a user reservations by ID
+      tags:
+        - Users
       security:
         - OwnerUser: [ ]
       parameters:
@@ -206,6 +222,8 @@ paths:
   /users/verify_nickname/{nickname}:
     get:
       summary: Verify nickname
+      tags:
+        - Users
       parameters:
         - name: nickname
           in: path
@@ -223,6 +241,8 @@ paths:
   /mentor_profiles:
     get:
       summary: Get all mentor profiles
+      tags:
+        - Mentor Profiles
       parameters:
         - in: query
           name: take
@@ -261,6 +281,8 @@ paths:
   /mentor_profiles/{id}:
     get:
       summary: Get a mentor profile by ID
+      tags:
+        - Mentor Profiles
       parameters:
         - name: id
           in: path
@@ -281,6 +303,8 @@ paths:
       description: |
         update mentor profiles.
         **NOTE**: **hashtags** and **categories** are replaced with the new ones
+      tags:
+        - Mentor Profiles
       security:
         - OwnerUser: []
       parameters:
@@ -314,6 +338,8 @@ paths:
   /reservations:
     get:
       summary: Get all reservations
+      tags:
+        - Reservations
       security:
         - AdminUser: [ ]
       description: |
@@ -358,6 +384,8 @@ paths:
       summary: Create a new reservation
       security:
         - NormalUser: []
+      tags:
+        - Reservations
       requestBody:
         required: true
         content:
@@ -381,6 +409,8 @@ paths:
   /reservations/{id}:
     get:
       summary: Get a reservation by ID
+      tags:
+        - Reservations
       security:
         - OwnerUser: []
       description: |
@@ -412,6 +442,8 @@ paths:
         **ROLE**\
         \
         only for `ADMIN` user
+      tags:
+        - Reservations
       security:
         - AdminUser: []
       parameters:
@@ -449,6 +481,8 @@ paths:
         **ROLE**\
         \
         only for `mentor` or `mentee` user that related with reservation
+      tags:
+        - Reservations
       security:
         - OwnerUser: [ ]
       parameters:
@@ -480,6 +514,8 @@ paths:
         **ROLE**\
         \
         only for `mentor` user that related with reservation
+      tags:
+        - Reservations
       security:
         - OwnerUser: [ ]
       parameters:
@@ -511,6 +547,8 @@ paths:
         **ROLE**\
         \
         only for `mentor` user that related with reservation
+      tags:
+        - Reservations
       security:
         - OwnerUser: [ ]
       parameters:
@@ -548,6 +586,8 @@ paths:
         **ROLE**\
         \
         only for `mentee` user that related with reservation
+      tags:
+        - Reservations
       security:
         - OwnerUser: [ ]
       parameters:
@@ -581,6 +621,8 @@ paths:
   /hashtags:
     get:
       summary: Get all hashtags
+      tags:
+        - Hashtags
       parameters:
         - in: query
           name: take
@@ -622,6 +664,8 @@ paths:
                   $ref: '#/components/schemas/HashtagGet'
     post:
       summary: Create a new hashtag
+      tags:
+        - Hashtags
       security:
         - NormalUser: []
       requestBody:
@@ -651,6 +695,8 @@ paths:
   /mentee_feedbacks:
     get:
       summary: Get all mentee feedbacks
+      tags:
+        - Mentee Feedbacks
       security:
         - AdminUser: []
       parameters:
@@ -696,6 +742,8 @@ paths:
 
     post:
       summary: Create a new mentee feedback
+      tags:
+        - Mentee Feedbacks
       security:
         - AdminUser: []
       requestBody:
@@ -721,6 +769,8 @@ paths:
   /mentee_feedbacks/{id}:
     get:
       summary: Get a mentee feedback by ID
+      tags:
+        - Mentee Feedbacks
       security:
         - NormalUser: []
       parameters:
@@ -746,6 +796,8 @@ paths:
   /mentor_feedbacks:
     get:
       summary: Get all mentor feedbacks
+      tags:
+        - Mentor Feedbacks
       security:
         - AdminUser: []
       parameters:
@@ -790,6 +842,8 @@ paths:
                   $ref: '#/components/schemas/MentorFeedbackGet'
     post:
       summary: Create a new mentor feedback
+      tags:
+        - Mentor Feedbacks
       security:
         - AdminUser: []
       requestBody:
@@ -815,6 +869,8 @@ paths:
   /mentor_feedbacks/{id}:
     get:
       summary: Get a mentor feedback by ID
+      tags:
+        - Mentor Feedbacks
       security:
         - NormalUser: []
       parameters:
@@ -839,6 +895,8 @@ paths:
   /categories:
     get:
       summary: Get all categories
+      tags:
+        - Categories
       responses:
         '200':
           description: OK
@@ -852,6 +910,8 @@ paths:
   /search/mentor/{search_string}:
     get:
       summary: Search mentor by string
+      tags:
+        - Search
       parameters:
         - in: path
           name: search_string
@@ -895,6 +955,8 @@ paths:
   /home:
     get:
       summary: Get main page mentor profiles (random)
+      tags:
+        - Home
       parameters:
         - in: query
           name: take
@@ -923,6 +985,8 @@ paths:
   /home/{category_id}:
     get:
       summary: Get main page mentor profiles by category
+      tags:
+        - Home
       description: "내부 알고리즘에 의해서 선정된 상위 프로필이 제공됩니다."
       parameters:
         - in: query
