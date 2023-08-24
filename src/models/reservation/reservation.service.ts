@@ -6,10 +6,11 @@ import { ReservationCreatePayloadDto } from './dto/request/reservationCreatePayl
 import { ReservationUpdatePayloadDto } from './dto/request/reservationUpdatePayload.dto';
 import { GetReservationQueryDto } from './dto/request/reservationQuery.dto';
 import { getReservationsWhereQuery } from './queries/getReservationsWhereQuery';
+import {ReservationRepository} from "../../database/repository/reservation.repository";
 
 @Injectable()
 export class ReservationService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService, private readonly reservationRepository: ReservationRepository) {}
 
   async findMany(query: GetReservationQueryDto): Promise<Array<ReservationGetResponseDto>> {
     const { category_id, hashtag_id, take, page } = query;
