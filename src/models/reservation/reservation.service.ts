@@ -6,11 +6,14 @@ import { ReservationCreatePayloadDto } from './dto/request/reservationCreatePayl
 import { ReservationUpdatePayloadDto } from './dto/request/reservationUpdatePayload.dto';
 import { GetReservationQueryDto } from './dto/request/reservationQuery.dto';
 import { getReservationsWhereQuery } from './queries/getReservationsWhereQuery';
-import {ReservationRepository} from "../../database/repository/reservation.repository";
+import { ReservationRepository } from '../../database/repository/reservation.repository';
 
 @Injectable()
 export class ReservationService {
-  constructor(private readonly prisma: PrismaService, private readonly reservationRepository: ReservationRepository) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly reservationRepository: ReservationRepository,
+  ) {}
 
   async findMany(query: GetReservationQueryDto): Promise<Array<ReservationGetResponseDto>> {
     const { category_id, hashtag_id, take, page } = query;
@@ -29,6 +32,14 @@ export class ReservationService {
     });
   }
 
+  /**
+   * @description 멘티가 멘토에게 예약을 요청하는 API
+   * - 멘토가 멘티에게 예약을 요청하는 경우는 없다.
+   * - 멘토가 존재하지 않거나, 멘토가 숨김 상태인 경우 예약을 생성할 수 없다.
+   * - 현재 진행중(ACCEPT, REQUEST)인 예약이 있으면 예약을 생성할 수 없다.
+   * @param payload: ReservationCreatePayloadDto
+   * @returns ReservationGetResponseDto
+   * */
   async create(payload: ReservationCreatePayloadDto): Promise<ReservationGetResponseDto> {
     const { menteeId, mentorId } = payload;
     if (menteeId === mentorId) throw new BadRequestException('can not reserve myself');
