@@ -6,4 +6,6 @@ export class ReservationRepository {
   constructor(private readonly prisma: PrismaService) {
     console.log('ReservationRepository');
   }
+
+  async mentor_completion() {}
 }
