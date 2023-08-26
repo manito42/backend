@@ -114,25 +114,11 @@ export class ReservationController {
     @GetUserId() userId: number,
     @GetUserRole() role: UserRole,
   ): Promise<ReservationGetResponseDto> {
+    /**
+     * @TODO: this validation should be done in pipes
+     * */
     if (reservationId < 0) throw new BadRequestException('invalid id');
-    return await this.prismaService.$transaction(async (prisma) => {
-      const reservation = await prisma.reservation.findUniqueOrThrow({
-        where: { id: reservationId },
-      });
-      if (!reservation || reservation.status !== ReservationStatus.REQUEST)
-        throw new BadRequestException('invalid reservation for cancel');
-      if (
-        role !== UserRole.ADMIN &&
-        reservation.menteeId !== userId &&
-        reservation.mentorId !== userId
-      )
-        throw new UnauthorizedException('user is not related with reservation');
-      return prisma.reservation.update({
-        where: { id: reservationId },
-        data: { status: ReservationStatus.CANCEL },
-        select: ReservationSelectQuery,
-      });
-    });
+    return await this.reservationService.cancelReservation(reservationId, userId, role);
   }
 
   /**
@@ -145,21 +131,11 @@ export class ReservationController {
     @GetUserId() userId: number,
     @GetUserRole() role: UserRole,
   ): Promise<ReservationGetResponseDto> {
+    /**
+     * @TODO: this validation should be done in pipes
+     * */
     if (reservationId < 0) throw new BadRequestException('invalid id');
-    return await this.prismaService.$transaction(async (prisma) => {
-      const reservation = await prisma.reservation.findUniqueOrThrow({
-        where: { id: reservationId },
-      });
-      if (!reservation || reservation.status !== ReservationStatus.REQUEST)
-        throw new BadRequestException('invalid reservation for accept');
-      if (role !== UserRole.ADMIN && reservation.mentorId !== userId)
-        throw new UnauthorizedException('user is not mentor of this reservation');
-      return prisma.reservation.update({
-        where: { id: reservationId },
-        data: { status: ReservationStatus.ACCEPT },
-        select: ReservationSelectQuery,
-      });
-    });
+    return await this.reservationService.acceptReservation(reservationId, userId, role);
   }
 
   /**
@@ -175,33 +151,7 @@ export class ReservationController {
   ): Promise<ReservationGetResponseDto> {
     if (reservationId < 0) throw new BadRequestException('invalid id');
     /* transaction REPEATABLE READ */
-    return await this.prismaService.$transaction(async (prisma) => {
-      const reservation = await prisma.reservation.findUnique({
-        where: { id: reservationId },
-      });
-      if (!reservation || reservation.status !== ReservationStatus.ACCEPT)
-        throw new BadRequestException('invalid reservation for mentor_completion');
-      if (role !== UserRole.ADMIN && reservation.mentorId !== userId)
-        throw new UnauthorizedException('user is not mentor of this reservation');
-      await prisma.mentorFeedback.create({
-        data: {
-          reservationId: reservationId,
-          menteeId: reservation.menteeId,
-          mentorId: reservation.mentorId,
-        },
-      });
-      await prisma.mentorProfile.update({
-        where: { userId: reservation.mentorId },
-        data: {
-          mentoringCount: { increment: 1 },
-        },
-      });
-      return prisma.reservation.update({
-        where: { id: reservationId },
-        data: { status: ReservationStatus.PENDING },
-        select: ReservationSelectQuery,
-      });
-    });
+    return await this.reservationService.mentorCompletion(reservationId, userId, role, payload);
   }
 
   /**
@@ -217,33 +167,6 @@ export class ReservationController {
   ): Promise<ReservationGetResponseDto> {
     if (reservationId < 0) throw new BadRequestException('invalid id');
     /* transaction REPEATABLE READ */
-    return await this.prismaService.$transaction(async (prisma) => {
-      const reservation = await prisma.reservation.findUnique({
-        where: { id: reservationId },
-      });
-      if (!reservation || reservation.status !== ReservationStatus.PENDING)
-        throw new BadRequestException('invalid reservation for mentee_completion');
-      if (role !== UserRole.ADMIN && reservation.menteeId !== userId)
-        throw new UnauthorizedException('user is not mentee of this reservation');
-      await prisma.menteeFeedback.create({
-        data: {
-          reservationId: reservationId,
-          menteeId: reservation.menteeId,
-          mentorId: reservation.mentorId,
-          content: payload.content,
-        },
-      });
-      await prisma.user.update({
-        where: { id: reservation.menteeId },
-        data: {
-          mentoringCount: { increment: 1 },
-        },
-      });
-      return prisma.reservation.update({
-        where: { id: reservationId },
-        data: { status: ReservationStatus.COMPLETE },
-        select: ReservationSelectQuery,
-      });
-    });
+    return await this.reservationService.menteeCompletion(reservationId, userId, role, payload);
   }
 }
