@@ -100,6 +100,19 @@ export class ReservationService {
   async acceptReservation(reservationId: number, userId: number, role: string) {
     return await this.reservationRepository.acceptReservation(reservationId, userId, role);
   }
+  async menteeCompletion(
+    reservationId: number,
+    userId: number,
+    role: string,
+    payload: ReservationCompleteAsMenteePayloadDto,
+  ) {
+    return await this.reservationRepository.completeReservationByMentee(
+      reservationId,
+      userId,
+      role,
+      payload,
+    );
+  }
 
   async mentorCompletion(
     reservationId: number,
@@ -108,20 +121,6 @@ export class ReservationService {
     payload: ReservationCompleteAsMentorPayloadDto,
   ) {
     return await this.reservationRepository.completeReservationByMentor(
-      reservationId,
-      userId,
-      role,
-      payload,
-    );
-  }
-
-  async menteeCompletion(
-    reservationId: number,
-    userId: number,
-    role: string,
-    payload: ReservationCompleteAsMenteePayloadDto,
-  ) {
-    return await this.reservationRepository.completeReservationByMentee(
       reservationId,
       userId,
       role,
