@@ -58,8 +58,8 @@ enum ReservationStatus {
   REQUEST
   ACCEPT
   CANCEL
-  MENTEE_FEEDBACK
-  DONE
+  PENDING
+  COMPLETE
 }
 
 // reservations model

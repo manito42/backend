@@ -101,7 +101,7 @@ export class UserService {
         whereQuery['OR'] = [
           { status: ReservationStatus.REQUEST },
           { status: ReservationStatus.ACCEPT },
-          { status: ReservationStatus.MENTEE_FEEDBACK },
+          { status: ReservationStatus.PENDING },
         ];
       mentorReservations = await this.prisma.reservation.findMany({
         where: whereQuery,
