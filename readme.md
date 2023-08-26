@@ -28,10 +28,15 @@ $ docker exec -it $container_name sh
 docker conatiner > $ npx ts-node ./src/database/seeders/seeder.ts
 ```
 
-### Testing
+## Testing
 
 ```bash
 # E2E tests
-
 docker exec -it node_dev sh -c "npm run test:e2e"
+
+# unit tests
+docker exec -it node_dev sh -c "npm run test"
+
+# test coverage
+docker exec -it node_dev sh -c "npm run test:cov"
 ```
