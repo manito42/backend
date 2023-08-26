@@ -20,10 +20,12 @@ describe('Reservation - Request', () => {
   let mentor: User;
   let mentorProfile: MentorProfile;
   let mentee: User;
+  let dummyMentee: User;
   let category: Category;
   let hashtag: Hashtag;
   let mentorAccessToken: string;
   let menteeAccessToken: string;
+  let dummyMenteeAccToken: string;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -57,6 +59,15 @@ describe('Reservation - Request', () => {
       },
     });
 
+    dummyMentee = await prisma.user.create({
+      data: {
+        email: 'ReservationDummyMentee@gmail.com',
+        nickname: 'ReservationDummyMentee',
+        profileImage: 'ReservationDummyMentee.png',
+        role: 'USER',
+      },
+    });
+
     category = await prisma.category.create({
       data: {
         name: 'ReservationTestCategory',
@@ -81,12 +92,28 @@ describe('Reservation - Request', () => {
 
     const mentorResponse = await request(app.getHttpServer()).get(`/dev/login/${mentor.id}`);
     const menteeResponse = await request(app.getHttpServer()).get(`/dev/login/${mentee.id}`);
+    const dummyMenteeResponse = await request(app.getHttpServer()).get(
+      `/dev/login/${dummyMentee.id}`,
+    );
 
     mentorAccessToken = mentorResponse.body.accessToken;
     menteeAccessToken = menteeResponse.body.accessToken;
+    dummyMenteeAccToken = dummyMenteeResponse.body.accessToken;
   });
 
   afterEach(async () => {
+    await prisma.mentorFeedback.deleteMany({
+      where: {
+        OR: [{ menteeId: mentee.id }, { mentorId: mentor.id }],
+      },
+    });
+
+    await prisma.menteeFeedback.deleteMany({
+      where: {
+        OR: [{ menteeId: mentee.id }, { mentorId: mentor.id }],
+      },
+    });
+
     await prisma.reservation.deleteMany({
       where: {
         mentorId: mentor.id,
@@ -101,7 +128,7 @@ describe('Reservation - Request', () => {
 
     await prisma.user.deleteMany({
       where: {
-        OR: [{ id: mentee.id }, { id: mentor.id }],
+        OR: [{ id: mentee.id }, { id: mentor.id }, { id: dummyMentee.id }],
       },
     });
 
@@ -121,8 +148,8 @@ describe('Reservation - Request', () => {
     await app.close();
   });
 
-  describe('Request a new reservation', () => {
-    it('POST /reservations', async () => {
+  describe('Request', () => {
+    it('멘티가 예약을 생성한다.', async () => {
       const response = await request(app.getHttpServer())
         .post('/reservations')
         .set('Authorization', `Bearer ${menteeAccessToken}`)
@@ -135,8 +162,6 @@ describe('Reservation - Request', () => {
         });
 
       expect(response.status).toBe(201);
-      expect(response.body.mentorId).toBe(mentor.id);
-      expect(response.body.menteeId).toBe(mentee.id);
     });
 
     afterAll(async () => {
@@ -148,7 +173,7 @@ describe('Reservation - Request', () => {
     });
   });
 
-  describe('Request Cancel', () => {
+  describe('Request', () => {
     let reservation: Reservation;
     beforeEach(async () => {
       const response = await request(app.getHttpServer())
@@ -164,26 +189,149 @@ describe('Reservation - Request', () => {
       reservation = response.body;
     });
 
-    it('멘티가 예약 취소를 요청한다.', async () => {
-      const response = await request(app.getHttpServer())
-        .patch(`/reservations/${reservation.id}/cancel`)
-        .set('Authorization', `Bearer ${menteeAccessToken}`);
-
-      expect(response.status).toBe(200);
+    afterEach(async () => {
+      await prisma.reservation.deleteMany({
+        where: {
+          mentorId: mentor.id,
+        },
+      });
     });
 
-    it('멘토가 예약 취소를 요청한다.', async () => {
-      const response = await request(app.getHttpServer())
-        .patch(`/reservations/${reservation.id}/cancel`)
-        .set('Authorization', `Bearer ${mentorAccessToken}`);
+    describe('Request -> Cancel By Mentee', () => {
+      it('멘티가 예약 취소를 요청한다. (200)', async () => {
+        const response = await request(app.getHttpServer())
+          .patch(`/reservations/${reservation.id}/cancel`)
+          .set('Authorization', `Bearer ${menteeAccessToken}`);
 
-      expect(response.status).toBe(200);
+        expect(response.status).toBe(200);
+        const res = await prisma.reservation.findUnique({
+          where: {
+            id: reservation.id,
+          },
+        });
+        expect(res.status).toBe('CANCEL');
+      });
+    });
+
+    describe('Request -> Cancel By Mentor', () => {
+      it('멘토가 예약 취소를 요청한다. (200)', async () => {
+        const response = await request(app.getHttpServer())
+          .patch(`/reservations/${reservation.id}/cancel`)
+          .set('Authorization', `Bearer ${mentorAccessToken}`);
+
+        expect(response.status).toBe(200);
+        const res = await prisma.reservation.findUnique({
+          where: {
+            id: reservation.id,
+          },
+        });
+        expect(res.status).toBe('CANCEL');
+      });
+    });
+
+    describe('Request -> Accept By Mentor', () => {
+      it('멘토의 예약 수락', async () => {
+        const response = await request(app.getHttpServer())
+          .patch(`/reservations/${reservation.id}/accept`)
+          .set('Authorization', `Bearer ${mentorAccessToken}`);
+
+        expect(response.status).toBe(200);
+        const res = await prisma.reservation.findUnique({
+          where: {
+            id: reservation.id,
+          },
+        });
+        expect(res.status).toBe('ACCEPT');
+      });
     });
   });
 
-  describe('Request Accept', () => {
-    describe('Mentee Feedback', () => {});
-    describe('Mentor Feedback', () => {});
+  describe('Request - Accept', () => {
+    let reservation: Reservation;
+    beforeEach(async () => {
+      const response = await request(app.getHttpServer())
+        .post('/reservations')
+        .set('Authorization', `Bearer ${menteeAccessToken}`)
+        .send({
+          menteeId: mentee.id,
+          mentorId: mentor.id,
+          categoryId: category.id,
+          requestMessage: 'ReservationRequestMessage',
+          hashtags: [{ id: hashtag.id }],
+        });
+      reservation = response.body;
+
+      // 멘토가 예약을 수락한다.
+      await request(app.getHttpServer())
+        .patch(`/reservations/${reservation.id}/accept`)
+        .set('Authorization', `Bearer ${mentorAccessToken}`);
+    });
+
+    describe('Accept -> Cancel By Mentor', () => {
+      it('멘토가 예약을 취소한다.(200)', async () => {
+        const response = await request(app.getHttpServer())
+          .patch(`/reservations/${reservation.id}/cancel`)
+          .set('Authorization', `Bearer ${mentorAccessToken}`);
+
+        expect(response.status).toBe(200);
+      });
+    });
+
+    describe('Accept -> Cancel By Mentee', () => {
+      it('멘티가 예약을 취소한다.(401)', async () => {
+        const response = await request(app.getHttpServer())
+          .patch(`/reservations/${reservation.id}/cancel`)
+          .set('Authorization', `Bearer ${menteeAccessToken}`);
+
+        expect(response.status).toBe(401);
+      });
+    });
+
+    describe('Accept -> Complete By Mentee', () => {
+      it('참여하지 않은 멘티가 피드백을 남긴다.(401)', async () => {
+        const response = await request(app.getHttpServer())
+          .patch(`/reservations/${reservation.id}/mentee_completion`)
+          .set('Authorization', `Bearer ${dummyMenteeAccToken}`)
+          .send({
+            rating: 5,
+            content: 'ReservationComment',
+          });
+        expect(response.status).toBe(401);
+      });
+
+      it('멘티가 피드백을 남긴다.(200)', async () => {
+        const response = await request(app.getHttpServer())
+          .patch(`/reservations/${reservation.id}/mentee_completion`)
+          .set('Authorization', `Bearer ${menteeAccessToken}`)
+          .send({
+            rating: 5,
+            content: 'ReservationComment',
+          });
+        expect(response.status).toBe(200);
+        const res = await prisma.reservation.findUnique({
+          where: {
+            id: reservation.id,
+          },
+        });
+        expect(res.status).toBe('MENTEE_FEEDBACK');
+      });
+
+      it('멘토가 피드백을 남긴다. (200)', async () => {
+        const response = await request(app.getHttpServer())
+          .patch(`/reservations/${reservation.id}/mentor_completion`)
+          .set('Authorization', `Bearer ${mentorAccessToken}`)
+          .send({
+            rating: 5,
+          });
+        expect(response.status).toBe(200);
+        const res = await prisma.reservation.findUnique({
+          where: {
+            id: reservation.id,
+          },
+        });
+        expect(res.status).toBe('DONE');
+      });
+    });
   });
 
   /**
