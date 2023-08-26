@@ -58,42 +58,6 @@ export class ReservationRepository {
       });
     });
   }
-
-  async completeReservationByMentor(
-    reservationId: number,
-    userId: number,
-    role: string,
-    payload: ReservationCompleteAsMentorPayloadDto,
-  ) {
-    return this.prismaService.$transaction(async (prisma) => {
-      const reservation = await prisma.reservation.findUnique({
-        where: { id: reservationId },
-      });
-      if (!reservation || reservation.status !== ReservationStatus.ACCEPT)
-        throw new BadRequestException('invalid reservation for mentor_completion');
-      if (role !== UserRole.ADMIN && reservation.mentorId !== userId)
-        throw new UnauthorizedException('user is not mentor of this reservation');
-      await prisma.mentorFeedback.create({
-        data: {
-          reservationId: reservationId,
-          menteeId: reservation.menteeId,
-          mentorId: reservation.mentorId,
-        },
-      });
-      await prisma.mentorProfile.update({
-        where: { userId: reservation.mentorId },
-        data: {
-          mentoringCount: { increment: 1 },
-        },
-      });
-      return prisma.reservation.update({
-        where: { id: reservationId },
-        data: { status: ReservationStatus.DONE },
-        select: ReservationSelectQuery,
-      });
-    });
-  }
-
   async completeReservationByMentee(
     reservationId: number,
     userId: number,
@@ -125,6 +89,41 @@ export class ReservationRepository {
       return prisma.reservation.update({
         where: { id: reservationId },
         data: { status: ReservationStatus.MENTEE_FEEDBACK },
+        select: ReservationSelectQuery,
+      });
+    });
+  }
+
+  async completeReservationByMentor(
+    reservationId: number,
+    userId: number,
+    role: string,
+    payload: ReservationCompleteAsMentorPayloadDto,
+  ) {
+    return this.prismaService.$transaction(async (prisma) => {
+      const reservation = await prisma.reservation.findUnique({
+        where: { id: reservationId },
+      });
+      if (!reservation || reservation.status !== ReservationStatus.ACCEPT)
+        throw new BadRequestException('invalid reservation for mentor_completion');
+      if (role !== UserRole.ADMIN && reservation.mentorId !== userId)
+        throw new UnauthorizedException('user is not mentor of this reservation');
+      await prisma.mentorFeedback.create({
+        data: {
+          reservationId: reservationId,
+          menteeId: reservation.menteeId,
+          mentorId: reservation.mentorId,
+        },
+      });
+      await prisma.mentorProfile.update({
+        where: { userId: reservation.mentorId },
+        data: {
+          mentoringCount: { increment: 1 },
+        },
+      });
+      return prisma.reservation.update({
+        where: { id: reservationId },
+        data: { status: ReservationStatus.DONE },
         select: ReservationSelectQuery,
       });
     });
