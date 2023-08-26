@@ -27,3 +27,11 @@ docker conatiner > $ npx prisma generate
 $ docker exec -it $container_name sh
 docker conatiner > $ npx ts-node ./src/database/seeders/seeder.ts
 ```
+
+### Testing
+
+```bash
+# E2E tests
+
+docker exec -it node_dev sh -c "npm run test:e2e"
+```
