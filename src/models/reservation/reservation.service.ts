@@ -3,7 +3,11 @@ import { PrismaService } from '../../database/services/prisma.service';
 import { ReservationGetResponseDto } from './dto/response/reservationGetResponse.dto';
 import { ReservationSelectQuery } from './queries/reservationSelect.query';
 import { ReservationCreatePayloadDto } from './dto/request/reservationCreatePayload.dto';
-import { ReservationUpdatePayloadDto } from './dto/request/reservationUpdatePayload.dto';
+import {
+  ReservationCompleteAsMenteePayloadDto,
+  ReservationCompleteAsMentorPayloadDto,
+  ReservationUpdatePayloadDto,
+} from './dto/request/reservationUpdatePayload.dto';
 import { GetReservationQueryDto } from './dto/request/reservationQuery.dto';
 import { getReservationsWhereQuery } from './queries/getReservationsWhereQuery';
 import { ReservationRepository } from '../../database/repository/reservation.repository';
@@ -87,5 +91,41 @@ export class ReservationService {
       },
       select: ReservationSelectQuery,
     });
+  }
+
+  async cancelReservation(reservationId: number, userId: number, role: string) {
+    return await this.reservationRepository.cancelReservation(reservationId, userId, role);
+  }
+
+  async acceptReservation(reservationId: number, userId: number, role: string) {
+    return await this.reservationRepository.acceptReservation(reservationId, userId, role);
+  }
+
+  async mentorCompletion(
+    reservationId: number,
+    userId: number,
+    role: string,
+    payload: ReservationCompleteAsMentorPayloadDto,
+  ) {
+    return await this.reservationRepository.completeReservationByMentor(
+      reservationId,
+      userId,
+      role,
+      payload,
+    );
+  }
+
+  async menteeCompletion(
+    reservationId: number,
+    userId: number,
+    role: string,
+    payload: ReservationCompleteAsMenteePayloadDto,
+  ) {
+    return await this.reservationRepository.completeReservationByMentee(
+      reservationId,
+      userId,
+      role,
+      payload,
+    );
   }
 }
