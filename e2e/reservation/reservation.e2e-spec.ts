@@ -7,14 +7,14 @@ import { PrismaService } from '../../src/database/services/prisma.service';
 import { ValidationOptions } from '../../src/common/pipes/validationPipe/validationOptions.constant';
 import { PrismaClientExceptionFilter } from '../../src/common/filters/prismaClientException.filter';
 import { User } from '@prisma/client';
-import { Category, Hashtag, MentorProfile } from '.prisma/client';
+import { Category, Hashtag, MentorProfile, Reservation } from '.prisma/client';
 import { DevModule } from '../../src/modules/dev/dev.module';
 
 /**
  * @description
  * - Reservation 모델의 Get/Patch 테스트
  * */
-describe('Reservation - Get/Patch', () => {
+describe('Reservation - Request', () => {
   let app: INestApplication;
   let prisma: PrismaService;
   let mentor: User;
@@ -36,7 +36,9 @@ describe('Reservation - Get/Patch', () => {
     await app.init();
 
     prisma = moduleFixture.get<PrismaService>(PrismaService);
+  });
 
+  beforeEach(async () => {
     mentor = await prisma.user.create({
       data: {
         email: 'ReservationMentor@gmail.com',
@@ -84,7 +86,7 @@ describe('Reservation - Get/Patch', () => {
     menteeAccessToken = menteeResponse.body.accessToken;
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await prisma.reservation.deleteMany({
       where: {
         mentorId: mentor.id,
@@ -129,12 +131,59 @@ describe('Reservation - Get/Patch', () => {
           mentorId: mentor.id,
           categoryId: category.id,
           requestMessage: 'ReservationRequestMessage',
-          hashtags: [hashtag.id],
+          hashtags: [{ id: hashtag.id }],
         });
 
-      console.log(response);
-      expect(response.body).toHaveProperty('id');
+      expect(response.status).toBe(201);
+      expect(response.body.mentorId).toBe(mentor.id);
+      expect(response.body.menteeId).toBe(mentee.id);
     });
+
+    afterAll(async () => {
+      await prisma.reservation.deleteMany({
+        where: {
+          mentorId: mentor.id,
+        },
+      });
+    });
+  });
+
+  describe('Request Cancel', () => {
+    let reservation: Reservation;
+    beforeEach(async () => {
+      const response = await request(app.getHttpServer())
+        .post('/reservations')
+        .set('Authorization', `Bearer ${menteeAccessToken}`)
+        .send({
+          menteeId: mentee.id,
+          mentorId: mentor.id,
+          categoryId: category.id,
+          requestMessage: 'ReservationRequestMessage',
+          hashtags: [{ id: hashtag.id }],
+        });
+      reservation = response.body;
+    });
+
+    it('멘티가 예약 취소를 요청한다.', async () => {
+      const response = await request(app.getHttpServer())
+        .patch(`/reservations/${reservation.id}/cancel`)
+        .set('Authorization', `Bearer ${menteeAccessToken}`);
+
+      expect(response.status).toBe(200);
+    });
+
+    it('멘토가 예약 취소를 요청한다.', async () => {
+      const response = await request(app.getHttpServer())
+        .patch(`/reservations/${reservation.id}/cancel`)
+        .set('Authorization', `Bearer ${mentorAccessToken}`);
+
+      expect(response.status).toBe(200);
+    });
+  });
+
+  describe('Request Accept', () => {
+    describe('Mentee Feedback', () => {});
+    describe('Mentor Feedback', () => {});
   });
 
   /**
