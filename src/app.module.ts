@@ -16,9 +16,15 @@ import { AppConfigModule } from './config/app/config.module';
 import { SearchModule } from './modules/search/search.module';
 import { HomeModule } from './modules/home/home.module';
 import { DevModule } from './modules/dev/dev.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { NotificationModule } from './modules/notification/notification.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import * as process from 'process';
+import { getMailerConfig } from './common/constants/getMailerConfig';
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot(),
     CategoryModule,
     HashtagModule,
     MenteeFeedbackModule,
@@ -33,6 +39,8 @@ import { DevModule } from './modules/dev/dev.module';
     HomeModule,
     AuthModule,
     DevModule,
+    NotificationModule,
+    MailerModule.forRoot(getMailerConfig()),
   ],
   controllers: [AppController],
   providers: [AppService, Logger],
