@@ -143,12 +143,13 @@ describe('Reservation - Request', () => {
         id: hashtag.id,
       },
     });
+  });
 
-    await prisma.$disconnect();
+  afterAll(async () => {
     await app.close();
   });
 
-  describe('Request', () => {
+  describe('Create Request', () => {
     it('멘티가 예약을 생성한다.', async () => {
       const response = await request(app.getHttpServer())
         .post('/reservations')
