@@ -36,7 +36,7 @@ export class ReservationRepository {
         throw new UnauthorizedException('user is not mentor of this reservation');
       return prisma.reservation.update({
         where: { id: reservationId },
-        data: { status: ReservationStatus.ACCEPT },
+        data: { status: ReservationStatus.CANCEL },
         select: ReservationSelectQuery,
       });
     });
