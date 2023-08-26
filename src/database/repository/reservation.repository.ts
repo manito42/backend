@@ -13,7 +13,7 @@ export class ReservationRepository {
 
   async cancelReservation(reservationId: number, userId: number, role: string) {
     return this.prismaService.$transaction(async (prisma) => {
-      const reservation = await prisma.reservation.findUniqueOrThrow({
+      const reservation = await prisma.reservation.findUnique({
         where: { id: reservationId },
       });
       /**

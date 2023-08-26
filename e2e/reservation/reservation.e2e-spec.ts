@@ -198,6 +198,14 @@ describe('Reservation - Request', () => {
     });
 
     describe('Request -> Cancel By Mentee', () => {
+      it('없는 예약을 취소한다. (404)', async () => {
+        const response = await request(app.getHttpServer())
+          .patch(`/reservations/999/cancel`)
+          .set('Authorization', `Bearer ${menteeAccessToken}`);
+
+        expect(response.status).toBe(400);
+      });
+
       it('멘티가 예약 취소를 요청한다. (200)', async () => {
         const response = await request(app.getHttpServer())
           .patch(`/reservations/${reservation.id}/cancel`)
