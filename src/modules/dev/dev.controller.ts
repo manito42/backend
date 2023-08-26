@@ -13,7 +13,7 @@ export class DevController {
   @Get('/login/:id')
   async loginDev(@Param('id') id: number) {
     /**
-     * @suggest
+     * @TODO
      * - use dynamic module
      * */
     if (process.env.NODE_ENV !== 'dev' && process.env.NODE_ENV !== 'test')
