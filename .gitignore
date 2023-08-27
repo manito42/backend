@@ -5,6 +5,7 @@
 .idea/
 .vscode/
 .env
+.env.test
 .DS_Store
 
 # Template
