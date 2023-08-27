@@ -19,7 +19,6 @@ import { DevModule } from './modules/dev/dev.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { NotificationModule } from './modules/notification/notification.module';
 import { MailerModule } from '@nestjs-modules/mailer';
-import * as process from 'process';
 import { getMailerConfig } from './common/constants/getMailerConfig';
 
 @Module({
@@ -40,7 +39,7 @@ import { getMailerConfig } from './common/constants/getMailerConfig';
     AuthModule,
     DevModule,
     NotificationModule,
-    MailerModule.forRoot(getMailerConfig()),
+    MailerModule.forRootAsync({ useFactory: getMailerConfig }),
   ],
   controllers: [AppController],
   providers: [AppService, Logger],
