@@ -1,7 +1,8 @@
 import * as AWS from 'aws-sdk';
 import * as process from 'process';
+import { MailerOptions } from '@nestjs-modules/mailer';
 
-export async function getMailerConfig() {
+export async function getMailerConfig(): Promise<MailerOptions> {
   const transporter = new AWS.SES({
     apiVersion: '2010-12-01',
     region: process.env.AWS_REGION,
@@ -14,7 +15,7 @@ export async function getMailerConfig() {
     transport: {
       SES: transporter,
       host: process.env.MAILER_HOST,
-      port: process.env.MAILER_PORT,
+      port: +process.env.MAILER_PORT,
     },
     defaults: {
       from: `${process.env.MAILER_SENDER}" <${process.env.MAILER_ADDRESS}>`,
