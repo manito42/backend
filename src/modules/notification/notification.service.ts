@@ -8,7 +8,6 @@ export class NotificationService {
   private logger = new Logger(NotificationService.name);
 
   private async notifyByMail(emails: Array<string>, subject: string, content: string) {
-    console.log(emails);
     await this.mailerService.sendMail({
       to: emails,
       subject: subject,
