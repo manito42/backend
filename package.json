@@ -29,6 +29,7 @@
     "@nestjs/passport": "^10.0.1",
     "@nestjs/platform-express": "^10.2.1",
     "@prisma/client": "^5.2.0",
+    "aws-sdk": "^2.1445.0",
     "axios": "^1.4.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
