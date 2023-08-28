@@ -16,27 +16,36 @@ jobs:
       id-token: write
       contents: write
 
-    name: Deploy Application
-    runs-on: ubuntu-latest
+    name: Development Deploy Application
+    runs-on: ubuntu-22.04
     outputs:
       deploymentId: ${{ steps.create-deployment.outputs.deploymendId }}
     environment: development
 
-
     steps:
-      # 레포지토리로 이동합니다.
       - name: Checkout
         uses: actions/checkout@v3
 
-        # 환경변수를 설치합니다.
       - name: Install Secret
         env:
           # github repository 안의 ENV_PROD 환경변수 사용
           ENV_DEV: ${{ secrets.ENV_DEV }}
         run: |
           echo "$ENV_DEV"  >> .env
-
-      #sonarQube관련 처리 여기서 해야할수도.
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.16.0
+      - uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}.
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+      - run: npx prisma generate
+      - run: npm run build
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
