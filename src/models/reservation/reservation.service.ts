@@ -11,12 +11,14 @@ import {
 import { GetReservationQueryDto } from './dto/request/reservationQuery.dto';
 import { getReservationsWhereQuery } from './queries/getReservationsWhereQuery';
 import { ReservationRepository } from '../../database/repository/reservation.repository';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class ReservationService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly reservationRepository: ReservationRepository,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async findMany(query: GetReservationQueryDto): Promise<Array<ReservationGetResponseDto>> {
@@ -47,8 +49,10 @@ export class ReservationService {
   async create(payload: ReservationCreatePayloadDto): Promise<ReservationGetResponseDto> {
     const { menteeId, mentorId } = payload;
     if (menteeId === mentorId) throw new BadRequestException('can not reserve myself');
-    const mentor = await this.prisma.mentorProfile.findUnique({ where: { userId: mentorId } });
-    if (!mentor || mentor.isHide)
+    const mentorProfile = await this.prisma.mentorProfile.findUnique({
+      where: { userId: mentorId },
+    });
+    if (!mentorProfile || mentorProfile.isHide)
       throw new BadRequestException('requested mentorID is not available');
     const existMentoringCount = await this.prisma.reservation.count({
       where: {
@@ -59,7 +63,7 @@ export class ReservationService {
     });
     if (existMentoringCount !== 0) throw new ConflictException('already exists active reservation');
 
-    return this.prisma.reservation.create({
+    const result = await this.prisma.reservation.create({
       data: {
         menteeId: menteeId,
         mentorId: mentorId,
@@ -71,6 +75,15 @@ export class ReservationService {
       },
       select: ReservationSelectQuery,
     });
+
+    const mentor = await this.prisma.user.findUnique({ where: { id: result.mentorId } });
+    const mentee = await this.prisma.user.findUnique({ where: { id: result.menteeId } });
+    this.eventEmitter.emit('reservation.request', {
+      mentor,
+      mentee,
+      reservation: result,
+    });
+    return result;
   }
 
   async update(
@@ -94,11 +107,21 @@ export class ReservationService {
   }
 
   async cancelReservation(reservationId: number, userId: number, role: string) {
-    return await this.reservationRepository.cancelReservation(reservationId, userId, role);
+    const result = await this.reservationRepository.cancelReservation(reservationId, userId, role);
+    const mentor = await this.prisma.user.findUnique({ where: { id: result.mentorId } });
+    const mentee = await this.prisma.user.findUnique({ where: { id: result.menteeId } });
+
+    this.eventEmitter.emit('reservation.cancel', { mentor, mentee, reservation: result });
+    return result;
   }
 
   async acceptReservation(reservationId: number, userId: number, role: string) {
-    return await this.reservationRepository.acceptReservation(reservationId, userId, role);
+    const result = await this.reservationRepository.acceptReservation(reservationId, userId, role);
+    const mentor = await this.prisma.user.findUnique({ where: { id: result.mentorId } });
+    const mentee = await this.prisma.user.findUnique({ where: { id: result.menteeId } });
+
+    this.eventEmitter.emit('reservation.accept', { mentor, mentee, reservation: result });
+    return result;
   }
   async menteeCompletion(
     reservationId: number,
@@ -106,12 +129,17 @@ export class ReservationService {
     role: string,
     payload: ReservationCompleteAsMenteePayloadDto,
   ) {
-    return await this.reservationRepository.completeReservationByMentee(
+    const result = await this.reservationRepository.completeReservationByMentee(
       reservationId,
       userId,
       role,
       payload,
     );
+    const mentor = await this.prisma.user.findUnique({ where: { id: result.mentorId } });
+    const mentee = await this.prisma.user.findUnique({ where: { id: result.menteeId } });
+
+    this.eventEmitter.emit('reservation.menteeCompletion', { mentor, mentee, reservation: result });
+    return result;
   }
 
   async mentorCompletion(
@@ -120,11 +148,16 @@ export class ReservationService {
     role: string,
     payload: ReservationCompleteAsMentorPayloadDto,
   ) {
-    return await this.reservationRepository.completeReservationByMentor(
+    const result = await this.reservationRepository.completeReservationByMentor(
       reservationId,
       userId,
       role,
       payload,
     );
+    const mentor = await this.prisma.user.findUnique({ where: { id: result.mentorId } });
+    const mentee = await this.prisma.user.findUnique({ where: { id: result.menteeId } });
+
+    this.eventEmitter.emit('reservation.mentorCompletion', { mentor, mentee, reservation: result });
+    return result;
   }
 }
