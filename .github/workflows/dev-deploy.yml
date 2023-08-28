@@ -16,7 +16,7 @@ jobs:
       id-token: write
       contents: write
 
-    name: Deploy Application
+    name: Development Deploy Application
     runs-on: ubuntu-22.04
     outputs:
       deploymentId: ${{ steps.create-deployment.outputs.deploymendId }}
@@ -32,12 +32,18 @@ jobs:
           ENV_DEV: ${{ secrets.ENV_DEV }}
         run: |
           echo "$ENV_DEV"  >> .env
-
-      - name: Install dependencies and build
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: 18
-      - run: npm ci
+          node-version: 18.16.0
+      - uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}.
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
       - run: npx prisma generate
       - run: npm run build
 
