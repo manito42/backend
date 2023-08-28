@@ -22,7 +22,6 @@ jobs:
       deploymentId: ${{ steps.create-deployment.outputs.deploymendId }}
     environment: development
 
-
     steps:
       # 레포지토리로 이동합니다.
       - name: Checkout
@@ -36,7 +35,13 @@ jobs:
         run: |
           echo "$ENV_DEV"  >> .env
 
-      #sonarQube관련 처리 여기서 해야할수도.
+      - name: Install dependencies and build
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run build
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
