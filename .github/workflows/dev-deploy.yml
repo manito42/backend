@@ -23,11 +23,9 @@ jobs:
     environment: development
 
     steps:
-      # 레포지토리로 이동합니다.
       - name: Checkout
         uses: actions/checkout@v3
 
-        # 환경변수를 설치합니다.
       - name: Install Secret
         env:
           # github repository 안의 ENV_PROD 환경변수 사용
