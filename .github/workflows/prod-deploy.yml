@@ -1,0 +1,73 @@
+# Dependency Install, Build, Start를 여기서 다합니다.
+
+name: Production Deploy to AWS
+on:
+  push:
+    branches:
+      - master
+
+env:
+  AWS_REGION: ap-northeast-2
+
+jobs:
+  deploy:
+    permissions:
+      id-token: write
+      contents: write
+
+    name: Production Deploy Application
+    runs-on: ubuntu-22.04
+    outputs:
+      deploymentId: ${{ steps.create-deployment.outputs.deploymendId }}
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.16.0
+      - uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}.
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+      - run: npx prisma generate
+      - run: npm run build
+      # github repository 안의 ENV_PROD 환경변수 사용
+      - name: Install Secret
+        env:
+          ENV_PROD: ${{ secrets.ENV_PROD }}
+        run: |
+          echo "$ENV_PROD"  >> .env
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Upload to S3
+        if: success()
+        run: aws deploy push --application-name manito42-main --description "upload production server file to s3" --s3-location s3://manito42-codedeploy-main-bucket/server.zip --source .
+
+      - name: Create CodeDeploy Deployment
+        if: success()
+        id: create-deployment
+        run: |
+          id=$(aws deploy create-deployment \
+          --application-name manito42-main \
+          --deployment-config-name CodeDeployDefault.OneAtATime \
+          --output text --deployment-group-name production \
+          --file-exists-behavior OVERWRITE \
+          --s3-location bucket=manito42-codedeploy-main-bucket,bundleType=zip,key=server.zip)
+          echo "deploymentId=$id" >> $GITHUB_OUTPUT
+
+      - name: Wait for deployment to finish
+        if: success()
+        run: |
+          echo ${{ steps.create-deployment.outputs.deploymentId }}
+          aws deploy wait deployment-successful --deployment-id ${{ steps.create-deployment.outputs.deploymentId }}

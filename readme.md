@@ -1,4 +1,42 @@
-# MANITO 42
-## Manito 42?
-- 42의 cadet과 cadet 간의 멘토링 중개 서비스입니다.
-- 모두가 어떤 분야에서든 멘토가 될 수 있습니다!
+## Description
+
+42 manito backend repo
+
+## Installation
+
+```bash
+$ npm install
+```
+
+## Running the app in development environment
+first, set the env file. see env_sample file
+
+```bash
+# first, install npm packages
+$ npm install
+# run docker
+$ docker compose up -d
+# set prisma client in docker container!!
+$ docker exec -it $container_name sh
+docker conatiner > $ npx prisma generate
+```
+
+## Seeding
+```bash
+# must be in docker container.
+$ docker exec -it $container_name sh
+docker conatiner > $ npx ts-node ./src/database/seeders/seeder.ts
+```
+
+## Testing
+
+```bash
+# E2E tests
+docker exec -it node_dev sh -c "npm run test:e2e"
+
+# unit tests
+docker exec -it node_dev sh -c "npm run test"
+
+# test coverage
+docker exec -it node_dev sh -c "npm run test:cov"
+```

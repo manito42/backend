@@ -1,0 +1,75 @@
+# Dependency Install, Build, Start를 여기서 다합니다.
+
+name: Dev Deploy to AWS
+
+on:
+  push:
+    branches:
+      - develop
+
+env:
+  AWS_REGION: ap-northeast-2
+
+jobs:
+  deploy:
+    permissions:
+      id-token: write
+      contents: write
+
+    name: Development Deploy Application
+    runs-on: ubuntu-22.04
+    outputs:
+      deploymentId: ${{ steps.create-deployment.outputs.deploymendId }}
+    environment: development
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Secret
+        env:
+          # github repository 안의 ENV_PROD 환경변수 사용
+          ENV_DEV: ${{ secrets.ENV_DEV }}
+        run: |
+          echo "$ENV_DEV"  >> .env
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.16.0
+      - uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}.
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+      - run: npx prisma generate
+      - run: npm run build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+        #Code Deploy를 사용해 S3 bucket에 소스코드 업로드
+      - name: S3 업로드
+        run: aws deploy push --application-name 42manito-development-cd --description "upload test server file in s3" --s3-location s3://manito42-code-deploy-bucket-test/server.zip --source .
+
+      - name: Create CodeDeploy Deployment
+        id: create-deployment
+        run: |
+          id=$(aws deploy create-deployment \
+          --application-name 42manito-development-cd \
+          --deployment-config-name CodeDeployDefault.OneAtATime \
+          --output text --deployment-group-name 42manito-development-deployment-group \
+          --file-exists-behavior OVERWRITE \
+          --s3-location bucket=manito42-code-deploy-bucket-test,bundleType=zip,key=server.zip)
+          echo "deploymentId=$id" >> $GITHUB_OUTPUT
+
+      - name: Wait for deployment to finish
+        run: |
+          echo ${{ steps.create-deployment.outputs.deploymentId }}
+          aws deploy wait deployment-successful --deployment-id ${{ steps.create-deployment.outputs.deploymentId }}

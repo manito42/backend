@@ -1,0 +1,146 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  engineType    = "binary"
+  binaryTargets = ["debian-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+// users model
+model User {
+  id                  Int              @id @default(autoincrement())
+  email               String           @unique @db.VarChar(255)
+  nickname            String           @unique @db.VarChar(128)
+  profileImage        String           @map("profile_image") @db.Text
+  role                UserRole         @default(USER)
+  mentoringCount      Int              @default(0) @map("mentoring_count") @db.Int
+  createdAt           DateTime         @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt           DateTime?        @updatedAt @map("updated_at") @db.Timestamp(0)
+  mentorProfile       MentorProfile?
+  mentorProfileId     Int?             @unique @map("mentor_profile_id")
+  menteeReservations  Reservation[]    @relation("ReservedAsMentee")
+  mentorReservations  Reservation[]    @relation("BeReservedAsMentor")
+  menteeFeedbacksTo   MenteeFeedback[] @relation("MenteeFeedbackTo")
+  menteeFeedbacksFrom MentorFeedback[] @relation("MentorFeedbackFrom")
+  mentorFeedbacksTo   MentorFeedback[] @relation("MentorFeedbackTo")
+  mentorFeedbacksFrom MenteeFeedback[] @relation("MenteeFeedbackFrom")
+
+  @@map("users")
+}
+
+// mentor_profiles model
+model MentorProfile {
+  id               Int        @id @default(autoincrement())
+  user             User       @relation(fields: [userId], references: [id])
+  userId           Int        @unique @map("user_id")
+  shortDescription String?    @db.VarChar(255)
+  description      String?    @db.Text
+  isHide           Boolean    @default(true) @db.TinyInt
+  mentoringCount   Int        @default(0) @map("mentoring_count") @db.Int
+  hashtags         Hashtag[]  @relation("profiles_hashtags")
+  categories       Category[] @relation("profiles_categories")
+  createdAt        DateTime   @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt        DateTime?  @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  @@map("mentor_profiles")
+}
+
+enum ReservationStatus {
+  REQUEST
+  ACCEPT
+  CANCEL
+  MENTEE_FEEDBACK
+  DONE
+}
+
+// reservations model
+model Reservation {
+  id             Int               @id @default(autoincrement())
+  mentor         User              @relation("BeReservedAsMentor", fields: [mentorId], references: [id])
+  mentorId       Int               @map("mentor_id")
+  mentee         User              @relation("ReservedAsMentee", fields: [menteeId], references: [id])
+  menteeId       Int               @map("mentee_id")
+  category       Category          @relation(fields: [categoryId], references: [id])
+  categoryId     Int               @map("category_id")
+  requestMessage String?           @map("request_message") @db.Text
+  status         ReservationStatus @default(REQUEST) @map("status")
+  createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt      DateTime?         @updatedAt @map("updated_at") @db.Timestamp(0)
+  hashtags       Hashtag[]         @relation("reservations_hashtags")
+  mentorFeedback MentorFeedback?
+  menteeFeedback MenteeFeedback?
+
+  @@map("reservations")
+}
+
+// mentee_feedbacks model
+model MenteeFeedback {
+  id            Int         @id @default(autoincrement())
+  mentee        User        @relation("MenteeFeedbackTo", fields: [menteeId], references: [id])
+  menteeId      Int         @map("mentee_id")
+  mentor        User        @relation("MenteeFeedbackFrom", fields: [mentorId], references: [id])
+  mentorId      Int         @map("mentor_id")
+  reservation   Reservation @relation(fields: [reservationId], references: [id])
+  reservationId Int         @unique @map("reservation_id")
+  rating        Float       @default(0.0) @db.Float
+  content       String?     @db.Text
+  createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt     DateTime?   @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  @@unique([menteeId, reservationId])
+  @@map("mentee_feedbacks")
+}
+
+// mentor_feedbacks model
+model MentorFeedback {
+  id            Int         @id @default(autoincrement())
+  mentee        User        @relation("MentorFeedbackFrom", fields: [menteeId], references: [id])
+  menteeId      Int         @map("mentee_id")
+  mentor        User        @relation("MentorFeedbackTo", fields: [mentorId], references: [id])
+  mentorId      Int         @map("mentor_id")
+  reservation   Reservation @relation(fields: [reservationId], references: [id])
+  reservationId Int         @unique @map("reservation_id")
+  rating        Float       @default(0.0) @db.Float
+  createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt     DateTime?   @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  @@unique([mentorId, reservationId])
+  @@map("mentor_feedbacks")
+}
+
+// hashtags model
+model Hashtag {
+  id           Int             @id @default(autoincrement())
+  name         String          @unique @map("tag_name") @db.VarChar(32)
+  profiles     MentorProfile[] @relation("profiles_hashtags")
+  reservations Reservation[]   @relation("reservations_hashtags")
+
+  @@map("hashtags")
+}
+
+// categories model
+model Category {
+  id             Int             @id @default(autoincrement())
+  name           String          @unique @db.VarChar(32)
+  mentorProfiles MentorProfile[] @relation("profiles_categories")
+  reservations   Reservation[]
+
+  @@map("categories")
+}
+
+// below are implicitlu created by prisma
+// profiles_hashtags model
+// reservations_hashtags model
+// profiles_categories model
+// reservations_categories model
