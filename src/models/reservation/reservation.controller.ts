@@ -3,7 +3,6 @@ import {
   Body,
   Controller,
   Get,
-  NotFoundException,
   Param,
   Patch,
   Post,
@@ -22,9 +21,8 @@ import {
 import { GetReservationQueryDto } from './dto/request/reservationQuery.dto';
 import { JwtGuard } from '../../common/guards/jwt/jwt.guard';
 import { GetUserId } from '../../common/decorators/getUserId.decorator';
-import { ReservationStatus, UserRole } from '@prisma/client';
+import { UserRole } from '@prisma/client';
 import { PrismaService } from '../../database/services/prisma.service';
-import { ReservationSelectQuery } from './queries/reservationSelect.query';
 import { GetUserRole } from '../../common/decorators/getUserRole.decorator';
 
 @Controller('/reservations')
@@ -45,7 +43,7 @@ export class ReservationController {
     @Query() query: GetReservationQueryDto,
   ): Promise<Array<ReservationGetResponseDto>> {
     if (role !== UserRole.ADMIN) throw new UnauthorizedException();
-    return await this.reservationService.findMany(query);
+    return await this.reservationService.findManyReservation(query);
   }
 
   /**
@@ -63,7 +61,7 @@ export class ReservationController {
   ): Promise<ReservationGetResponseDto> {
     if (role !== UserRole.ADMIN && payload.menteeId !== userId)
       throw new UnauthorizedException('menteeID is not matched with session userID');
-    return await this.reservationService.create(payload);
+    return await this.reservationService.createReservation(payload);
   }
 
   /**
@@ -79,7 +77,7 @@ export class ReservationController {
   ): Promise<ReservationGetResponseDto> {
     if (id < 0) throw new BadRequestException('id is invalid');
     if (role !== UserRole.ADMIN) throw new UnauthorizedException('only for admin');
-    return await this.reservationService.update(id, payload);
+    return await this.reservationService.updateReservation(id, payload);
   }
 
   /**
@@ -93,15 +91,7 @@ export class ReservationController {
     @Param('id') id: number,
   ): Promise<ReservationGetResponseDto> {
     if (id < 0) throw new BadRequestException('id is invalid');
-    const reservation = await this.reservationService.findById(id);
-    if (!reservation) throw new NotFoundException('not exist reservation');
-    if (
-      role !== UserRole.ADMIN &&
-      userId !== reservation.menteeId &&
-      userId !== reservation.mentorId
-    )
-      throw new UnauthorizedException();
-    return reservation;
+    return await this.reservationService.findReservationById(id, role, userId);
   }
 
   /**
