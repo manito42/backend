@@ -76,9 +76,7 @@ export class ReservationService {
       select: ReservationSelectQuery,
     });
 
-    const mentor = await this.prisma.user.findUnique({ where: { id: result.mentorId } });
-    const mentee = await this.prisma.user.findUnique({ where: { id: result.menteeId } });
-    this.eventEmitter.emit('reservation.request', {
+    this.eventEmitter.emit(RESERVATION_REQUEST, {
       mentor,
       mentee,
       reservation: result,
@@ -111,7 +109,7 @@ export class ReservationService {
     const mentor = await this.prisma.user.findUnique({ where: { id: result.mentorId } });
     const mentee = await this.prisma.user.findUnique({ where: { id: result.menteeId } });
 
-    this.eventEmitter.emit('reservation.cancel', { mentor, mentee, reservation: result });
+    this.eventEmitter.emit(RESERVATION_CANCEL, { mentor, mentee, reservation: result });
     return result;
   }
 
@@ -120,7 +118,7 @@ export class ReservationService {
     const mentor = await this.prisma.user.findUnique({ where: { id: result.mentorId } });
     const mentee = await this.prisma.user.findUnique({ where: { id: result.menteeId } });
 
-    this.eventEmitter.emit('reservation.accept', { mentor, mentee, reservation: result });
+    this.eventEmitter.emit(RESERVATION_ACCEPT, { mentor, mentee, reservation: result });
     return result;
   }
   async menteeCompletion(
@@ -138,7 +136,7 @@ export class ReservationService {
     const mentor = await this.prisma.user.findUnique({ where: { id: result.mentorId } });
     const mentee = await this.prisma.user.findUnique({ where: { id: result.menteeId } });
 
-    this.eventEmitter.emit('reservation.menteeCompletion', { mentor, mentee, reservation: result });
+    this.eventEmitter.emit(RESERVATION_MENTEE_COMPLETION, { mentor, mentee, reservation: result });
     return result;
   }
 
