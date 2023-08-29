@@ -18,8 +18,6 @@ import { HomeModule } from './modules/home/home.module';
 import { DevModule } from './modules/dev/dev.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { NotificationModule } from './modules/notification/notification.module';
-import { MailerModule } from '@nestjs-modules/mailer';
-import { getMailerConfig } from './common/constants/getMailerConfig';
 
 @Module({
   imports: [
