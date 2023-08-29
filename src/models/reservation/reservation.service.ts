@@ -122,16 +122,11 @@ export class ReservationService {
     role: string,
     payload: ReservationCompleteAsMentorPayloadDto,
   ) {
-    const result = await this.reservationRepository.completeReservationByMentor(
+    return await this.reservationRepository.completeReservationByMentor(
       reservationId,
       userId,
       role,
       payload,
     );
-    const mentor = await this.prisma.user.findUnique({ where: { id: result.mentorId } });
-    const mentee = await this.prisma.user.findUnique({ where: { id: result.menteeId } });
-
-    this.eventEmitter.emit('reservation.mentorCompletion', { mentor, mentee, reservation: result });
-    return result;
   }
 }
