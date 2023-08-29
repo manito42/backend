@@ -22,15 +22,11 @@ import { GetReservationQueryDto } from './dto/request/reservationQuery.dto';
 import { JwtGuard } from '../../common/guards/jwt/jwt.guard';
 import { GetUserId } from '../../common/decorators/getUserId.decorator';
 import { UserRole } from '@prisma/client';
-import { PrismaService } from '../../database/services/prisma.service';
 import { GetUserRole } from '../../common/decorators/getUserRole.decorator';
 
 @Controller('/reservations')
 export class ReservationController {
-  constructor(
-    private readonly reservationService: ReservationService,
-    private readonly prismaService: PrismaService,
-  ) {}
+  constructor(private readonly reservationService: ReservationService) {}
 
   /**
    * NOTE: 일반 사용자가 Reservation 에 대해서 조회할 이유가 없기 때문에 ADMIN 전용으로 함.
