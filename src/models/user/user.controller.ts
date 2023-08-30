@@ -40,7 +40,8 @@ export class UserController {
     @Query() query: GetUserQueryDto,
   ): Promise<Array<UserGetResponseDto>> {
     if (role !== UserRole.ADMIN) throw new UnauthorizedException();
-    return await this.userService.findMany(query);
+    const { take, page } = query;
+    return await this.userService.findMany(take, page);
   }
 
   /**
@@ -61,10 +62,11 @@ export class UserController {
   @Post('/')
   @UseGuards(JwtGuard)
   async create(
-    @GetUserRole() role: UserRole,
-    @Body() payload: UserCreatePayloadDto,
+    @GetUserRole() userRole: UserRole,
+    @Body() data: UserCreatePayloadDto,
   ): Promise<UserGetResponseDto> {
-    return await this.userService.create(payload);
+    if (userRole !== UserRole.ADMIN) throw new UnauthorizedException();
+    return await this.userService.create(data);
   }
 
   /**
@@ -75,11 +77,11 @@ export class UserController {
   async update(
     @GetUser() user: JwtPayloadInterface,
     @Param('id') id: number,
-    @Body() payload: UserUpdatePayloadDto,
+    @Body() data: UserUpdatePayloadDto,
   ): Promise<UserGetResponseDto> {
     if (user.id !== id && user.role !== UserRole.ADMIN) throw new UnauthorizedException();
     if (id < 0) throw new BadRequestException();
-    return await this.userService.update(id, payload);
+    return await this.userService.update(id, data);
   }
 
   @Get('/verify_nickname/:nickname')
@@ -100,7 +102,15 @@ export class UserController {
   ): Promise<UserReservationGetDto> {
     if (id < 0) throw new BadRequestException();
     if (user.id !== id && user.role !== UserRole.ADMIN) throw new UnauthorizedException();
-    const reservations = await this.userService.findUserReservation(id, query);
+    const { take, page, as_mentor, as_mentee, active } = query;
+    const reservations = await this.userService.findUserReservation(
+      id,
+      take,
+      page,
+      as_mentor,
+      as_mentee,
+      active,
+    );
     if (!reservations) throw new BadRequestException();
     return reservations;
   }

@@ -1,5 +1,6 @@
 import { IsInt, IsOptional, Max, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { SelectAllType } from '../../../../common/constants/selectAll.type';
 
 export class GetMentorProfileQueryDto {
   @Transform(({ value }) => {
@@ -18,6 +19,12 @@ export class GetMentorProfileQueryDto {
   @IsInt()
   @Min(0)
   page?: number = 0;
+
+  @IsOptional()
+  @Transform(({ value }) => {
+    return value === 'true';
+  })
+  is_hide?: boolean | SelectAllType = SelectAllType.ALL;
 
   @Transform(({ value }) => {
     return Number(value);

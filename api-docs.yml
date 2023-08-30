@@ -243,6 +243,8 @@ paths:
       summary: Get all mentor profiles
       tags:
         - Mentor Profiles
+      security:
+        - AdminUser: [ ]
       parameters:
         - in: query
           name: take
@@ -256,6 +258,11 @@ paths:
           schema:
             type: integer
             format: int32
+        - in: query
+          name: is_hide
+          description: filter by is_hide
+          schema:
+            type: boolean
         - in: query
           name: hashtag_id
           description: filter by hashtag
