@@ -4,7 +4,7 @@ import { GetHomeQueryDto } from './dto/request/homeQuery.dto';
 import { MentorProfileService } from '../../models/mentorProfile/mentorProfile.service';
 import { MentorProfileGetResponseDto } from '../../models/mentorProfile/dto/response/mentorProfileGetResponse.dto';
 import { GetHomeCategoryParameterDto } from './dto/request/homeParameter.dto';
-import { GetMentorProfileQueryDto } from '../../models/mentorProfile/dto/request/mentorProfileQuery.dto';
+import { SelectAllType } from '../../common/constants/selectAll.type';
 
 @Controller('home')
 export class HomeController {
@@ -17,8 +17,19 @@ export class HomeController {
   async getHomeProfiles(
     @Query() query: GetHomeQueryDto,
   ): Promise<Array<MentorProfileGetResponseDto>> {
+    const { take, page } = query;
     const sortQuery = this.homeService.getHomeProfileSortQuery();
-    const profiles = await this.mentorProfileService.findManyWithoutHide(query, sortQuery);
+    const isHide = false;
+    const hashtagId = SelectAllType.ALL;
+    const categoryId = SelectAllType.ALL;
+    const profiles = await this.mentorProfileService.findMany(
+      take,
+      page,
+      isHide,
+      hashtagId,
+      categoryId,
+      sortQuery,
+    );
     return this.homeService.random(profiles);
   }
 
@@ -27,12 +38,19 @@ export class HomeController {
     @Query() query: GetHomeQueryDto,
     @Param() param: GetHomeCategoryParameterDto,
   ): Promise<Array<MentorProfileGetResponseDto>> {
-    const profileQuery: GetMentorProfileQueryDto = {
-      category_id: param.category_id,
-      ...query,
-    };
+    const { take, page } = query;
+    const { category_id } = param;
     const sortQuery = this.homeService.getHomeProfileSortQuery();
-    const profiles = await this.mentorProfileService.findManyWithoutHide(profileQuery, sortQuery);
+    const isHide = false;
+    const hashtagId = SelectAllType.ALL;
+    const profiles = await this.mentorProfileService.findMany(
+      take,
+      page,
+      isHide,
+      hashtagId,
+      category_id,
+      sortQuery,
+    );
     return this.homeService.random(profiles);
   }
 }

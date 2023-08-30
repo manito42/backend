@@ -13,6 +13,14 @@ export class SearchController {
     @Query() query: GetSearchQueryDto,
     @Param() param: GetSearchParameterDto,
   ): Promise<Array<MentorProfileGetResponseDto>> {
-    return await this.mentorProfileService.findBySearch(query, param.search);
+    const { take, page, search_by_hashtag_name, search_by_user_nickname } = query;
+    const { search } = param;
+    return await this.mentorProfileService.findBySearch(
+      take,
+      page,
+      search_by_hashtag_name,
+      search_by_user_nickname,
+      search,
+    );
   }
 }
