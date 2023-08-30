@@ -24,7 +24,8 @@ export class HashtagController {
 
   @Get('/')
   async getHashtags(@Query() query: GetHashtagsQueryDto): Promise<Array<HashtagGetResponseDto>> {
-    return await this.hashtagService.findMany(query);
+    const { page, take, profile_id, reservation_id, search } = query;
+    return await this.hashtagService.findMany(take, page, profile_id, reservation_id, search);
   }
 
   @Get('/:id')
@@ -44,11 +45,12 @@ export class HashtagController {
     @Body() payload: HashtagCreatePayloadDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<HashtagGetResponseDto> {
-    const existHashtag = await this.hashtagService.findByName(payload.name);
+    const name = payload.name;
+    const existHashtag = await this.hashtagService.findByName(name);
     if (existHashtag) {
       res.status(HttpStatus.OK);
       return existHashtag;
     }
-    return await this.hashtagService.create(payload);
+    return await this.hashtagService.create(name);
   }
 }
