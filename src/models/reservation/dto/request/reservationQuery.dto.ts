@@ -1,5 +1,6 @@
 import { IsInt, IsOptional, Max, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { SelectAllType } from '../../../../common/constants/selectAll.type';
 
 export class GetReservationQueryDto {
   @Transform(({ value }) => {
@@ -23,12 +24,12 @@ export class GetReservationQueryDto {
   @IsOptional()
   @IsInt()
   @Min(0)
-  hashtag_id?: number;
+  hashtag_id?: number | SelectAllType = SelectAllType.ALL;
   @Transform(({ value }) => {
     return Number(value);
   })
   @IsOptional()
   @IsInt()
   @Min(0)
-  category_id?: number;
+  category_id?: number | SelectAllType = SelectAllType.ALL;
 }

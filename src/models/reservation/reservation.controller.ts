@@ -39,7 +39,8 @@ export class ReservationController {
     @Query() query: GetReservationQueryDto,
   ): Promise<Array<ReservationGetResponseDto>> {
     if (role !== UserRole.ADMIN) throw new UnauthorizedException();
-    return await this.reservationService.findManyReservation(query);
+    const { category_id, hashtag_id, take, page } = query;
+    return await this.reservationService.findManyReservation(category_id, hashtag_id, take, page);
   }
 
   /**

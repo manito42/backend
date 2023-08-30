@@ -32,7 +32,7 @@ export class GetMentorProfileQueryDto {
   @IsOptional()
   @IsInt()
   @Min(0)
-  hashtag_id?: number;
+  hashtag_id?: number | SelectAllType = SelectAllType.ALL;
 
   @Transform(({ value }) => {
     return Number(value);
@@ -40,5 +40,5 @@ export class GetMentorProfileQueryDto {
   @IsOptional()
   @IsInt()
   @Min(0)
-  category_id?: number;
+  category_id?: number | SelectAllType = SelectAllType.ALL;
 }

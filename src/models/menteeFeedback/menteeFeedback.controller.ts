@@ -29,7 +29,15 @@ export class MenteeFeedbackController {
     @Query() query: GetMenteeFeedbacksQueryDto,
   ): Promise<Array<MenteeFeedbackResponseDto>> {
     if (role !== UserRole.ADMIN) throw new UnauthorizedException();
-    return await this.menteeFeedbackService.findMany(query);
+    const { take, page, mentor_id, mentee_id, reservation_id } = query;
+
+    return await this.menteeFeedbackService.findManyMenteeFeedback(
+      take,
+      page,
+      mentor_id,
+      mentee_id,
+      reservation_id,
+    );
   }
 
   @Post('/')
@@ -39,14 +47,14 @@ export class MenteeFeedbackController {
     @Body() body: MenteeFeedbackCreatePayloadDto,
   ): Promise<MenteeFeedbackResponseDto> {
     if (role !== UserRole.ADMIN) throw new UnauthorizedException();
-    return await this.menteeFeedbackService.create(body);
+    return await this.menteeFeedbackService.createMenteeFeedback(body);
   }
 
   @Get('/:id')
   @UseGuards(JwtGuard)
   async getMenteeFeedbackById(@Param('id') id: number): Promise<MenteeFeedbackResponseDto> {
     if (id < 0) throw new BadRequestException();
-    const feedback = await this.menteeFeedbackService.findById(id);
+    const feedback = await this.menteeFeedbackService.findMenteeFeedbackById(id);
     if (!feedback) throw new NotFoundException();
     return feedback;
   }
