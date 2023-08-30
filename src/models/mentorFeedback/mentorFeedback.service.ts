@@ -1,10 +1,7 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../database/services/prisma.service';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { MentorFeedbackResponseDto } from './dto/response/mentorFeedbackResponse.dto';
-import { MentorFeedbackSelectQuery } from './queries/mentorFeedbackSelect.query';
 import { MentorFeedbackCreatePayloadDto } from './dto/request/mentorFeedbackCreatePayload.dto';
 import { GetMentorFeedbacksQueryDto } from './dto/request/mentorFeedbackQuery.dto';
-import { getMentorFeedbacksWhereQuery } from './queries/getMentorFeedbacksWhereQuery';
 import { MentorFeedbackRepository } from '../../database/repository/mentorFeedback.repository';
 import { ReservationRepository } from '../../database/repository/reservation.repository';
 
