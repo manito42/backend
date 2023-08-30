@@ -1,15 +1,93 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '../services/prisma.service';
 import { ReservationStatus, UserRole } from '@prisma/client';
 import { ReservationSelectQuery } from '../../models/reservation/queries/reservationSelect.query';
 import {
   ReservationCompleteAsMenteePayloadDto,
   ReservationCompleteAsMentorPayloadDto,
+  ReservationUpdatePayloadDto,
 } from '../../models/reservation/dto/request/reservationUpdatePayload.dto';
+import { GetReservationQueryDto } from '../../models/reservation/dto/request/reservationQuery.dto';
+import { ReservationGetResponseDto } from '../../models/reservation/dto/response/reservationGetResponse.dto';
+import { getReservationsWhereQuery } from '../../models/reservation/queries/getReservationsWhereQuery';
+import { ReservationCreatePayloadDto } from '../../models/reservation/dto/request/reservationCreatePayload.dto';
 
 @Injectable()
 export class ReservationRepository {
   constructor(private readonly prismaService: PrismaService) {}
+
+  async findMany(query: GetReservationQueryDto): Promise<Array<ReservationGetResponseDto>> {
+    const { category_id, hashtag_id, take, page } = query;
+    return this.prismaService.reservation.findMany({
+      take: take,
+      skip: page * take,
+      where: getReservationsWhereQuery(hashtag_id, category_id),
+      select: ReservationSelectQuery,
+    });
+  }
+
+  async findById(id: number): Promise<ReservationGetResponseDto> {
+    return this.prismaService.reservation.findUnique({
+      where: { id: id },
+      select: ReservationSelectQuery,
+    });
+  }
+
+  async create(payload: ReservationCreatePayloadDto): Promise<ReservationGetResponseDto> {
+    const { menteeId, mentorId } = payload;
+    if (menteeId === mentorId) throw new BadRequestException('can not reserve myself');
+    const mentorProfile = await this.prismaService.mentorProfile.findUnique({
+      where: { userId: mentorId },
+    });
+    if (!mentorProfile || mentorProfile.isHide)
+      throw new BadRequestException('requested mentorID is not available');
+    const existMentoringCount = await this.prismaService.reservation.count({
+      where: {
+        mentorId: mentorId,
+        menteeId: menteeId,
+        OR: [{ status: 'ACCEPT' }, { status: 'REQUEST' }],
+      },
+    });
+    if (existMentoringCount !== 0) throw new ConflictException('already exists active reservation');
+
+    return this.prismaService.reservation.create({
+      data: {
+        menteeId: menteeId,
+        mentorId: mentorId,
+        categoryId: payload.categoryId,
+        requestMessage: payload.requestMessage,
+        hashtags: {
+          connect: payload.hashtags,
+        },
+      },
+      select: ReservationSelectQuery,
+    });
+  }
+
+  async update(
+    id: number,
+    payload: ReservationUpdatePayloadDto,
+  ): Promise<ReservationGetResponseDto> {
+    return this.prismaService.reservation.update({
+      where: {
+        id: id,
+      },
+      data: {
+        requestMessage: payload.requestMessage,
+        status: payload.status,
+        categoryId: payload.categoryId,
+        hashtags: {
+          set: payload.hashtags,
+        },
+      },
+      select: ReservationSelectQuery,
+    });
+  }
 
   async cancelReservation(reservationId: number, userId: number, role: string) {
     return this.prismaService.$transaction(async (prisma) => {

@@ -6,7 +6,7 @@ COPY . /app
 
 WORKDIR /app
 # NPM INSTALL
-RUN npm i
+RUN npm ci
 RUN chmod +x ./prisma_init.sh
 
 CMD ["./prisma_init.sh"]

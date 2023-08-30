@@ -7,11 +7,17 @@ import { getRequestTemplate } from './templates/reservation/reqeust.template';
 import { getCancelTemplate } from './templates/reservation/cancel.template';
 import { getAcceptTemplate } from './templates/reservation/accept.template';
 import { getMenteeCompletionTemplate } from './templates/reservation/menteeCompletion.template';
+import {
+  RESERVATION_ACCEPT,
+  RESERVATION_CANCEL,
+  RESERVATION_MENTEE_COMPLETION,
+  RESERVATION_REQUEST,
+} from '../../common/constants/notification.event';
 
 @Controller('notification')
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
-  @OnSafeEvent('reservation.request')
+  @OnSafeEvent(RESERVATION_REQUEST)
   async handleReservationRequest(payload: IReservationEventPayload) {
     const { mentor, mentee, reservation } = payload;
     const sendTo: Array<User> = [mentor];
@@ -21,7 +27,7 @@ export class NotificationController {
     await this.notificationService.notify(sendTo, subject, content);
   }
 
-  @OnSafeEvent('reservation.cancel')
+  @OnSafeEvent(RESERVATION_CANCEL)
   async handleReservationCancel(payload: IReservationEventPayload) {
     const { mentor, mentee, reservation } = payload;
     const sendTo: Array<User> = [mentor, mentee];
@@ -31,7 +37,7 @@ export class NotificationController {
     await this.notificationService.notify(sendTo, subject, content);
   }
 
-  @OnSafeEvent('reservation.accept')
+  @OnSafeEvent(RESERVATION_ACCEPT)
   async handleReservationAccept(payload: IReservationEventPayload) {
     const { mentor, mentee, reservation } = payload;
     const sendTo: Array<User> = [mentee];
@@ -41,7 +47,7 @@ export class NotificationController {
     await this.notificationService.notify(sendTo, subject, content);
   }
 
-  @OnSafeEvent('reservation.menteeCompletion')
+  @OnSafeEvent(RESERVATION_MENTEE_COMPLETION)
   async handleReservationMenteeCompletion(payload: IReservationEventPayload) {
     const { mentor, mentee, reservation } = payload;
     const sendTo: Array<User> = [mentor];
