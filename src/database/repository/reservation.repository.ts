@@ -12,7 +12,6 @@ import {
   ReservationCompleteAsMentorPayloadDto,
   ReservationUpdatePayloadDto,
 } from '../../models/reservation/dto/request/reservationUpdatePayload.dto';
-import { GetReservationQueryDto } from '../../models/reservation/dto/request/reservationQuery.dto';
 import { ReservationGetResponseDto } from '../../models/reservation/dto/response/reservationGetResponse.dto';
 import { getReservationsWhereQuery } from '../../models/reservation/queries/getReservationsWhereQuery';
 import { ReservationCreatePayloadDto } from '../../models/reservation/dto/request/reservationCreatePayload.dto';
@@ -21,8 +20,12 @@ import { ReservationCreatePayloadDto } from '../../models/reservation/dto/reques
 export class ReservationRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async findMany(query: GetReservationQueryDto): Promise<Array<ReservationGetResponseDto>> {
-    const { category_id, hashtag_id, take, page } = query;
+  async findMany(
+    category_id: number,
+    hashtag_id: number,
+    take: number,
+    page: number,
+  ): Promise<Array<ReservationGetResponseDto>> {
     return this.prismaService.reservation.findMany({
       take: take,
       skip: page * take,
