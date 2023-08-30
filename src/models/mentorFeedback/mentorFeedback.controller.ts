@@ -32,7 +32,7 @@ export class MentorFeedbackController {
     @Query() query: GetMentorFeedbacksQueryDto,
   ): Promise<Array<MentorFeedbackResponseDto>> {
     if (role !== UserRole.ADMIN) throw new UnauthorizedException();
-    return this.mentorFeedbackService.findMany(query);
+    return this.mentorFeedbackService.findManyMentorFeedbacks(query);
   }
 
   /**
@@ -45,7 +45,7 @@ export class MentorFeedbackController {
     @Body() body: MentorFeedbackCreatePayloadDto,
   ): Promise<MentorFeedbackResponseDto> {
     if (role !== UserRole.ADMIN) throw new UnauthorizedException();
-    return this.mentorFeedbackService.create(body);
+    return this.mentorFeedbackService.createMentorFeedback(body);
   }
 
   /**
@@ -55,7 +55,7 @@ export class MentorFeedbackController {
   @UseGuards(JwtGuard)
   async getMentorFeedbackById(@Param('id') id: number): Promise<MentorFeedbackResponseDto> {
     if (id < 0) throw new BadRequestException();
-    const feedback = await this.mentorFeedbackService.findById(id);
+    const feedback = await this.mentorFeedbackService.findMentorFeedbackById(id);
     if (!feedback) throw new NotFoundException();
     return feedback;
   }
