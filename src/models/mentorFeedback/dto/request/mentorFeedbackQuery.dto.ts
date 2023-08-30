@@ -1,5 +1,6 @@
 import { IsInt, IsOptional, Max, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { SelectAllType } from '../../../../common/constants/selectAll.type';
 
 export class GetMentorFeedbacksQueryDto {
   @Transform(({ value }) => {
@@ -22,19 +23,19 @@ export class GetMentorFeedbacksQueryDto {
   @IsOptional()
   @IsInt()
   @Min(0)
-  mentor_id?: number;
+  mentor_id?: number | SelectAllType = SelectAllType.ALL;
   @Transform(({ value }) => {
     return Number(value);
   })
   @IsOptional()
   @IsInt()
   @Min(0)
-  mentee_id?: number;
+  mentee_id?: number | SelectAllType = SelectAllType.ALL;
   @Transform(({ value }) => {
     return Number(value);
   })
   @IsOptional()
   @IsInt()
   @Min(0)
-  reservation_id?: number;
+  reservation_id?: number | SelectAllType = SelectAllType.ALL;
 }

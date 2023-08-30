@@ -15,14 +15,15 @@ import {
 import { ReservationGetResponseDto } from '../../models/reservation/dto/response/reservationGetResponse.dto';
 import { getReservationsWhereQuery } from '../../models/reservation/queries/getReservationsWhereQuery';
 import { ReservationCreatePayloadDto } from '../../models/reservation/dto/request/reservationCreatePayload.dto';
+import { SelectAllType } from '../../common/constants/selectAll.type';
 
 @Injectable()
 export class ReservationRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
   async findMany(
-    category_id: number,
-    hashtag_id: number,
+    category_id: number | SelectAllType,
+    hashtag_id: number | SelectAllType,
     take: number,
     page: number,
   ): Promise<Array<ReservationGetResponseDto>> {

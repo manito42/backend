@@ -4,6 +4,7 @@ import { MentorFeedbackCreatePayloadDto } from './dto/request/mentorFeedbackCrea
 import { GetMentorFeedbacksQueryDto } from './dto/request/mentorFeedbackQuery.dto';
 import { MentorFeedbackRepository } from '../../database/repository/mentorFeedback.repository';
 import { ReservationRepository } from '../../database/repository/reservation.repository';
+import { SelectAllType } from '../../common/constants/selectAll.type';
 
 @Injectable()
 export class MentorFeedbackService {
@@ -13,14 +14,18 @@ export class MentorFeedbackService {
   ) {}
 
   async findManyMentorFeedbacks(
-    query: GetMentorFeedbacksQueryDto,
+    take: number,
+    page: number,
+    mentor_id: number | SelectAllType,
+    mentee_id: number | SelectAllType,
+    reservation_id: number | SelectAllType,
   ): Promise<MentorFeedbackResponseDto[]> {
     return await this.mentorFeedbackRepository.findMany(
-      query.mentor_id,
-      query.mentee_id,
-      query.reservation_id,
-      query.take,
-      query.page,
+      take,
+      page,
+      mentor_id,
+      mentee_id,
+      reservation_id,
     );
   }
 

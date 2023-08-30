@@ -1,16 +1,18 @@
+import { SelectAllType } from '../../../common/constants/selectAll.type';
+
 export function getReservationsWhereQuery(
-  hashtagId: number,
-  categoryId: number,
+  hashtagId: number | SelectAllType,
+  categoryId: number | SelectAllType,
 ) {
   const whereObject = {};
-  if (hashtagId !== undefined) {
+  if (hashtagId !== SelectAllType.ALL) {
     whereObject['hashtags'] = {
       some: {
         id: hashtagId,
       },
     };
   }
-  if (categoryId !== undefined) {
+  if (categoryId !== SelectAllType.ALL) {
     whereObject['categoryId'] = categoryId;
   }
   return whereObject;

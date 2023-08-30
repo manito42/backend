@@ -32,7 +32,14 @@ export class MentorFeedbackController {
     @Query() query: GetMentorFeedbacksQueryDto,
   ): Promise<Array<MentorFeedbackResponseDto>> {
     if (role !== UserRole.ADMIN) throw new UnauthorizedException();
-    return this.mentorFeedbackService.findManyMentorFeedbacks(query);
+    const { take, page, mentor_id, reservation_id, mentee_id } = query;
+    return this.mentorFeedbackService.findManyMentorFeedbacks(
+      take,
+      page,
+      mentor_id,
+      mentee_id,
+      reservation_id,
+    );
   }
 
   /**

@@ -4,17 +4,18 @@ import { MenteeFeedbackResponseDto } from '../../models/menteeFeedback/dto/respo
 import { getMenteeFeedbacksWhereQuery } from '../../models/menteeFeedback/queries/getMenteeFeedbacksWhereQuery';
 import { MenteeFeedbackGetSelectQuery } from '../../models/menteeFeedback/queries/menteeFeedbackGetSelect.query';
 import { MenteeFeedbackCreatePayloadDto } from '../../models/menteeFeedback/dto/request/menteeFeedbackCreatePayload.dto';
+import { SelectAllType } from '../../common/constants/selectAll.type';
 
 @Injectable()
 export class MenteeFeedbackRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
   async findMany(
-    mentor_id: number,
-    mentee_id: number,
-    reservation_id: number,
     take: number,
     page: number,
+    mentor_id: number | SelectAllType,
+    mentee_id: number | SelectAllType,
+    reservation_id: number | SelectAllType,
   ): Promise<MenteeFeedbackResponseDto[]> {
     return this.prismaService.menteeFeedback.findMany({
       where: getMenteeFeedbacksWhereQuery(mentor_id, mentee_id, reservation_id),

@@ -29,7 +29,15 @@ export class MenteeFeedbackController {
     @Query() query: GetMenteeFeedbacksQueryDto,
   ): Promise<Array<MenteeFeedbackResponseDto>> {
     if (role !== UserRole.ADMIN) throw new UnauthorizedException();
-    return await this.menteeFeedbackService.findManyMenteeFeedback(query);
+    const { take, page, mentor_id, mentee_id, reservation_id } = query;
+
+    return await this.menteeFeedbackService.findManyMenteeFeedback(
+      take,
+      page,
+      mentor_id,
+      mentee_id,
+      reservation_id,
+    );
   }
 
   @Post('/')

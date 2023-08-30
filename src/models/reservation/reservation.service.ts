@@ -17,6 +17,7 @@ import {
   RESERVATION_REQUEST,
 } from '../../common/constants/notification.event';
 import { UserRepository } from '../../database/repository/user.repository';
+import { SelectAllType } from '../../common/constants/selectAll.type';
 
 @Injectable()
 export class ReservationService {
@@ -27,14 +28,12 @@ export class ReservationService {
   ) {}
 
   async findManyReservation(
-    query: GetReservationQueryDto,
+    category_id: number | SelectAllType,
+    hashtag_id: number | SelectAllType,
+    take: number,
+    page: number,
   ): Promise<Array<ReservationGetResponseDto>> {
-    return await this.reservationRepository.findMany(
-      query.category_id,
-      query.hashtag_id,
-      query.take,
-      query.page,
-    );
+    return await this.reservationRepository.findMany(category_id, hashtag_id, take, page);
   }
 
   async findReservationById(
