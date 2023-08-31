@@ -1,6 +1,8 @@
 import { IsInt, IsOptional, Max, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { SelectAllType } from '../../../../common/constants/selectAll.type';
+import { IsBooleanSelectAll } from '../../../../common/decorators/isBooleanSelectAll.decorator';
+import { IsIntSelectAll } from '../../../../common/decorators/isIntSelectAll.decorator';
 
 export class GetMentorProfileQueryDto {
   @Transform(({ value }) => {
@@ -20,25 +22,24 @@ export class GetMentorProfileQueryDto {
   @Min(0)
   page?: number = 0;
 
-  @IsOptional()
   @Transform(({ value }) => {
+    if (value === SelectAllType.ALL) return value;
     return value === 'true';
   })
+  @IsBooleanSelectAll()
   is_hide?: boolean | SelectAllType = SelectAllType.ALL;
 
   @Transform(({ value }) => {
+    if (value === SelectAllType.ALL) return value;
     return Number(value);
   })
-  @IsOptional()
-  @IsInt()
-  @Min(0)
+  @IsIntSelectAll()
   hashtag_id?: number | SelectAllType = SelectAllType.ALL;
 
   @Transform(({ value }) => {
+    if (value === SelectAllType.ALL) return value;
     return Number(value);
   })
-  @IsOptional()
-  @IsInt()
-  @Min(0)
+  @IsIntSelectAll({ min: 0 })
   category_id?: number | SelectAllType = SelectAllType.ALL;
 }
