@@ -25,7 +25,6 @@ export class GetMenteeFeedbacksQueryDto {
     if (value === SelectAllType.ALL) return value;
     return Number(value);
   })
-  @IsOptional()
   @IsIntSelectAll({ min: 0 })
   mentor_id?: number | SelectAllType = SelectAllType.ALL;
 
@@ -33,7 +32,6 @@ export class GetMenteeFeedbacksQueryDto {
     if (value === SelectAllType.ALL) return value;
     return Number(value);
   })
-  @IsOptional()
   @IsIntSelectAll({ min: 0 })
   mentee_id?: number | SelectAllType = SelectAllType.ALL;
 
@@ -41,7 +39,6 @@ export class GetMenteeFeedbacksQueryDto {
     if (value === SelectAllType.ALL) return value;
     return Number(value);
   })
-  @IsOptional()
   @IsIntSelectAll({ min: 0 })
   reservation_id?: number | SelectAllType = SelectAllType.ALL;
 }

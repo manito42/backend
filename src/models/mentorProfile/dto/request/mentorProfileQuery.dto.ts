@@ -22,7 +22,6 @@ export class GetMentorProfileQueryDto {
   @Min(0)
   page?: number = 0;
 
-  @IsOptional()
   @Transform(({ value }) => {
     if (value === SelectAllType.ALL) return value;
     return value === 'true';
@@ -34,7 +33,6 @@ export class GetMentorProfileQueryDto {
     if (value === SelectAllType.ALL) return value;
     return Number(value);
   })
-  @IsOptional()
   @IsIntSelectAll()
   hashtag_id?: number | SelectAllType = SelectAllType.ALL;
 
@@ -42,7 +40,6 @@ export class GetMentorProfileQueryDto {
     if (value === SelectAllType.ALL) return value;
     return Number(value);
   })
-  @IsOptional()
   @IsIntSelectAll({ min: 0 })
   category_id?: number | SelectAllType = SelectAllType.ALL;
 }

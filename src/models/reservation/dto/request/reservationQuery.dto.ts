@@ -25,7 +25,6 @@ export class GetReservationQueryDto {
     if (value === SelectAllType.ALL) return value;
     return Number(value);
   })
-  @IsOptional()
   @IsIntSelectAll({ min: 0 })
   hashtag_id?: number | SelectAllType = SelectAllType.ALL;
 
@@ -33,7 +32,6 @@ export class GetReservationQueryDto {
     if (value === SelectAllType.ALL) return value;
     return Number(value);
   })
-  @IsOptional()
   @IsIntSelectAll({ min: 0 })
   category_id?: number | SelectAllType = SelectAllType.ALL;
 }
