@@ -1,16 +1,18 @@
+import { SelectAllType } from '../../../common/constants/selectAll.type';
+
 export function getMenteeFeedbacksWhereQuery(
-  mentorId: number,
-  menteeId: number,
-  reservationId: number,
+  mentorId: number | SelectAllType,
+  menteeId: number | SelectAllType,
+  reservationId: number | SelectAllType,
 ) {
   const whereObject = {};
-  if (mentorId !== undefined) {
+  if (mentorId !== SelectAllType.ALL) {
     whereObject['mentorId'] = mentorId;
   }
-  if (menteeId !== undefined) {
+  if (menteeId !== SelectAllType.ALL) {
     whereObject['menteeId'] = menteeId;
   }
-  if (reservationId !== undefined) {
+  if (reservationId !== SelectAllType.ALL) {
     whereObject['reservationId'] = reservationId;
   }
   return whereObject;

@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { PrismaService } from '../../database/services/prisma.service';
 import { ReservationGetResponseDto } from './dto/response/reservationGetResponse.dto';
 import { ReservationCreatePayloadDto } from './dto/request/reservationCreatePayload.dto';
 import {
@@ -17,19 +16,24 @@ import {
   RESERVATION_MENTEE_COMPLETION,
   RESERVATION_REQUEST,
 } from '../../common/constants/notification.event';
+import { UserRepository } from '../../database/repository/user.repository';
+import { SelectAllType } from '../../common/constants/selectAll.type';
 
 @Injectable()
 export class ReservationService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly userRepository: UserRepository,
     private readonly reservationRepository: ReservationRepository,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async findManyReservation(
-    query: GetReservationQueryDto,
+    category_id: number | SelectAllType,
+    hashtag_id: number | SelectAllType,
+    take: number,
+    page: number,
   ): Promise<Array<ReservationGetResponseDto>> {
-    return await this.reservationRepository.findMany(query);
+    return await this.reservationRepository.findMany(category_id, hashtag_id, take, page);
   }
 
   async findReservationById(
@@ -54,16 +58,15 @@ export class ReservationService {
    * - 멘토가 멘티에게 예약을 요청하는 경우는 없다.
    * - 멘토가 존재하지 않거나, 멘토가 숨김 상태인 경우 예약을 생성할 수 없다.
    * - 현재 진행중(ACCEPT, REQUEST)인 예약이 있으면 예약을 생성할 수 없다.
-   * @param payload: ReservationCreatePayloadDto
    * @returns ReservationGetResponseDto
+   * @param payload
    * */
   async createReservation(
     payload: ReservationCreatePayloadDto,
   ): Promise<ReservationGetResponseDto> {
     const createResult = await this.reservationRepository.create(payload);
-
-    const mentor = await this.prisma.user.findUnique({ where: { id: createResult.mentorId } });
-    const mentee = await this.prisma.user.findUnique({ where: { id: createResult.menteeId } });
+    const mentor = await this.userRepository.findById(createResult.mentorId);
+    const mentee = await this.userRepository.findById(createResult.menteeId);
 
     this.eventEmitter.emit(RESERVATION_REQUEST, {
       mentor,
@@ -82,8 +85,8 @@ export class ReservationService {
 
   async cancelReservation(reservationId: number, userId: number, role: string) {
     const result = await this.reservationRepository.cancelReservation(reservationId, userId, role);
-    const mentor = await this.prisma.user.findUnique({ where: { id: result.mentorId } });
-    const mentee = await this.prisma.user.findUnique({ where: { id: result.menteeId } });
+    const mentor = await this.userRepository.findById(result.mentorId);
+    const mentee = await this.userRepository.findById(result.menteeId);
 
     this.eventEmitter.emit(RESERVATION_CANCEL, { mentor, mentee, reservation: result });
     return result;
@@ -91,8 +94,8 @@ export class ReservationService {
 
   async acceptReservation(reservationId: number, userId: number, role: string) {
     const result = await this.reservationRepository.acceptReservation(reservationId, userId, role);
-    const mentor = await this.prisma.user.findUnique({ where: { id: result.mentorId } });
-    const mentee = await this.prisma.user.findUnique({ where: { id: result.menteeId } });
+    const mentor = await this.userRepository.findById(result.mentorId);
+    const mentee = await this.userRepository.findById(result.menteeId);
 
     this.eventEmitter.emit(RESERVATION_ACCEPT, { mentor, mentee, reservation: result });
     return result;
@@ -109,8 +112,8 @@ export class ReservationService {
       role,
       payload,
     );
-    const mentor = await this.prisma.user.findUnique({ where: { id: result.mentorId } });
-    const mentee = await this.prisma.user.findUnique({ where: { id: result.menteeId } });
+    const mentor = await this.userRepository.findById(result.mentorId);
+    const mentee = await this.userRepository.findById(result.menteeId);
 
     this.eventEmitter.emit(RESERVATION_MENTEE_COMPLETION, { mentor, mentee, reservation: result });
     return result;
