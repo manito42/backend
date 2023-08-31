@@ -1,6 +1,4 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { ReservationRepository } from '../../src/database/repository/reservation.repository';
-import { ReservationModule } from '../../src/models/reservation/reservation.module';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { PrismaService } from '../../src/database/services/prisma.service';
@@ -8,7 +6,7 @@ import { ValidationOptions } from '../../src/common/pipes/validationPipe/validat
 import { PrismaClientExceptionFilter } from '../../src/common/filters/prismaClientException.filter';
 import { User } from '@prisma/client';
 import { Category, Hashtag, MentorProfile, Reservation } from '.prisma/client';
-import { DevModule } from '../../src/modules/dev/dev.module';
+import { AppModule } from '../../src/app.module';
 
 /**
  * @description
@@ -29,7 +27,7 @@ describe('Reservation - Request', () => {
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [ReservationModule, DevModule],
+      imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -43,7 +41,7 @@ describe('Reservation - Request', () => {
   beforeEach(async () => {
     mentor = await prisma.user.create({
       data: {
-        email: 'ReservationMentor@gmail.com',
+        email: 'myukang@student.42seoul.kr',
         nickname: 'ReservationMentor',
         profileImage: 'ReservationMentor.png',
         role: 'USER',
@@ -52,7 +50,7 @@ describe('Reservation - Request', () => {
 
     mentee = await prisma.user.create({
       data: {
-        email: 'ReservationMentee@gmail.com',
+        email: 'myunghwan0421@gmail.com',
         nickname: 'ReservationMentee',
         profileImage: 'ReservationMentee.png',
         role: 'USER',
