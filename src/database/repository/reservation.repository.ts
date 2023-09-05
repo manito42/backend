@@ -108,13 +108,15 @@ export class ReservationRepository {
           reservation.status !== ReservationStatus.MENTEE_CHECKED)
       )
         throw new BadRequestException('invalid reservation for accept');
+
       /**
-       * NOTE: ACCEPT 상태의 예약은 멘토 혹은 Admin 만 취소할 수 있다.
+       * NOTE: ACCEPT/MENTEE_CHECKED 상태의 예약은 멘토 혹은 Admin 만 취소할 수 있다.
        */
       if (
-        reservation.status === ReservationStatus.ACCEPT &&
-        role !== UserRole.ADMIN &&
-        reservation.mentorId !== userId
+        (reservation.status === ReservationStatus.ACCEPT ||
+          reservation.status === ReservationStatus.MENTEE_CHECKED) &&
+        reservation.mentorId !== userId &&
+        role !== UserRole.ADMIN
       )
         throw new UnauthorizedException('user is not mentor of this reservation');
       return prisma.reservation.update({
