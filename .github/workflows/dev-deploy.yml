@@ -6,6 +6,15 @@ on:
   push:
     branches:
       - develop
+    paths:
+      - 'src/**' # source code
+      - 'e2e/**' # e2e test
+      - 'package.json' # 의존성
+      - 'package-lock.json' # 의존성
+      - 'prisma/**' # prisma, bin file/schema
+      - 'tsconfig.json' # tsconfig
+      - 'tsconfig.build.json' # tsconfig
+      - 'appspec.yml' # codedeploy
 
 env:
   AWS_REGION: ap-northeast-2
