@@ -99,12 +99,13 @@ export class ReservationRepository {
         where: { id: reservationId },
       });
       /**
-       * NOTE: 예약은 REQUEST/ACCEPT 상태일 때만 취소할 수 있다.
+       * NOTE: 예약은 REQUEST/ACCEPT/MENTEE_CHECKED 상태일 때만 취소할 수 있다.
        * */
       if (
         !reservation ||
         (reservation.status !== ReservationStatus.REQUEST &&
-          reservation.status !== ReservationStatus.ACCEPT)
+          reservation.status !== ReservationStatus.ACCEPT &&
+          reservation.status !== ReservationStatus.MENTEE_CHECKED)
       )
         throw new BadRequestException('invalid reservation for accept');
       /**
