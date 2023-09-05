@@ -60,6 +60,7 @@ enum ReservationStatus {
   REQUEST
   ACCEPT
   CANCEL
+  MENTEE_CHECKED
   MENTEE_FEEDBACK
   DONE
 }
