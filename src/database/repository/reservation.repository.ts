@@ -153,7 +153,11 @@ export class ReservationRepository {
       const reservation = await prisma.reservation.findUnique({
         where: { id: reservationId },
       });
-      if (!reservation || reservation.status !== ReservationStatus.ACCEPT)
+      if (
+        !reservation ||
+        (reservation.status !== ReservationStatus.ACCEPT &&
+          reservation.status !== ReservationStatus.MENTEE_CHECKED)
+      )
         throw new BadRequestException('invalid reservation for mentee_completion');
       if (role !== UserRole.ADMIN && reservation.menteeId !== userId)
         throw new UnauthorizedException('user is not mentee of this reservation');
