@@ -23,7 +23,6 @@ import { JwtGuard } from '../../common/guards/jwt/jwt.guard';
 import { GetUserId } from '../../common/decorators/getUserId.decorator';
 import { UserRole } from '@prisma/client';
 import { GetUserRole } from '../../common/decorators/getUserRole.decorator';
-import { IdParamDto } from '../../common/dto/param/id.dto';
 
 @Controller('/reservations')
 export class ReservationController {
@@ -132,11 +131,11 @@ export class ReservationController {
   @Patch('/:id/check')
   @UseGuards(JwtGuard)
   async check(
-    @Param('id') param: IdParamDto,
+    @Param('id') reservationId: number,
     @GetUserId() userId: number,
     @GetUserRole() role: UserRole,
   ): Promise<ReservationGetResponseDto> {
-    return await this.reservationService.checkReservationByMentee(param.id, userId, role);
+    return await this.reservationService.checkReservationByMentee(reservationId, userId, role);
   }
 
   /**

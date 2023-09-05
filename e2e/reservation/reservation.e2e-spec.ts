@@ -6,7 +6,7 @@ import { ValidationOptions } from '../../src/common/pipes/validationPipe/validat
 import { PrismaClientExceptionFilter } from '../../src/common/filters/prismaClientException.filter';
 import { User } from '@prisma/client';
 import { Category, Hashtag, MentorProfile, Reservation } from '.prisma/client';
-import { AppModule } from '../../src/app.module';
+import { AppModule } from 'src/app.module';
 
 /**
  * @description
@@ -255,6 +255,7 @@ describe('Reservation - Request', () => {
 
   describe('Request - Accept', () => {
     let reservation: Reservation;
+    //Accept된 예약 생성
     beforeEach(async () => {
       const response = await request(app.getHttpServer())
         .post('/reservations')
@@ -337,6 +338,31 @@ describe('Reservation - Request', () => {
           },
         });
         expect(res.status).toBe('DONE');
+      });
+    });
+
+    describe('Accept -> Checked By mentee', () => {
+      it('참여하지 않은 멘티가 예약을 확인한다.(401)', async () => {
+        const response = await request(app.getHttpServer())
+          .patch(`/reservations/${reservation.id}/check`)
+          .set('Authorization', `Bearer ${dummyMenteeAccToken}`);
+
+        expect(response.status).toBe(401);
+      });
+
+      it('멘티가 예약을 확인한다.(200)', async () => {
+        const response = await request(app.getHttpServer())
+          .patch(`/reservations/${reservation.id}/check`)
+          .set('Authorization', `Bearer ${menteeAccessToken}`);
+
+        expect(response.status).toBe(200);
+
+        const res = await prisma.reservation.findUnique({
+          where: {
+            id: reservation.id,
+          },
+        });
+        expect(res.status).toBe('MENTEE_CHECKED');
       });
     });
   });

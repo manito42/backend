@@ -6,7 +6,6 @@ import {
   ReservationCompleteAsMentorPayloadDto,
   ReservationUpdatePayloadDto,
 } from './dto/request/reservationUpdatePayload.dto';
-import { GetReservationQueryDto } from './dto/request/reservationQuery.dto';
 import { ReservationRepository } from '../../database/repository/reservation.repository';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { UserRole } from '@prisma/client';
