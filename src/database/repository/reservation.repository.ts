@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '../services/prisma.service';
@@ -143,6 +144,45 @@ export class ReservationRepository {
       });
     });
   }
+
+  /**
+   * @param reservationId
+   *   - 예약 ID
+   * @param userId
+   *   - 요청한 유저 ID
+   * @param role
+   *   - 요청한 유저의 Role
+   * */
+  async checkReservation(
+    reservationId: number,
+    userId: number,
+    role: string,
+  ): Promise<ReservationGetResponseDto> {
+    return this.prismaService.$transaction(async (prisma) => {
+      const reservation = await this.prismaService.reservation.findUnique({
+        where: {
+          id: reservationId,
+        },
+      });
+      // reservation이 없는 경우
+      if (!reservation) throw new NotFoundException('not exist reservation');
+
+      // check는 ACCEPT 상태의 예약만 가능
+      if (reservation.status !== ReservationStatus.ACCEPT)
+        throw new BadRequestException('invalid reservation for check');
+
+      // check는 예약한 멘티 혹은 Admin 만 가능
+      if (reservation.menteeId !== userId && role !== 'ADMIN')
+        throw new UnauthorizedException('invalid user');
+
+      return prisma.reservation.update({
+        where: { id: reservationId },
+        data: { status: ReservationStatus.MENTEE_CHECKED },
+        select: ReservationSelectQuery,
+      });
+    });
+  }
+
   async completeReservationByMentee(
     reservationId: number,
     userId: number,

@@ -23,6 +23,7 @@ import { JwtGuard } from '../../common/guards/jwt/jwt.guard';
 import { GetUserId } from '../../common/decorators/getUserId.decorator';
 import { UserRole } from '@prisma/client';
 import { GetUserRole } from '../../common/decorators/getUserRole.decorator';
+import { IdParamDto } from '../../common/dto/param/id.dto';
 
 @Controller('/reservations')
 export class ReservationController {
@@ -123,6 +124,19 @@ export class ReservationController {
      * */
     if (reservationId < 0) throw new BadRequestException('invalid id');
     return await this.reservationService.acceptReservation(reservationId, userId, role);
+  }
+
+  /**
+   * @access >= OWNER
+   * */
+  @Patch('/:id/check')
+  @UseGuards(JwtGuard)
+  async check(
+    @Param('id') param: IdParamDto,
+    @GetUserId() userId: number,
+    @GetUserRole() role: UserRole,
+  ): Promise<ReservationGetResponseDto> {
+    return await this.reservationService.checkReservationByMentee(param.id, userId, role);
   }
 
   /**
