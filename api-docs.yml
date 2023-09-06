@@ -547,6 +547,39 @@ paths:
         '409':
           description: already exists
 
+  /reservations/{id}/check:
+    patch:
+      summary: check accepted reservation by mentee
+      description: |
+        **ROLE**\
+        \
+        only for `mentee` user that related with reservation
+      tags:
+        - Reservations
+      security:
+        - OwnerUser: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "reservation id"
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationGet'
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '409':
+          description: already exists
+
   /reservations/{id}/mentor_completion:
     patch:
       summary: complete reservation as mentor
@@ -947,6 +980,12 @@ paths:
         - in: query
           name: search_by_hashtag_name
           description: search by tag name `default = true`
+          schema:
+            type: string
+            format: "true | false"
+        - in: query
+          name: search_by_category_name
+          description: search by category name `default = true`
           schema:
             type: string
             format: "true | false"

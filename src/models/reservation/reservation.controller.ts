@@ -127,6 +127,19 @@ export class ReservationController {
 
   /**
    * @access >= OWNER
+   * */
+  @Patch('/:id/check')
+  @UseGuards(JwtGuard)
+  async check(
+    @Param('id') reservationId: number,
+    @GetUserId() userId: number,
+    @GetUserRole() role: UserRole,
+  ): Promise<ReservationGetResponseDto> {
+    return await this.reservationService.checkReservationByMentee(reservationId, userId, role);
+  }
+
+  /**
+   * @access >= OWNER
    */
   @Patch('/:id/mentor_completion')
   @UseGuards(JwtGuard)

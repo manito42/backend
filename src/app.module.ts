@@ -17,9 +17,11 @@ import { SearchModule } from './modules/search/search.module';
 import { HomeModule } from './modules/home/home.module';
 import { DevModule } from './modules/dev/dev.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot(),
     CategoryModule,
     HashtagModule,
     MenteeFeedbackModule,
