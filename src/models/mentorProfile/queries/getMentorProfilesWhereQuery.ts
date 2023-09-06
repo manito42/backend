@@ -30,6 +30,7 @@ export function getMentorProfilesWhereQuery(
 export function getMentorProfilesSearchWhereQuery(
   searchHashtag: boolean,
   searchNickname: boolean,
+  searchCategory: boolean,
   search: string,
 ) {
   const orArray = [];
@@ -53,6 +54,17 @@ export function getMentorProfilesSearchWhereQuery(
       },
     };
     orArray.push(userWhereObject);
+  }
+  if (searchCategory) {
+    const categoryWhereObject = {};
+    categoryWhereObject['categories'] = {
+      some: {
+        name: {
+          contains: search,
+        },
+      },
+    };
+    orArray.push(categoryWhereObject);
   }
   return whereObject;
 }

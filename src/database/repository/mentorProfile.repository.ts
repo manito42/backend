@@ -54,6 +54,7 @@ export class MentorProfileRepository {
    * @param page
    * @param search_by_hashtag_name
    * @param search_by_user_nickname
+   * @param search_by_category_name
    * @param search
    */
   async findBySearch(
@@ -61,6 +62,7 @@ export class MentorProfileRepository {
     page: number,
     search_by_hashtag_name: boolean,
     search_by_user_nickname: boolean,
+    search_by_category_name: boolean,
     search?: string,
   ): Promise<Array<MentorProfileGetResponseDto>> {
     if (!search_by_hashtag_name && !search_by_user_nickname) throw new BadRequestException();
@@ -71,6 +73,7 @@ export class MentorProfileRepository {
       where: getMentorProfilesSearchWhereQuery(
         search_by_hashtag_name,
         search_by_user_nickname,
+        search_by_category_name,
         search,
       ),
     });

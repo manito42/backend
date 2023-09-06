@@ -32,4 +32,11 @@ export class GetSearchQueryDto {
     return value === 'true';
   })
   search_by_user_nickname?: boolean = true;
+
+  @IsOptional()
+  @IsBoolean({ message: "search_by_category_name must be 'true' or 'false'" })
+  @Transform(({ value }) => {
+    return value === 'true';
+  })
+  search_by_category_name?: boolean = true;
 }

@@ -28,6 +28,7 @@ export class MentorProfileService {
     page: number,
     search_by_hashtag_name: boolean,
     search_by_user_nickname: boolean,
+    search_by_category_name: boolean,
     search?: string,
   ): Promise<Array<MentorProfileGetResponseDto>> {
     return this.mentorProfileRepository.findBySearch(
@@ -35,6 +36,7 @@ export class MentorProfileService {
       page,
       search_by_hashtag_name,
       search_by_user_nickname,
+      search_by_category_name,
       search,
     );
   }
