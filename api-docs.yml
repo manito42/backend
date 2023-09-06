@@ -950,6 +950,12 @@ paths:
           schema:
             type: string
             format: "true | false"
+        - in: query
+          name: search_by_category_name
+          description: search by category name `default = true`
+          schema:
+            type: string
+            format: "true | false"
       responses:
         '200':
           description: OK
