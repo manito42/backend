@@ -42,5 +42,7 @@ jobs:
       - name: Install Dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
+      - name: prisma generate
+        run: npx prisma generate
       - name: build
         run: npm run build

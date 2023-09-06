@@ -6,7 +6,6 @@ import {
   ReservationCompleteAsMentorPayloadDto,
   ReservationUpdatePayloadDto,
 } from './dto/request/reservationUpdatePayload.dto';
-import { GetReservationQueryDto } from './dto/request/reservationQuery.dto';
 import { ReservationRepository } from '../../database/repository/reservation.repository';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { UserRole } from '@prisma/client';
@@ -100,6 +99,20 @@ export class ReservationService {
     this.eventEmitter.emit(RESERVATION_ACCEPT, { mentor, mentee, reservation: result });
     return result;
   }
+
+  /**
+   * @description 멘티가 예약을 확인하는 API
+   * - 멘티가 멘토에게 예약을 요청한 경우, 멘토가 수락하면 예약이 생성된다.
+   * - 수락된 예약은 멘티가 확인을 했느냐/하지 않았냐에 따라 달라짐.
+   * */
+  async checkReservationByMentee(
+    reservationId: number,
+    userId: number,
+    role: string,
+  ): Promise<ReservationGetResponseDto> {
+    return await this.reservationRepository.checkReservation(reservationId, userId, role);
+  }
+
   async menteeCompletion(
     reservationId: number,
     userId: number,
