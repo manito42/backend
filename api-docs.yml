@@ -1851,17 +1851,17 @@ components:
 
   securitySchemes:
     NormalUser:
-      type: apiKey
-      in: cookie
-      name : "Authorization"
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
       description: "User Role >= USER"
     OwnerUser:
-      type: apiKey
-      in: cookie
-      name : "Authorization"
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
       description: "User Role >= ResourceOwner"
     AdminUser:
-      type: apiKey
-      in: cookie
-      name : "Authorization"
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
       description: "User Role >= ADMIN"
