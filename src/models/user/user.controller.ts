@@ -122,4 +122,32 @@ export class UserController {
     if (!reservations) throw new BadRequestException();
     return reservations;
   }
+
+  /**
+   * @access >= OWNER
+   */
+  @Get('/:id/reservations/request')
+  @UseGuards(JwtGuard)
+  async getUserReservationRequests(
+    @GetUser() user: JwtPayloadInterface,
+    @Param('id') id: number,
+  ): Promise<UserReservationGetDto> {
+    if (id < 0 || !id) throw new BadRequestException();
+    if (user.id !== id && user.role !== UserRole.ADMIN) throw new UnauthorizedException();
+    const take = 100;
+    const page = 0;
+    const as_mentor = true;
+    const as_mentee = true;
+    const status: ReservationStatus[] = [ReservationStatus.REQUEST, ReservationStatus.ACCEPT];
+    const reservations = await this.userService.findUserReservation(
+      id,
+      take,
+      page,
+      as_mentor,
+      as_mentee,
+      status,
+    );
+    if (!reservations) throw new BadRequestException();
+    return reservations;
+  }
 }

@@ -4,6 +4,8 @@ servers:
     url: "https://api.dev.42manito.com/"
   - description: 42 MANITO API SERVER
     url: "https://api.42manito.com/"
+  - description: 42 MANITO API LOCAL TEST
+    url: "http://localhost:3000"
 
 info:
   version: "1.0.0"
@@ -203,10 +205,36 @@ paths:
             format: boolean
         - in: query
           name: active
-          description: find all active (`REQUEST`, `ACCEPT`, `PENDING`) user's `reservations` `(default ="false")`
+          description: find all active (`REQUEST`, `ACCEPT`, `MENTEE_CHECK`, `MENTEE_FEEDBACK`) user's `reservations` `(default ="false")`
           schema:
             type: string
             format: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersReservationsGet'
+        '400':
+          description: Invalid request parameter id
+        '404':
+          description: User not found
+
+  /users/{id}/reservations/request:
+    get:
+      summary: Get a user reservation requests by ID
+      tags:
+        - Users
+      security:
+        - OwnerUser: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
       responses:
         '200':
           description: OK
