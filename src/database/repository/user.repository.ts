@@ -74,17 +74,16 @@ export class UserRepository {
     page: number,
     as_mentor: boolean,
     as_mentee: boolean,
-    active: boolean,
+    status: ReservationStatus[],
   ): Promise<UserReservationGetDto> {
     let menteeReservations;
     let mentorReservations;
     if (as_mentee) {
       let whereQuery = { menteeId: id };
-      if (active)
-        whereQuery['OR'] = [
-          { status: ReservationStatus.REQUEST },
-          { status: ReservationStatus.ACCEPT },
-        ];
+      whereQuery['OR'] = [];
+      status.forEach((s) => {
+        whereQuery['OR'].push({ status: s });
+      });
       menteeReservations = await this.prisma.reservation.findMany({
         where: whereQuery,
         select: ReservationSelectQuery,
@@ -97,12 +96,10 @@ export class UserRepository {
     }
     if (as_mentor) {
       let whereQuery = { mentorId: id };
-      if (active)
-        whereQuery['OR'] = [
-          { status: ReservationStatus.REQUEST },
-          { status: ReservationStatus.ACCEPT },
-          { status: ReservationStatus.MENTEE_FEEDBACK },
-        ];
+      whereQuery['OR'] = [];
+      status.forEach((s) => {
+        whereQuery['OR'].push({ status: s });
+      });
       mentorReservations = await this.prisma.reservation.findMany({
         where: whereQuery,
         select: ReservationSelectQuery,
