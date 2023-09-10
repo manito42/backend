@@ -22,7 +22,7 @@ import { UserReservationGetDto } from './dto/response/userReservationGet.dto';
 import { GetUserReservationQueryDto } from './dto/request/userReservationQuery.dto';
 import { JwtGuard } from '../../common/guards/jwt/jwt.guard';
 import { GetUserRole } from '../../common/decorators/getUserRole.decorator';
-import { UserRole } from '@prisma/client';
+import { ReservationStatus, UserRole } from '@prisma/client';
 import { GetUser } from '../../common/decorators/getUser.decorator';
 import { JwtPayloadInterface } from '../../common/interfaces/jwt/jwtPayload.interface';
 
@@ -100,16 +100,52 @@ export class UserController {
     @Param('id') id: number,
     @Query() query: GetUserReservationQueryDto,
   ): Promise<UserReservationGetDto> {
-    if (id < 0) throw new BadRequestException();
+    if (id < 0 || !id) throw new BadRequestException();
     if (user.id !== id && user.role !== UserRole.ADMIN) throw new UnauthorizedException();
     const { take, page, as_mentor, as_mentee, active } = query;
+    const status: ReservationStatus[] = active
+      ? [
+          ReservationStatus.REQUEST,
+          ReservationStatus.ACCEPT,
+          ReservationStatus.MENTEE_CHECKED,
+          ReservationStatus.MENTEE_FEEDBACK,
+        ]
+      : [ReservationStatus.DONE, ReservationStatus.CANCEL];
     const reservations = await this.userService.findUserReservation(
       id,
       take,
       page,
       as_mentor,
       as_mentee,
-      active,
+      status,
+    );
+    if (!reservations) throw new BadRequestException();
+    return reservations;
+  }
+
+  /**
+   * @access >= OWNER
+   */
+  @Get('/:id/reservations/request')
+  @UseGuards(JwtGuard)
+  async getUserReservationRequests(
+    @GetUser() user: JwtPayloadInterface,
+    @Param('id') id: number,
+  ): Promise<UserReservationGetDto> {
+    if (id < 0 || !id) throw new BadRequestException();
+    if (user.id !== id && user.role !== UserRole.ADMIN) throw new UnauthorizedException();
+    const take = 100;
+    const page = 0;
+    const as_mentor = true;
+    const as_mentee = true;
+    const status: ReservationStatus[] = [ReservationStatus.REQUEST, ReservationStatus.ACCEPT];
+    const reservations = await this.userService.findUserReservation(
+      id,
+      take,
+      page,
+      as_mentor,
+      as_mentee,
+      status,
     );
     if (!reservations) throw new BadRequestException();
     return reservations;
