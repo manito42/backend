@@ -1614,9 +1614,8 @@ components:
         menteeId:
           type: integer
           format: int32
-        categoryId:
-          type: integer
-          format: int32
+        category:
+          $ref: '#/components/schemas/CategoryGet'
         requestMessage:
           type: string
         status:
