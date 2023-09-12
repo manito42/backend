@@ -17,13 +17,14 @@ import { HashtagCreatePayloadDto } from './dto/request/hashtagCreatePayload.dto'
 import { GetHashtagsQueryDto } from './dto/request/hashtagQuery.dto';
 import { Response } from 'express';
 import { JwtGuard } from '../../common/guards/jwt/jwt.guard';
+import { HashtagPaginationResponseDto } from './dto/response/hashtagPaginationResponse.dto';
 
 @Controller('/hashtags')
 export class HashtagController {
   constructor(private readonly hashtagService: HashtagService) {}
 
   @Get('/')
-  async getHashtags(@Query() query: GetHashtagsQueryDto): Promise<Array<HashtagGetResponseDto>> {
+  async getHashtags(@Query() query: GetHashtagsQueryDto): Promise<HashtagPaginationResponseDto> {
     const { page, take, profile_id, reservation_id, search } = query;
     return await this.hashtagService.findMany(take, page, profile_id, reservation_id, search);
   }
