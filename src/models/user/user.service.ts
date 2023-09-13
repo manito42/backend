@@ -5,6 +5,7 @@ import { UserGetResponseDto } from './dto/response/userGetResponse.dto';
 import { UserReservationGetDto } from './dto/response/userReservationGet.dto';
 import { UserRepository } from '../../database/repository/user.repository';
 import { ReservationStatus } from '@prisma/client';
+import { UserReservationPaginationResponseDto } from './dto/response/userReservationPaginationResponse.dto';
 
 @Injectable()
 export class UserService {
@@ -38,10 +39,26 @@ export class UserService {
     id: number,
     take: number,
     page: number,
-    as_mentor: boolean,
-    as_mentee: boolean,
     status: ReservationStatus[],
   ): Promise<UserReservationGetDto> {
-    return this.userRepository.findUserReservation(id, take, page, as_mentor, as_mentee, status);
+    return this.userRepository.findUserReservation(id, take, page, status);
+  }
+
+  async findUserReservationAsMentor(
+    id: number,
+    take: number,
+    page: number,
+    status: ReservationStatus[],
+  ): Promise<UserReservationPaginationResponseDto> {
+    return await this.userRepository.findUserReservationAsMentor(id, take, page, status);
+  }
+
+  async findUserReservationAsMentee(
+    id: number,
+    take: number,
+    page: number,
+    status: ReservationStatus[],
+  ): Promise<UserReservationPaginationResponseDto> {
+    return await this.userRepository.findUserReservationAsMentee(id, take, page, status);
   }
 }
