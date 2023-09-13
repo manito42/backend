@@ -18,6 +18,7 @@ export class HashtagRepository {
     const totalCount = await this.prisma.hashtag.count({
       where: getHashtagsWhereQuery(profileId, reservationId, search),
     });
+    const totalPage = Math.ceil(totalCount / take) - 1;
     return {
       content: await this.prisma.hashtag.findMany({
         take: take,
@@ -27,9 +28,9 @@ export class HashtagRepository {
       page: {
         take: take,
         page: page,
-        totalPage: Math.ceil(totalCount / take),
+        totalPage: totalPage,
         currentPage: page,
-        isLast: totalCount / take <= page,
+        isLast: totalPage <= page,
       },
     };
   }
