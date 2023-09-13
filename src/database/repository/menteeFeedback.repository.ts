@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../services/prisma.service';
 import { MenteeFeedbackResponseDto } from '../../models/menteeFeedback/dto/response/menteeFeedbackResponse.dto';
 import { getMenteeFeedbacksWhereQuery } from '../../models/menteeFeedback/queries/getMenteeFeedbacksWhereQuery';
