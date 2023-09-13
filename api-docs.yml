@@ -761,7 +761,7 @@ paths:
 
   /mentee_feedbacks:
     get:
-      summary: Get all mentee feedbacks
+      summary: Get all mentee feedbacks order by recent updated
       tags:
         - Mentee Feedbacks
       security:
@@ -803,9 +803,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/MenteeFeedbackGet'
+                $ref: '#/components/schemas/MenteeFeedbackPagination'
 
     post:
       summary: Create a new mentee feedback
@@ -904,9 +902,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/MentorFeedbackGet'
+                $ref: '#/components/schemas/MentorFeedbackPagination'
     post:
       summary: Create a new mentor feedback
       tags:
@@ -1731,7 +1727,6 @@ components:
       type: object
       properties:
         content:
-          type: array
           items:
             $ref: '#/components/schemas/HashtagGet'
         page:
@@ -1856,6 +1851,24 @@ components:
           type: string
           format: date-time
 
+    MentorFeedbackPagination:
+      type: object
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/MentorFeedbackGet'
+        page:
+          $ref: '#/components/schemas/Page'
+
+    MenteeFeedbackPagination:
+      type: object
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/MenteeFeedbackGet'
+        page:
+          $ref: '#/components/schemas/Page'
+
     MentorFeedbackCreate:
       type: object
       properties:
@@ -1883,6 +1896,7 @@ components:
         - mentorId
         - reservationId
         - rating
+ 
     ## Category
     CategoryGet:
       type: object
