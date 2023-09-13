@@ -311,7 +311,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/MentorProfileGet'
+                  $ref: '#/components/schemas/MentorProfilePagination'
 
   /mentor_profiles/{id}:
     get:
@@ -1466,6 +1466,15 @@ components:
               type: string
             profileImage:
               type: string
+
+    MentorProfilePagination:
+      type: object
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/MentorProfileGet'
+        page:
+          $ref: '#/components/schemas/Page'
 
     MentorProfileSimpleGet:
       type: object
