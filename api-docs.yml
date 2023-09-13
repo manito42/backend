@@ -727,9 +727,8 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/HashtagGet'
+                type: object
+                $ref: '#/components/schemas/HashtagPagination'
     post:
       summary: Create a new hashtag
       tags:
@@ -1728,6 +1727,28 @@ components:
         name:
           type: string
 
+    HashtagPagination:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/HashtagGet'
+        page:
+          $ref: '#/components/schemas/Page'
+      example:
+        content:
+          - id: 0
+            name: 'test1'
+          - id: 1
+            name: 'test2'
+        page:
+          take: 0
+          page: 0
+          totalPage: 0
+          currentPage: 0
+          isLast: false
+
     HashtagId:
       type: object
       properties:
@@ -1875,6 +1896,24 @@ components:
     ## Search/Mentor
     SearchMentorGet:
       $ref: '#/components/schemas/HomeGet'
+
+    Page:
+      type: object
+      properties:
+        take:
+          type: integer
+          format: int32
+        page:
+          type: integer
+          format: int32
+        totalPage:
+          type: integer
+          format: int32
+        currentPage:
+          type: integer
+          format: int32
+        isLast:
+          type: boolean
 
   securitySchemes:
     NormalUser:
