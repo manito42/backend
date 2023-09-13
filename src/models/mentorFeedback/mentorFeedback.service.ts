@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { MentorFeedbackResponseDto } from './dto/response/mentorFeedbackResponse.dto';
 import { MentorFeedbackCreatePayloadDto } from './dto/request/mentorFeedbackCreatePayload.dto';
-import { GetMentorFeedbacksQueryDto } from './dto/request/mentorFeedbackQuery.dto';
 import { MentorFeedbackRepository } from '../../database/repository/mentorFeedback.repository';
 import { ReservationRepository } from '../../database/repository/reservation.repository';
 import { SelectAllType } from '../../common/constants/selectAll.type';
+import { MentorFeedbackPaginationResponseDto } from './dto/response/mentorFeedbackPaginationResponse.dto';
 
 @Injectable()
 export class MentorFeedbackService {
@@ -19,7 +19,7 @@ export class MentorFeedbackService {
     mentor_id: number | SelectAllType,
     mentee_id: number | SelectAllType,
     reservation_id: number | SelectAllType,
-  ): Promise<MentorFeedbackResponseDto[]> {
+  ): Promise<MentorFeedbackPaginationResponseDto> {
     return await this.mentorFeedbackRepository.findMany(
       take,
       page,
