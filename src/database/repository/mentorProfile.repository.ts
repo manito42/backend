@@ -8,6 +8,7 @@ import {
 } from '../../models/mentorProfile/queries/getMentorProfilesWhereQuery';
 import { MentorProfileUpdatePayloadDto } from '../../models/mentorProfile/dto/request/mentorProfileUpdatePayload.dto';
 import { SelectAllType } from '../../common/constants/selectAll.type';
+import { MentorProfilePaginationResponseDto } from 'src/models/mentorProfile/dto/response/mentorProfilePaginationResponse.dto';
 
 @Injectable()
 export class MentorProfileRepository {
@@ -28,15 +29,30 @@ export class MentorProfileRepository {
     isHide: boolean | SelectAllType,
     hashtagId: number | SelectAllType,
     categoryId: number | SelectAllType,
-    sort?,
-  ): Promise<Array<MentorProfileGetResponseDto>> {
-    return this.prisma.mentorProfile.findMany({
-      take: take,
-      skip: page * take,
-      select: MentorProfileSelectQuery,
+  ): Promise<MentorProfilePaginationResponseDto> {
+    const totalCount = await this.prisma.mentorProfile.count({
       where: getMentorProfilesWhereQuery(isHide, hashtagId, categoryId),
-      orderBy: sort,
     });
+    const totalPage = Math.ceil(totalCount / take) - 1;
+
+    return {
+      content: await this.prisma.mentorProfile.findMany({
+        take: take,
+        skip: page * take,
+        select: MentorProfileSelectQuery,
+        where: getMentorProfilesWhereQuery(isHide, hashtagId, categoryId),
+        orderBy: {
+          updatedAt: 'desc',
+        },
+      }),
+      page: {
+        take: take,
+        page: page,
+        totalPage: totalPage,
+        currentPage: page,
+        isLast: totalPage <= page,
+      },
+    };
   }
 
   async findById(id: number): Promise<MentorProfileGetResponseDto> {
