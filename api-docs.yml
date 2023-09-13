@@ -414,7 +414,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ReservationGet'
+                  $ref: '#/components/schemas/ReservationPagination'
     post:
       summary: Create a new reservation
       security:
@@ -1645,6 +1645,16 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/HashtagGet'
+
+    ReservationPagination:
+      type: object
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/ReservationGet'
+        page:
+          $ref: '#/components/schemas/Page'
+
     UserReservationGet:
       type: object
       properties:
