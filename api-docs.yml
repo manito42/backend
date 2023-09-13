@@ -220,6 +220,94 @@ paths:
           description: Invalid request parameter id
         '404':
           description: User not found
+  
+  /users/{id}/reservations/as_mentor:
+    get:
+      summary: Get a user reservations by ID
+      tags:
+        - Users
+      security:
+        - OwnerUser: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: take
+          description: take `take` Users (`min = 1, max = 100, default = 20`)
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: page
+          description: skip `take * page` Users and take `take` Users (`skip >= 0`)
+          schema:
+            type: string
+            format: boolean
+        - in: query
+          name: active
+          description: find all active (`REQUEST`, `ACCEPT`, `MENTEE_CHECK`, `MENTEE_FEEDBACK`) user's `reservations` `(default ="false")`
+          schema:
+            type: string
+            format: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersReservationsPagination'
+        '400':
+          description: Invalid request parameter id
+        '404':
+          description: User not found
+
+  /users/{id}/reservations/as_mentee:
+    get:
+      summary: Get a user reservations by ID
+      tags:
+        - Users
+      security:
+        - OwnerUser: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: take
+          description: take `take` Users (`min = 1, max = 100, default = 20`)
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: page
+          description: skip `take * page` Users and take `take` Users (`skip >= 0`)
+          schema:
+            type: string
+            format: boolean
+        - in: query
+          name: active
+          description: find all active (`REQUEST`, `ACCEPT`, `MENTEE_CHECK`, `MENTEE_FEEDBACK`) user's `reservations` `(default ="false")`
+          schema:
+            type: string
+            format: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersReservationsPagination'
+        '400':
+          description: Invalid request parameter id
+        '404':
+          description: User not found
 
   /users/{id}/reservations/request:
     get:
@@ -1415,6 +1503,15 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ReservationGet'
+
+    UsersReservationsPagination:
+      type: object
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/ReservationGet'
+        page:
+          $ref: '#/components/schemas/Page'
 
     ## MentorProfile
     MentorProfileCreate:
