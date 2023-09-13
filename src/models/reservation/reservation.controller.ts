@@ -23,6 +23,7 @@ import { JwtGuard } from '../../common/guards/jwt/jwt.guard';
 import { GetUserId } from '../../common/decorators/getUserId.decorator';
 import { UserRole } from '@prisma/client';
 import { GetUserRole } from '../../common/decorators/getUserRole.decorator';
+import { ReservationPaginationResponseDto } from './dto/response/reservationPaginationResponse.dto';
 
 @Controller('/reservations')
 export class ReservationController {
@@ -37,7 +38,7 @@ export class ReservationController {
   async getReservations(
     @GetUserRole() role: UserRole,
     @Query() query: GetReservationQueryDto,
-  ): Promise<Array<ReservationGetResponseDto>> {
+  ): Promise<ReservationPaginationResponseDto> {
     if (role !== UserRole.ADMIN) throw new UnauthorizedException();
     const { category_id, hashtag_id, take, page } = query;
     return await this.reservationService.findManyReservation(category_id, hashtag_id, take, page);

@@ -17,6 +17,7 @@ import { ReservationGetResponseDto } from '../../models/reservation/dto/response
 import { getReservationsWhereQuery } from '../../models/reservation/queries/getReservationsWhereQuery';
 import { ReservationCreatePayloadDto } from '../../models/reservation/dto/request/reservationCreatePayload.dto';
 import { SelectAllType } from '../../common/constants/selectAll.type';
+import { ReservationPaginationResponseDto } from 'src/models/reservation/dto/response/reservationPaginationResponse.dto';
 
 @Injectable()
 export class ReservationRepository {
@@ -27,13 +28,27 @@ export class ReservationRepository {
     hashtag_id: number | SelectAllType,
     take: number,
     page: number,
-  ): Promise<Array<ReservationGetResponseDto>> {
-    return this.prismaService.reservation.findMany({
-      take: take,
-      skip: page * take,
+  ): Promise<ReservationPaginationResponseDto> {
+    const totalCount = await this.prismaService.reservation.count({
       where: getReservationsWhereQuery(hashtag_id, category_id),
-      select: ReservationSelectQuery,
     });
+    const totalPage = Math.ceil(totalCount / take) - 1;
+
+    return {
+      content: await this.prismaService.reservation.findMany({
+        take: take,
+        skip: page * take,
+        where: getReservationsWhereQuery(hashtag_id, category_id),
+        select: ReservationSelectQuery,
+      }),
+      page: {
+        take: take,
+        page: page,
+        totalPage: totalPage,
+        currentPage: page,
+        isLast: totalPage <= page,
+      },
+    };
   }
 
   async findById(id: number): Promise<ReservationGetResponseDto> {
