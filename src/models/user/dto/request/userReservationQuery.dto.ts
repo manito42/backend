@@ -19,20 +19,6 @@ export class GetUserReservationQueryDto {
   page?: number = 0;
 
   @IsOptional()
-  @IsBoolean({ message: "as_mentee must be 'true' or 'false'" })
-  @Transform(({ value }) => {
-    return value === 'true';
-  })
-  as_mentee?: boolean = true;
-
-  @IsOptional()
-  @IsBoolean({ message: "as_mentor must be 'true' or 'false'" })
-  @Transform(({ value }) => {
-    return value === 'true';
-  })
-  as_mentor?: boolean = true;
-
-  @IsOptional()
   @IsBoolean({ message: "all must be 'true' or 'false'" })
   @Transform(({ value }) => {
     return value === 'true';

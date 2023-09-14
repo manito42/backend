@@ -17,6 +17,7 @@ import {
 } from '../../common/constants/notification.event';
 import { UserRepository } from '../../database/repository/user.repository';
 import { SelectAllType } from '../../common/constants/selectAll.type';
+import { ReservationPaginationResponseDto } from './dto/response/reservationPaginationResponse.dto';
 
 @Injectable()
 export class ReservationService {
@@ -31,7 +32,7 @@ export class ReservationService {
     hashtag_id: number | SelectAllType,
     take: number,
     page: number,
-  ): Promise<Array<ReservationGetResponseDto>> {
+  ): Promise<ReservationPaginationResponseDto> {
     return await this.reservationRepository.findMany(category_id, hashtag_id, take, page);
   }
 
