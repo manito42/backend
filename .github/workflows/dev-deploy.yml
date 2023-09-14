@@ -64,9 +64,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-        #Code Deploy를 사용해 S3 bucket에 소스코드 업로드
+       #Code Deploy를 사용해 S3 bucket에 소스코드 업로드
       - name: S3 업로드
-        run: aws deploy push --application-name 42manito-development-cd --description "upload test server file in s3" --s3-location s3://manito42-code-deploy-bucket-test/server.zip --source .
+        run : |
+          zip --symlinks -r server.zip .
+          aws s3 put-object --bucket manito42-code-deploy-bucket-test --key server.zip --body server.zip
 
       - name: Create CodeDeploy Deployment
         id: create-deployment
