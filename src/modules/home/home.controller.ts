@@ -18,7 +18,6 @@ export class HomeController {
     @Query() query: GetHomeQueryDto,
   ): Promise<Array<MentorProfileGetResponseDto>> {
     const { take, page } = query;
-    const sortQuery = this.homeService.getHomeProfileSortQuery();
     const isHide = false;
     const hashtagId = SelectAllType.ALL;
     const categoryId = SelectAllType.ALL;
@@ -28,9 +27,8 @@ export class HomeController {
       isHide,
       hashtagId,
       categoryId,
-      sortQuery,
     );
-    return this.homeService.random(profiles);
+    return this.homeService.random(profiles.content);
   }
 
   @Get('/:category_id')
@@ -40,7 +38,6 @@ export class HomeController {
   ): Promise<Array<MentorProfileGetResponseDto>> {
     const { take, page } = query;
     const { category_id } = param;
-    const sortQuery = this.homeService.getHomeProfileSortQuery();
     const isHide = false;
     const hashtagId = SelectAllType.ALL;
     const profiles = await this.mentorProfileService.findMany(
@@ -49,8 +46,7 @@ export class HomeController {
       isHide,
       hashtagId,
       category_id,
-      sortQuery,
     );
-    return this.homeService.random(profiles);
+    return this.homeService.random(profiles.content);
   }
 }

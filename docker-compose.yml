@@ -4,7 +4,9 @@ version: '3.8'
 services:
   # npm install 이 안되어있으면 작동 안함
   nestjs:
-    image: node:18.16-alpine
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     container_name: node_dev
     depends_on:
       - mysql
@@ -13,13 +15,12 @@ services:
     networks:
       - backend
     volumes:
-      - type: bind
-        source: .
-        target: /app
+      - .:/app
     working_dir: /app
+    env_file:
+      .env
     environment:
       - TZ=Asia/Seoul
-    command: npm run start:dev
 
   mysql:
     image: mysql:8.0.33

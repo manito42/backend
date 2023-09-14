@@ -3,6 +3,7 @@ import { MentorProfileGetResponseDto } from './dto/response/mentorProfileGetResp
 import { MentorProfileUpdatePayloadDto } from './dto/request/mentorProfileUpdatePayload.dto';
 import { MentorProfileRepository } from '../../database/repository/mentorProfile.repository';
 import { SelectAllType } from '../../common/constants/selectAll.type';
+import { MentorProfilePaginationResponseDto } from './dto/response/mentorProfilePaginationResponse.dto';
 
 @Injectable()
 export class MentorProfileService {
@@ -15,8 +16,8 @@ export class MentorProfileService {
     hashtagId: number | SelectAllType,
     categoryId: number | SelectAllType,
     sort?,
-  ): Promise<Array<MentorProfileGetResponseDto>> {
-    return this.mentorProfileRepository.findMany(take, page, isHide, hashtagId, categoryId, sort);
+  ): Promise<MentorProfilePaginationResponseDto> {
+    return await this.mentorProfileRepository.findMany(take, page, isHide, hashtagId, categoryId);
   }
 
   async findById(id: number): Promise<MentorProfileGetResponseDto> {

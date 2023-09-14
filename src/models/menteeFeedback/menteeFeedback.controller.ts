@@ -17,6 +17,7 @@ import { GetMenteeFeedbacksQueryDto } from './dto/request/menteeFeedbackQuery.dt
 import { GetUserRole } from '../../common/decorators/getUserRole.decorator';
 import { UserRole } from '@prisma/client';
 import { JwtGuard } from '../../common/guards/jwt/jwt.guard';
+import { MenteeFeedbackPaginationResponseDto } from './dto/response/menteeFeedbackPaginationResponse.dto';
 
 @Controller('/mentee_feedbacks')
 export class MenteeFeedbackController {
@@ -27,7 +28,7 @@ export class MenteeFeedbackController {
   async getMenteeFeedbacks(
     @GetUserRole() role: UserRole,
     @Query() query: GetMenteeFeedbacksQueryDto,
-  ): Promise<Array<MenteeFeedbackResponseDto>> {
+  ): Promise<MenteeFeedbackPaginationResponseDto> {
     if (role !== UserRole.ADMIN) throw new UnauthorizedException();
     const { take, page, mentor_id, mentee_id, reservation_id } = query;
 

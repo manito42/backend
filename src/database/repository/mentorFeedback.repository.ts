@@ -5,6 +5,7 @@ import { MentorFeedbackSelectQuery } from '../../models/mentorFeedback/queries/m
 import { MentorFeedbackCreatePayloadDto } from '../../models/mentorFeedback/dto/request/mentorFeedbackCreatePayload.dto';
 import { MentorFeedbackResponseDto } from '../../models/mentorFeedback/dto/response/mentorFeedbackResponse.dto';
 import { SelectAllType } from '../../common/constants/selectAll.type';
+import { MentorFeedbackPaginationResponseDto } from 'src/models/mentorFeedback/dto/response/mentorFeedbackPaginationResponse.dto';
 
 @Injectable()
 export class MentorFeedbackRepository {
@@ -16,13 +17,30 @@ export class MentorFeedbackRepository {
     mentor_id: number | SelectAllType,
     mentee_id: number | SelectAllType,
     reservation_id: number | SelectAllType,
-  ): Promise<MentorFeedbackResponseDto[]> {
-    return await this.prismaService.mentorFeedback.findMany({
+  ): Promise<MentorFeedbackPaginationResponseDto> {
+    const totalCount = await this.prismaService.mentorFeedback.count({
       where: getMentorFeedbacksWhereQuery(mentor_id, mentee_id, reservation_id),
-      select: MentorFeedbackSelectQuery,
-      take: take,
-      skip: page * take,
     });
+    const totalPage = Math.ceil(totalCount / take) - 1;
+
+    return {
+      content: await this.prismaService.mentorFeedback.findMany({
+        where: getMentorFeedbacksWhereQuery(mentor_id, mentee_id, reservation_id),
+        select: MentorFeedbackSelectQuery,
+        take: take,
+        skip: page * take,
+        orderBy: {
+          updatedAt: 'desc',
+        },
+      }),
+      page: {
+        take: take,
+        page: page,
+        totalPage: totalPage,
+        currentPage: page,
+        isLast: totalPage <= page,
+      },
+    };
   }
 
   async create(data: MentorFeedbackCreatePayloadDto): Promise<MentorFeedbackResponseDto> {

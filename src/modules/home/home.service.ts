@@ -8,14 +8,4 @@ export class HomeService {
   random(profiles: MentorProfileGetResponseDto[]) {
     return profiles.sort(() => Math.random() - 0.5);
   }
-
-  getRecentUpdatedMentorSortQuery() {
-    return {
-      updatedAt: 'desc',
-    };
-  }
-
-  getHomeProfileSortQuery() {
-    return this.getRecentUpdatedMentorSortQuery();
-  }
 }

@@ -18,6 +18,7 @@ import { JwtGuard } from '../../common/guards/jwt/jwt.guard';
 import { GetUserRole } from '../../common/decorators/getUserRole.decorator';
 import { UserRole } from '@prisma/client';
 import { GetUserId } from '../../common/decorators/getUserId.decorator';
+import { MentorProfilePaginationResponseDto } from './dto/response/mentorProfilePaginationResponse.dto';
 
 @Controller('/mentor_profiles')
 export class MentorProfileController {
@@ -31,7 +32,7 @@ export class MentorProfileController {
   async getMentorProfiles(
     @GetUserRole() role: UserRole,
     @Query() query: GetMentorProfileQueryDto,
-  ): Promise<Array<MentorProfileGetResponseDto>> {
+  ): Promise<MentorProfilePaginationResponseDto> {
     if (role !== UserRole.ADMIN) throw new UnauthorizedException();
     const { take, page, is_hide, hashtag_id, category_id } = query;
     return await this.mentorProfileService.findMany(take, page, is_hide, hashtag_id, category_id);
