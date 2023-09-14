@@ -62,7 +62,9 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
       - name: Upload to S3
         if: success()
-        run: aws deploy push --application-name manito42-main --description "upload production server file to s3" --s3-location s3://manito42-codedeploy-main-bucket/server.zip --source .
+        run: |
+          zip --symlinks -r server.zip .
+          aws s3 put-object --bucket manito42-codedeploy-main-bucket --key server.zip --body server.zip
 
       - name: Create CodeDeploy Deployment
         if: success()
