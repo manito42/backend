@@ -3,6 +3,12 @@
 name: Dev Deploy to AWS
 
 on:
+  workflow_dispatch:
+    inputs:
+      comment:
+        description: '수동 trigger 사유'
+        default: 'ex) 서버 설정 변경 등'
+
   push:
     branches:
       - develop
