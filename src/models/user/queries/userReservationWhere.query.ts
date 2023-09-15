@@ -10,11 +10,10 @@ export const getUserReservationsWhereQuery = (
 
   if (role === ReservationRole.ALL) {
     whereQuery['OR'] = [{ menteeId: id }, { mentorId: id }];
-    return whereQuery;
+  } else if (role === ReservationRole.MENTEE) {
+    whereQuery['menteeId'] = id;
   } else {
-    whereQuery['status'] = { in: status };
-    if (role === ReservationRole.MENTEE) whereQuery['menteeId'] = id;
-    else whereQuery['mentorId'] = id;
-    return whereQuery;
+    whereQuery['mentorId'] = id;
   }
+  return whereQuery;
 };
