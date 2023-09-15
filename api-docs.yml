@@ -164,7 +164,7 @@ paths:
           description: Unauthorized
         '409':
           description: already exists
-
+  
   /users/{id}/reservations:
     get:
       summary: Get a user reservations by ID
@@ -183,76 +183,45 @@ paths:
           name: take
           description: take `take` Users (`min = 1, max = 100, default = 20`)
           schema:
+            default: 20
             type: integer
             format: int32
         - in: query
           name: page
           description: skip `take * page` Users and take `take` Users (`skip >= 0`)
           schema:
-            type: integer
-            format: int32
-        - in: query
-          name: as_mentor
-          description: find `reservations` that reserved as mentor `(default = "true")`
-          schema:
+            default: 0
             type: string
             format: boolean
         - in: query
-          name: as_mentee
-          description: find `reservations` that reserved as mentee `(default = "true")`
+          name: role
+          required: false
+          description: find matched role reservations (ALL is find ALL)
           schema:
-            type: string
-            format: boolean
+            default: ALL
+            enum:
+              - MENTOR
+              - MENTEE
+              - ALL
         - in: query
-          name: active
-          description: find all active (`REQUEST`, `ACCEPT`, `MENTEE_CHECK`, `MENTEE_FEEDBACK`) user's `reservations` `(default ="false")`
+          name: status
+          description: find matched status reservations
           schema:
-            type: string
-            format: boolean
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UsersReservationsGet'
-        '400':
-          description: Invalid request parameter id
-        '404':
-          description: User not found
-  
-  /users/{id}/reservations/as_mentor:
-    get:
-      summary: Get a user reservations by ID
-      tags:
-        - Users
-      security:
-        - OwnerUser: [ ]
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-        - in: query
-          name: take
-          description: take `take` Users (`min = 1, max = 100, default = 20`)
-          schema:
-            type: integer
-            format: int32
-        - in: query
-          name: page
-          description: skip `take * page` Users and take `take` Users (`skip >= 0`)
-          schema:
-            type: string
-            format: boolean
-        - in: query
-          name: active
-          description: find all active (`REQUEST`, `ACCEPT`, `MENTEE_CHECK`, `MENTEE_FEEDBACK`) user's `reservations` `(default ="false")`
-          schema:
-            type: string
-            format: boolean
+            type: array
+            default: [REQUEST, ACCEPT, MENTEE_CHECKED, MENTEE_FEEDBACK, DONE, CANCEL]
+            items:
+              enum:
+                - REQUEST
+                - ACCEPT
+                - MENTEE_CHECKED
+                - MENTEE_FEEDBACK
+                - DONE
+                - CANCEL
+              minItems: 1
+              maxItems: 6
+          style: matrix
+          explode: false
+
       responses:
         '200':
           description: OK
@@ -260,76 +229,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UsersReservationsPagination'
-        '400':
-          description: Invalid request parameter id
-        '404':
-          description: User not found
-
-  /users/{id}/reservations/as_mentee:
-    get:
-      summary: Get a user reservations by ID
-      tags:
-        - Users
-      security:
-        - OwnerUser: [ ]
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-        - in: query
-          name: take
-          description: take `take` Users (`min = 1, max = 100, default = 20`)
-          schema:
-            type: integer
-            format: int32
-        - in: query
-          name: page
-          description: skip `take * page` Users and take `take` Users (`skip >= 0`)
-          schema:
-            type: string
-            format: boolean
-        - in: query
-          name: active
-          description: find all active (`REQUEST`, `ACCEPT`, `MENTEE_CHECK`, `MENTEE_FEEDBACK`) user's `reservations` `(default ="false")`
-          schema:
-            type: string
-            format: boolean
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UsersReservationsPagination'
-        '400':
-          description: Invalid request parameter id
-        '404':
-          description: User not found
-
-  /users/{id}/reservations/request:
-    get:
-      summary: Get a user reservation requests by ID
-      tags:
-        - Users
-      security:
-        - OwnerUser: [ ]
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UsersReservationsGet'
         '400':
           description: Invalid request parameter id
         '404':

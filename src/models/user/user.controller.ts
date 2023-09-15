@@ -94,70 +94,17 @@ export class UserController {
   /**
    * @access >= OWNER
    */
-  @Get('/:id/reservations/as_mentor')
+  @Get('/:id/reservations')
   @UseGuards(JwtGuard)
-  async getUserReservationsAsMentor(
+  async getUserReservations(
     @GetUser() user: JwtPayloadInterface,
     @Param('id') id: number,
     @Query() query: GetUserReservationQueryDto,
   ): Promise<UserReservationPaginationResponseDto> {
     if (id < 0 || !id) throw new BadRequestException();
     if (user.id !== id && user.role !== UserRole.ADMIN) throw new UnauthorizedException();
-    const { take, page, active } = query;
-    const status: ReservationStatus[] = active
-      ? [
-          ReservationStatus.REQUEST,
-          ReservationStatus.ACCEPT,
-          ReservationStatus.MENTEE_CHECKED,
-          ReservationStatus.MENTEE_FEEDBACK,
-        ]
-      : [ReservationStatus.DONE, ReservationStatus.CANCEL];
-    const reservations = await this.userService.findUserReservationAsMentor(id, take, page, status);
-    if (!reservations) throw new BadRequestException();
-    return reservations;
-  }
-
-  /**
-   * @access >= OWNER
-   */
-  @Get('/:id/reservations/as_mentee')
-  @UseGuards(JwtGuard)
-  async getUserReservationsAsMentee(
-    @GetUser() user: JwtPayloadInterface,
-    @Param('id') id: number,
-    @Query() query: GetUserReservationQueryDto,
-  ): Promise<UserReservationPaginationResponseDto> {
-    if (id < 0 || !id) throw new BadRequestException();
-    if (user.id !== id && user.role !== UserRole.ADMIN) throw new UnauthorizedException();
-    const { take, page, active } = query;
-    const status: ReservationStatus[] = active
-      ? [
-          ReservationStatus.REQUEST,
-          ReservationStatus.ACCEPT,
-          ReservationStatus.MENTEE_CHECKED,
-          ReservationStatus.MENTEE_FEEDBACK,
-        ]
-      : [ReservationStatus.DONE, ReservationStatus.CANCEL];
-    const reservations = await this.userService.findUserReservationAsMentee(id, take, page, status);
-    if (!reservations) throw new BadRequestException();
-    return reservations;
-  }
-
-  /**
-   * @access >= OWNER
-   */
-  @Get('/:id/reservations/request')
-  @UseGuards(JwtGuard)
-  async getUserReservationRequests(
-    @GetUser() user: JwtPayloadInterface,
-    @Param('id') id: number,
-  ): Promise<UserReservationGetDto> {
-    if (id < 0 || !id) throw new BadRequestException();
-    if (user.id !== id && user.role !== UserRole.ADMIN) throw new UnauthorizedException();
-    const take = 100;
-    const page = 0;
-    const status: ReservationStatus[] = [ReservationStatus.REQUEST, ReservationStatus.ACCEPT];
-    const reservations = await this.userService.findUserReservation(id, take, page, status);
+    const { take, page, role, status } = query;
+    const reservations = await this.userService.findUserReservation(id, take, page, role, status);
     if (!reservations) throw new BadRequestException();
     return reservations;
   }

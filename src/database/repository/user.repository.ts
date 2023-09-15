@@ -6,12 +6,11 @@ import { UserCreatePayloadDto } from '../../models/user/dto/request/userCreatePa
 import { UserUpdatePayloadDto } from '../../models/user/dto/request/userUpdatePayload.dto';
 import { ReservationStatus } from '@prisma/client';
 import { ReservationSelectQuery } from '../../models/reservation/queries/reservationSelect.query';
-import { UserReservationPaginationResponseDto } from 'src/models/user/dto/response/userReservationPaginationResponse.dto';
-import {
-  getUserReservationsAsMenteeWhereQuery,
-  getUserReservationsAsMentorWhereQuery,
-} from 'src/models/user/queries/userReservationWhere.query';
-import { UserReservationGetDto } from 'src/models/user/dto/response/userReservationGet.dto';
+import { getUserReservationsWhereQuery } from 'src/models/user/queries/userReservationWhere.query';
+import { ReservationRole } from '../../models/user/dto/request/userReservationQuery.dto';
+import { ReservationGetResponseDto } from '../../models/reservation/dto/response/reservationGetResponse.dto';
+import { IPaginationResponse } from '../../common/interfaces/api/common/IPaginationResponse.interface';
+import { UserReservationPaginationResponseDto } from '../../models/user/dto/response/userReservationPaginationResponse.dto';
 
 @Injectable()
 export class UserRepository {
@@ -79,6 +78,7 @@ export class UserRepository {
    * @param id: number
    * @param take: number
    * @param page: number
+   * @param role
    * @param status: ReservationStatus[] : 데이터베이스에서 가져올 예약의 상태
    * @return
    */
@@ -86,71 +86,10 @@ export class UserRepository {
     id: number,
     take: number,
     page: number,
-    status: ReservationStatus[],
-  ): Promise<UserReservationGetDto> {
-    const menteeReservations = await this.prisma.reservation.findMany({
-      where: getUserReservationsAsMenteeWhereQuery(id, status),
-      select: ReservationSelectQuery,
-      take: take,
-      skip: take * page,
-      orderBy: {
-        updatedAt: 'desc',
-      },
-    });
-    const mentorReservations = await this.prisma.reservation.findMany({
-      where: getUserReservationsAsMentorWhereQuery(id, status),
-      select: ReservationSelectQuery,
-      take: take,
-      skip: take * page,
-      orderBy: {
-        updatedAt: 'desc',
-      },
-    });
-    return {
-      menteeReservations,
-      mentorReservations,
-    };
-  }
-
-  async findUserReservationAsMentor(
-    id: number,
-    take: number,
-    page: number,
+    role: ReservationRole,
     status: ReservationStatus[],
   ): Promise<UserReservationPaginationResponseDto> {
-    const whereQuery = getUserReservationsAsMentorWhereQuery(id, status);
-    const totalCount = await this.prisma.reservation.count({
-      where: whereQuery,
-    });
-    const totalPage = Math.ceil(totalCount / take) - 1;
-
-    return {
-      content: await this.prisma.reservation.findMany({
-        where: whereQuery,
-        select: ReservationSelectQuery,
-        take: take,
-        skip: take * page,
-        orderBy: {
-          updatedAt: 'desc',
-        },
-      }),
-      page: {
-        take: take,
-        page: page,
-        totalPage: totalPage,
-        currentPage: page,
-        isLast: totalPage <= page,
-      },
-    };
-  }
-
-  async findUserReservationAsMentee(
-    id: number,
-    take: number,
-    page: number,
-    status: ReservationStatus[],
-  ): Promise<UserReservationPaginationResponseDto> {
-    const whereQuery = getUserReservationsAsMenteeWhereQuery(id, status);
+    const whereQuery = getUserReservationsWhereQuery(id, role, status);
     const totalCount = await this.prisma.reservation.count({
       where: whereQuery,
     });

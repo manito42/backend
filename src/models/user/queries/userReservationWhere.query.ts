@@ -1,24 +1,16 @@
-export const getUserReservationsAsMenteeWhereQuery = (id: number, status: string[]): any => {
-  const whereQuery = { menteeId: id };
+import { ReservationStatus } from '@prisma/client';
+import { ReservationRole } from '../dto/request/userReservationQuery.dto';
+export const getUserReservationsWhereQuery = (
+  id: number,
+  role: ReservationRole,
+  status: ReservationStatus[],
+): any => {
+  const whereQuery = {};
   whereQuery['OR'] = [];
-  status.forEach((s) => {
-    whereQuery['OR'].push({ status: s });
-  });
-  return whereQuery;
-};
-
-export const getUserReservationsAsMentorWhereQuery = (id: number, status: string[]): any => {
-  const whereQuery = { mentorId: id };
-  whereQuery['OR'] = [];
-  status.forEach((s) => {
-    whereQuery['OR'].push({ status: s });
-  });
-  return whereQuery;
-};
-
-export const getUserReservationsWhereQuery = <T>(id: number, status: string[]): any => {
-  const whereQuery = { T: id };
-  whereQuery['OR'] = [];
+  if (role === ReservationRole.MENTEE || role === ReservationRole.ALL)
+    whereQuery['OR'].push({ menteeId: id });
+  if (role === ReservationRole.MENTOR || role === ReservationRole.ALL)
+    whereQuery['OR'].push({ mentorId: id });
   status.forEach((s) => {
     whereQuery['OR'].push({ status: s });
   });
