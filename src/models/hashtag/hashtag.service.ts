@@ -1,36 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../database/services/prisma.service';
 import { HashtagGetResponseDto } from './dto/response/hashtagGetResponse.dto';
-import { HashtagCreatePayloadDto } from './dto/request/hashtagCreatePayload.dto';
-import { HashtagGetSelectQuery } from './queries/hashtagGetSelect.query';
-import { GetHashtagsQueryDto } from './dto/request/hashtagQuery.dto';
-import { getHashtagsWhereQuery } from './queries/getHashtagsWhereQuery';
+import { HashtagRepository } from '../../database/repository/hashtag.repository';
+import { HashtagPaginationResponseDto } from './dto/response/hashtagPaginationResponse.dto';
 
 @Injectable()
 export class HashtagService {
-  constructor(private readonly prisma: PrismaService) {}
-  async findMany(query: GetHashtagsQueryDto): Promise<Array<HashtagGetResponseDto>> {
-    const { profile_id, reservation_id, take, page, search } = query;
-    return this.prisma.hashtag.findMany({
-      take: take,
-      skip: page * take,
-      where: getHashtagsWhereQuery(profile_id, reservation_id, search),
-    });
+  constructor(private readonly hashtagRepository: HashtagRepository) {}
+  async findMany(
+    take: number,
+    page: number,
+    profileId: number,
+    reservationId: number,
+    search: string,
+  ): Promise<HashtagPaginationResponseDto> {
+    return this.hashtagRepository.findMany(take, page, profileId, reservationId, search);
   }
   async findById(id: number): Promise<HashtagGetResponseDto> {
-    return this.prisma.hashtag.findUnique({
-      where: { id: id },
-      select: HashtagGetSelectQuery,
-    });
+    return this.hashtagRepository.findById(id);
   }
 
   async findByName(name: string): Promise<HashtagGetResponseDto> {
-    return this.prisma.hashtag.findUnique({ where: { name: name } });
+    return this.hashtagRepository.findByName(name);
   }
 
-  async create(payload: HashtagCreatePayloadDto): Promise<HashtagGetResponseDto> {
-    return this.prisma.hashtag.create({
-      data: { name: payload.name },
-    });
+  async create(name: string): Promise<HashtagGetResponseDto> {
+    return this.hashtagRepository.create(name);
   }
 }

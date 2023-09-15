@@ -1,93 +1,48 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { PrismaService } from '../../database/services/prisma.service';
-import { MentorProfileSelectQuery } from './queries/mentorProfileSelect.query';
+import { Injectable } from '@nestjs/common';
 import { MentorProfileGetResponseDto } from './dto/response/mentorProfileGetResponse.dto';
-import { MentorProfileCreatePayloadDto } from './dto/request/mentorProfileCreatePayload.dto';
 import { MentorProfileUpdatePayloadDto } from './dto/request/mentorProfileUpdatePayload.dto';
-import { GetMentorProfileQueryDto } from './dto/request/mentorProfileQuery.dto';
-import {
-  getMentorProfileRevealsWhereQuery,
-  getMentorProfilesSearchWhereQuery,
-  getMentorProfilesWhereQuery,
-} from './queries/getMentorProfilesWhereQuery';
-import { GetSearchQueryDto } from '../../modules/search/dto/request/searchQuery.dto';
+import { MentorProfileRepository } from '../../database/repository/mentorProfile.repository';
+import { SelectAllType } from '../../common/constants/selectAll.type';
+import { MentorProfilePaginationResponseDto } from './dto/response/mentorProfilePaginationResponse.dto';
 
 @Injectable()
 export class MentorProfileService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly mentorProfileRepository: MentorProfileRepository) {}
 
   async findMany(
-    query: GetMentorProfileQueryDto,
+    take: number,
+    page: number,
+    isHide: boolean | SelectAllType,
+    hashtagId: number | SelectAllType,
+    categoryId: number | SelectAllType,
     sort?,
-  ): Promise<Array<MentorProfileGetResponseDto>> {
-    const { page, take, hashtag_id, category_id } = query;
-    return this.prisma.mentorProfile.findMany({
-      take: take,
-      skip: page * take,
-      select: MentorProfileSelectQuery,
-      where: getMentorProfilesWhereQuery(hashtag_id, category_id),
-      orderBy: sort,
-    });
-  }
-
-  async findManyWithoutHide(
-    query: GetMentorProfileQueryDto,
-    sort?,
-  ): Promise<Array<MentorProfileGetResponseDto>> {
-    const { page, take, hashtag_id, category_id } = query;
-    return this.prisma.mentorProfile.findMany({
-      take: take,
-      skip: page * take,
-      select: MentorProfileSelectQuery,
-      where: getMentorProfileRevealsWhereQuery(hashtag_id, category_id),
-      orderBy: sort,
-    });
+  ): Promise<MentorProfilePaginationResponseDto> {
+    return await this.mentorProfileRepository.findMany(take, page, isHide, hashtagId, categoryId);
   }
 
   async findById(id: number): Promise<MentorProfileGetResponseDto> {
-    return this.prisma.mentorProfile.findUnique({
-      where: {
-        userId: id,
-      },
-      select: MentorProfileSelectQuery,
-    });
+    return this.mentorProfileRepository.findById(id);
   }
 
   async findBySearch(
-    query: GetSearchQueryDto,
-    search: string,
+    take: number,
+    page: number,
+    search_by_hashtag_name: boolean,
+    search_by_user_nickname: boolean,
+    search_by_category_name: boolean,
+    search?: string,
   ): Promise<Array<MentorProfileGetResponseDto>> {
-    const { page, take, search_by_hashtag_name, search_by_user_nickname } = query;
-    if (!search_by_hashtag_name && !search_by_user_nickname) throw new BadRequestException();
-    return this.prisma.mentorProfile.findMany({
-      take: take,
-      skip: page * take,
-      select: MentorProfileSelectQuery,
-      where: getMentorProfilesSearchWhereQuery(
-        search_by_hashtag_name,
-        search_by_user_nickname,
-        search,
-      ),
-    });
+    return this.mentorProfileRepository.findBySearch(
+      take,
+      page,
+      search_by_hashtag_name,
+      search_by_user_nickname,
+      search_by_category_name,
+      search,
+    );
   }
 
-  async update(userId: number, payload: MentorProfileUpdatePayloadDto) {
-    return this.prisma.mentorProfile.update({
-      where: {
-        userId: userId,
-      },
-      data: {
-        shortDescription: payload.shortDescription,
-        description: payload.description,
-        hashtags: {
-          set: payload.hashtags,
-        },
-        categories: {
-          set: payload.categories,
-        },
-        isHide: payload.isHide,
-      },
-      select: MentorProfileSelectQuery,
-    });
+  async update(userId: number, data: MentorProfileUpdatePayloadDto) {
+    return this.mentorProfileRepository.update(userId, data);
   }
 }

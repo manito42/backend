@@ -1,10 +1,20 @@
 # Dependency Install, Build, Start를 여기서 다합니다.
 
 name: Production Deploy to AWS
+
 on:
   push:
     branches:
       - master
+    paths:
+      - 'src/**' # source code
+      - 'e2e/**' # e2e test
+      - 'package.json' # 의존성
+      - 'package-lock.json' # 의존성
+      - 'prisma/**' # prisma, bin file/schema
+      - 'tsconfig.json' # tsconfig
+      - 'tsconfig.build.json' # tsconfig
+      - 'appspec.yml' # codedeploy
 
 env:
   AWS_REGION: ap-northeast-2
@@ -28,6 +38,7 @@ jobs:
         with:
           node-version: 18.16.0
       - uses: actions/cache@v3
+        id: cache
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}.
@@ -52,7 +63,9 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
       - name: Upload to S3
         if: success()
-        run: aws deploy push --application-name manito42-main --description "upload production server file to s3" --s3-location s3://manito42-codedeploy-main-bucket/server.zip --source .
+        run: |
+          zip --symlinks -r server.zip .
+          aws s3 put-object --bucket manito42-codedeploy-main-bucket --key server.zip --body server.zip
 
       - name: Create CodeDeploy Deployment
         if: success()

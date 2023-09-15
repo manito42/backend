@@ -17,14 +17,16 @@ import { HashtagCreatePayloadDto } from './dto/request/hashtagCreatePayload.dto'
 import { GetHashtagsQueryDto } from './dto/request/hashtagQuery.dto';
 import { Response } from 'express';
 import { JwtGuard } from '../../common/guards/jwt/jwt.guard';
+import { HashtagPaginationResponseDto } from './dto/response/hashtagPaginationResponse.dto';
 
 @Controller('/hashtags')
 export class HashtagController {
   constructor(private readonly hashtagService: HashtagService) {}
 
   @Get('/')
-  async getHashtags(@Query() query: GetHashtagsQueryDto): Promise<Array<HashtagGetResponseDto>> {
-    return await this.hashtagService.findMany(query);
+  async getHashtags(@Query() query: GetHashtagsQueryDto): Promise<HashtagPaginationResponseDto> {
+    const { page, take, profile_id, reservation_id, search } = query;
+    return await this.hashtagService.findMany(take, page, profile_id, reservation_id, search);
   }
 
   @Get('/:id')
@@ -44,11 +46,12 @@ export class HashtagController {
     @Body() payload: HashtagCreatePayloadDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<HashtagGetResponseDto> {
-    const existHashtag = await this.hashtagService.findByName(payload.name);
+    const name = payload.name;
+    const existHashtag = await this.hashtagService.findByName(name);
     if (existHashtag) {
       res.status(HttpStatus.OK);
       return existHashtag;
     }
-    return await this.hashtagService.create(payload);
+    return await this.hashtagService.create(name);
   }
 }

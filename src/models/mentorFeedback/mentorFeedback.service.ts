@@ -1,50 +1,47 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../database/services/prisma.service';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { MentorFeedbackResponseDto } from './dto/response/mentorFeedbackResponse.dto';
-import { MentorFeedbackSelectQuery } from './queries/mentorFeedbackSelect.query';
 import { MentorFeedbackCreatePayloadDto } from './dto/request/mentorFeedbackCreatePayload.dto';
-import { GetMentorFeedbacksQueryDto } from './dto/request/mentorFeedbackQuery.dto';
-import { getMentorFeedbacksWhereQuery } from './queries/getMentorFeedbacksWhereQuery';
+import { MentorFeedbackRepository } from '../../database/repository/mentorFeedback.repository';
+import { ReservationRepository } from '../../database/repository/reservation.repository';
+import { SelectAllType } from '../../common/constants/selectAll.type';
+import { MentorFeedbackPaginationResponseDto } from './dto/response/mentorFeedbackPaginationResponse.dto';
 
 @Injectable()
 export class MentorFeedbackService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly reservationRepository: ReservationRepository,
+    private readonly mentorFeedbackRepository: MentorFeedbackRepository,
+  ) {}
 
-  async findMany(query: GetMentorFeedbacksQueryDto): Promise<MentorFeedbackResponseDto[]> {
-    const { mentor_id, mentee_id, take, page, reservation_id } = query;
-    return this.prisma.mentorFeedback.findMany({
-      where: getMentorFeedbacksWhereQuery(mentor_id, mentee_id, reservation_id),
-      select: MentorFeedbackSelectQuery,
-      take: take,
-      skip: page * take,
-    });
+  async findManyMentorFeedbacks(
+    take: number,
+    page: number,
+    mentor_id: number | SelectAllType,
+    mentee_id: number | SelectAllType,
+    reservation_id: number | SelectAllType,
+  ): Promise<MentorFeedbackPaginationResponseDto> {
+    return await this.mentorFeedbackRepository.findMany(
+      take,
+      page,
+      mentor_id,
+      mentee_id,
+      reservation_id,
+    );
   }
 
-  async create(body: MentorFeedbackCreatePayloadDto): Promise<MentorFeedbackResponseDto> {
+  async createMentorFeedback(
+    body: MentorFeedbackCreatePayloadDto,
+  ): Promise<MentorFeedbackResponseDto> {
     // find reservation and check if it exists
-    const reservation = await this.prisma.reservation.findUnique({
-      where: { id: body.reservationId },
-    });
+    const reservation = await this.reservationRepository.findById(body.reservationId);
     if (!reservation) throw new BadRequestException();
     if (reservation.menteeId !== body.menteeId || reservation.mentorId !== body.mentorId)
       throw new BadRequestException();
-    return this.prisma.mentorFeedback.create({
-      data: {
-        reservationId: body.reservationId,
-        menteeId: body.menteeId,
-        mentorId: body.mentorId,
-        rating: body.rating,
-      },
-      select: MentorFeedbackSelectQuery,
-    });
+
+    return await this.mentorFeedbackRepository.create(body);
   }
 
-  async findById(id: number): Promise<MentorFeedbackResponseDto> {
-    return this.prisma.mentorFeedback.findUnique({
-      where: {
-        id,
-      },
-      select: MentorFeedbackSelectQuery,
-    });
+  async findMentorFeedbackById(id: number): Promise<MentorFeedbackResponseDto> {
+    return await this.mentorFeedbackRepository.findById(id);
   }
 }

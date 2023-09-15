@@ -1,15 +1,17 @@
+import { HashtagGetSelectQuery } from '../../hashtag/queries/hashtagGetSelect.query';
+import { CategoryGetSelectQuery } from '../../category/queries/categoryGetSelect.query';
+
 export const ReservationSelectQuery = {
   id: true,
   mentorId: true,
   menteeId: true,
-  categoryId: true,
+  category: {
+    select: CategoryGetSelectQuery,
+  },
   requestMessage: true,
   status: true,
   hashtags: {
-    select: {
-      id: true,
-      name: true,
-    },
+    select: HashtagGetSelectQuery,
   },
   mentorFeedback: {
     select: {

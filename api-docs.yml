@@ -4,6 +4,8 @@ servers:
     url: "https://api.dev.42manito.com/"
   - description: 42 MANITO API SERVER
     url: "https://api.42manito.com/"
+  - description: 42 MANITO API LOCAL TEST
+    url: "http://localhost:3000"
 
 info:
   version: "1.0.0"
@@ -62,12 +64,14 @@ paths:
           name: take
           description: take `take` Users (`min = 1, max = 100, default = 20`)
           schema:
+            default: 20
             type: integer
             format: int32
         - in: query
           name: page
           description: skip `take * page` Users and take `take` Users (`skip >= 0`)
           schema:
+            default: 0
             type: integer
             format: int32
       responses:
@@ -162,7 +166,7 @@ paths:
           description: Unauthorized
         '409':
           description: already exists
-
+  
   /users/{id}/reservations:
     get:
       summary: Get a user reservations by ID
@@ -181,39 +185,52 @@ paths:
           name: take
           description: take `take` Users (`min = 1, max = 100, default = 20`)
           schema:
+            default: 20
             type: integer
             format: int32
         - in: query
           name: page
           description: skip `take * page` Users and take `take` Users (`skip >= 0`)
           schema:
-            type: integer
-            format: int32
-        - in: query
-          name: as_mentor
-          description: find `reservations` that reserved as mentor `(default = "true")`
-          schema:
+            default: 0
             type: string
             format: boolean
         - in: query
-          name: as_mentee
-          description: find `reservations` that reserved as mentee `(default = "true")`
+          name: role
+          required: false
+          description: find matched role reservations (ALL is find ALL)
           schema:
-            type: string
-            format: boolean
+            default: ALL
+            enum:
+              - MENTOR
+              - MENTEE
+              - ALL
         - in: query
-          name: active
-          description: find all active (`REQUEST`, `ACCEPT`, `PENDING`) user's `reservations` `(default ="false")`
+          name: status
+          description: find matched status reservations
           schema:
-            type: string
-            format: boolean
+            type: array
+            default: [REQUEST, ACCEPT, MENTEE_CHECKED, MENTEE_FEEDBACK, DONE, CANCEL]
+            items:
+              enum:
+                - REQUEST
+                - ACCEPT
+                - MENTEE_CHECKED
+                - MENTEE_FEEDBACK
+                - DONE
+                - CANCEL
+              minItems: 1
+              maxItems: 6
+          style: matrix
+          explode: false
+
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UsersReservationsGet'
+                $ref: '#/components/schemas/UsersReservationsPagination'
         '400':
           description: Invalid request parameter id
         '404':
@@ -243,19 +260,28 @@ paths:
       summary: Get all mentor profiles
       tags:
         - Mentor Profiles
+      security:
+        - AdminUser: [ ]
       parameters:
         - in: query
           name: take
           description: take `take` Users (min = 1, max = 100, default = 20)
           schema:
+            default: 20
             type: integer
             format: int32
         - in: query
           name: page
           description: skip `take * page` Users and take `take` Users (>= 0)
           schema:
+            default: 0
             type: integer
             format: int32
+        - in: query
+          name: is_hide
+          description: filter by is_hide
+          schema:
+            type: boolean
         - in: query
           name: hashtag_id
           description: filter by hashtag
@@ -276,7 +302,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/MentorProfileGet'
+                  $ref: '#/components/schemas/MentorProfilePagination'
 
   /mentor_profiles/{id}:
     get:
@@ -351,12 +377,14 @@ paths:
           name: take
           description: take `take` Users (min = 1, max = 100, default = 20)
           schema:
+            default: 20
             type: integer
             format: int32
         - in: query
           name: page
           description: skip `take * page` Users and take `take` Users (>= 0)
           schema:
+            default: 0
             type: integer
             format: int32
         - in: query
@@ -379,7 +407,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ReservationGet'
+                  $ref: '#/components/schemas/ReservationPagination'
     post:
       summary: Create a new reservation
       security:
@@ -540,6 +568,39 @@ paths:
         '409':
           description: already exists
 
+  /reservations/{id}/check:
+    patch:
+      summary: check accepted reservation by mentee
+      description: |
+        **ROLE**\
+        \
+        only for `mentee` user that related with reservation
+      tags:
+        - Reservations
+      security:
+        - OwnerUser: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "reservation id"
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationGet'
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '409':
+          description: already exists
+
   /reservations/{id}/mentor_completion:
     patch:
       summary: complete reservation as mentor
@@ -628,12 +689,14 @@ paths:
           name: take
           description: take `take` Users (min = 1, max = 100, default = 20)
           schema:
+            default: 20
             type: integer
             format: int32
         - in: query
           name: page
           description: skip `take * page` Users and take `take` Users (>= 0)
           schema:
+            default: 0
             type: integer
             format: int32
         - in: query
@@ -659,9 +722,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/HashtagGet'
+                $ref: '#/components/schemas/HashtagPagination'
     post:
       summary: Create a new hashtag
       tags:
@@ -694,7 +755,7 @@ paths:
 
   /mentee_feedbacks:
     get:
-      summary: Get all mentee feedbacks
+      summary: Get all mentee feedbacks order by recent updated
       tags:
         - Mentee Feedbacks
       security:
@@ -704,12 +765,14 @@ paths:
           name: take
           description: take `take` Users (min = 1, max = 100, default = 20)
           schema:
+            default: 20
             type: integer
             format: int32
         - in: query
           name: page
           description: skip `take * page` Users and take `take` Users (>= 0)
           schema:
+            default: 0
             type: integer
             format: int32
         - in: query
@@ -736,9 +799,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/MenteeFeedbackGet'
+                $ref: '#/components/schemas/MenteeFeedbackPagination'
 
     post:
       summary: Create a new mentee feedback
@@ -805,12 +866,14 @@ paths:
           name: take
           description: take `take` Users (min = 1, max = 100, default = 20)
           schema:
+            default: 20
             type: integer
             format: int32
         - in: query
           name: page
           description: skip `take * page` Users and take `take` Users (>= 0)
           schema:
+            default: 0
             type: integer
             format: int32
         - in: query
@@ -837,9 +900,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/MentorFeedbackGet'
+                $ref: '#/components/schemas/MentorFeedbackPagination'
     post:
       summary: Create a new mentor feedback
       tags:
@@ -923,24 +984,35 @@ paths:
           name: take
           description: take `take` Users `min = 1, max = 100, default = 20`
           schema:
+            default: 20
             type: integer
             format: int32
         - in: query
           name: page
           description: skip `take * page` Users and take `take` Users `take >= 0`
           schema:
+            default: 0
             type: integer
             format: int32
         - in: query
           name: search_by_user_nickname
           description: search by nickname `default = true`
           schema:
+            default: true
             type: string
             format: "true | false"
         - in: query
           name: search_by_hashtag_name
           description: search by tag name `default = true`
           schema:
+            default: true
+            type: string
+            format: "true | false"
+        - in: query
+          name: search_by_category_name
+          description: search by category name `default = true`
+          schema:
+            default: true
             type: string
             format: "true | false"
       responses:
@@ -962,12 +1034,14 @@ paths:
           name: take
           description: take `take` Users `min = 1, max = 100, default = 20`
           schema:
+            default: 20
             type: integer
             format: int32
         - in: query
           name: page
           description: skip `take * page` Users and take `take` Users `take >= 0`
           schema:
+            default: 0
             type: integer
             format: int32
       responses:
@@ -993,12 +1067,14 @@ paths:
           name: take
           description: take `take` Users `min = 1, max = 100, default = 20`
           schema:
+            default: 20
             type: integer
             format: int32
         - in: query
           name: page
           description: skip `take * page` Users and take `take` Users `take >= 0`
           schema:
+            default: 0
             type: integer
             format: int32
         - in: path
@@ -1347,6 +1423,15 @@ components:
           items:
             $ref: '#/components/schemas/ReservationGet'
 
+    UsersReservationsPagination:
+      type: object
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/ReservationGet'
+        page:
+          $ref: '#/components/schemas/Page'
+
     ## MentorProfile
     MentorProfileCreate:
       type: object
@@ -1397,6 +1482,15 @@ components:
               type: string
             profileImage:
               type: string
+
+    MentorProfilePagination:
+      type: object
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/MentorProfileGet'
+        page:
+          $ref: '#/components/schemas/Page'
 
     MentorProfileSimpleGet:
       type: object
@@ -1540,9 +1634,8 @@ components:
         menteeId:
           type: integer
           format: int32
-        categoryId:
-          type: integer
-          format: int32
+        category:
+          $ref: '#/components/schemas/CategoryGet'
         requestMessage:
           type: string
         status:
@@ -1568,6 +1661,16 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/HashtagGet'
+
+    ReservationPagination:
+      type: object
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/ReservationGet'
+        page:
+          $ref: '#/components/schemas/Page'
+
     UserReservationGet:
       type: object
       properties:
@@ -1654,6 +1757,27 @@ components:
           format: int32
         name:
           type: string
+
+    HashtagPagination:
+      type: object
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/HashtagGet'
+        page:
+          $ref: '#/components/schemas/Page'
+      example:
+        content:
+          - id: 0
+            name: 'test1'
+          - id: 1
+            name: 'test2'
+        page:
+          take: 0
+          page: 0
+          totalPage: 0
+          currentPage: 0
+          isLast: false
 
     HashtagId:
       type: object
@@ -1762,6 +1886,24 @@ components:
           type: string
           format: date-time
 
+    MentorFeedbackPagination:
+      type: object
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/MentorFeedbackGet'
+        page:
+          $ref: '#/components/schemas/Page'
+
+    MenteeFeedbackPagination:
+      type: object
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/MenteeFeedbackGet'
+        page:
+          $ref: '#/components/schemas/Page'
+
     MentorFeedbackCreate:
       type: object
       properties:
@@ -1789,6 +1931,7 @@ components:
         - mentorId
         - reservationId
         - rating
+ 
     ## Category
     CategoryGet:
       type: object
@@ -1803,19 +1946,37 @@ components:
     SearchMentorGet:
       $ref: '#/components/schemas/HomeGet'
 
+    Page:
+      type: object
+      properties:
+        take:
+          type: integer
+          format: int32
+        page:
+          type: integer
+          format: int32
+        totalPage:
+          type: integer
+          format: int32
+        currentPage:
+          type: integer
+          format: int32
+        isLast:
+          type: boolean
+
   securitySchemes:
     NormalUser:
-      type: apiKey
-      in: cookie
-      name : "Authorization"
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
       description: "User Role >= USER"
     OwnerUser:
-      type: apiKey
-      in: cookie
-      name : "Authorization"
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
       description: "User Role >= ResourceOwner"
     AdminUser:
-      type: apiKey
-      in: cookie
-      name : "Authorization"
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
       description: "User Role >= ADMIN"

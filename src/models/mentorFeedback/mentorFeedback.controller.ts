@@ -17,6 +17,7 @@ import { GetMentorFeedbacksQueryDto } from './dto/request/mentorFeedbackQuery.dt
 import { JwtGuard } from '../../common/guards/jwt/jwt.guard';
 import { GetUserRole } from '../../common/decorators/getUserRole.decorator';
 import { UserRole } from '@prisma/client';
+import { MentorFeedbackPaginationResponseDto } from './dto/response/mentorFeedbackPaginationResponse.dto';
 
 @Controller('/mentor_feedbacks')
 export class MentorFeedbackController {
@@ -30,9 +31,16 @@ export class MentorFeedbackController {
   async getMentorFeedbacks(
     @GetUserRole() role: UserRole,
     @Query() query: GetMentorFeedbacksQueryDto,
-  ): Promise<Array<MentorFeedbackResponseDto>> {
+  ): Promise<MentorFeedbackPaginationResponseDto> {
     if (role !== UserRole.ADMIN) throw new UnauthorizedException();
-    return this.mentorFeedbackService.findMany(query);
+    const { take, page, mentor_id, reservation_id, mentee_id } = query;
+    return this.mentorFeedbackService.findManyMentorFeedbacks(
+      take,
+      page,
+      mentor_id,
+      mentee_id,
+      reservation_id,
+    );
   }
 
   /**
@@ -45,7 +53,7 @@ export class MentorFeedbackController {
     @Body() body: MentorFeedbackCreatePayloadDto,
   ): Promise<MentorFeedbackResponseDto> {
     if (role !== UserRole.ADMIN) throw new UnauthorizedException();
-    return this.mentorFeedbackService.create(body);
+    return this.mentorFeedbackService.createMentorFeedback(body);
   }
 
   /**
@@ -55,7 +63,7 @@ export class MentorFeedbackController {
   @UseGuards(JwtGuard)
   async getMentorFeedbackById(@Param('id') id: number): Promise<MentorFeedbackResponseDto> {
     if (id < 0) throw new BadRequestException();
-    const feedback = await this.mentorFeedbackService.findById(id);
+    const feedback = await this.mentorFeedbackService.findMentorFeedbackById(id);
     if (!feedback) throw new NotFoundException();
     return feedback;
   }

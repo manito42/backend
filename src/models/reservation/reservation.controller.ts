@@ -3,7 +3,6 @@ import {
   Body,
   Controller,
   Get,
-  NotFoundException,
   Param,
   Patch,
   Post,
@@ -22,17 +21,13 @@ import {
 import { GetReservationQueryDto } from './dto/request/reservationQuery.dto';
 import { JwtGuard } from '../../common/guards/jwt/jwt.guard';
 import { GetUserId } from '../../common/decorators/getUserId.decorator';
-import { ReservationStatus, UserRole } from '@prisma/client';
-import { PrismaService } from '../../database/services/prisma.service';
-import { ReservationSelectQuery } from './queries/reservationSelect.query';
+import { UserRole } from '@prisma/client';
 import { GetUserRole } from '../../common/decorators/getUserRole.decorator';
+import { ReservationPaginationResponseDto } from './dto/response/reservationPaginationResponse.dto';
 
 @Controller('/reservations')
 export class ReservationController {
-  constructor(
-    private readonly reservationService: ReservationService,
-    private readonly prismaService: PrismaService,
-  ) {}
+  constructor(private readonly reservationService: ReservationService) {}
 
   /**
    * NOTE: 일반 사용자가 Reservation 에 대해서 조회할 이유가 없기 때문에 ADMIN 전용으로 함.
@@ -43,9 +38,10 @@ export class ReservationController {
   async getReservations(
     @GetUserRole() role: UserRole,
     @Query() query: GetReservationQueryDto,
-  ): Promise<Array<ReservationGetResponseDto>> {
+  ): Promise<ReservationPaginationResponseDto> {
     if (role !== UserRole.ADMIN) throw new UnauthorizedException();
-    return await this.reservationService.findMany(query);
+    const { category_id, hashtag_id, take, page } = query;
+    return await this.reservationService.findManyReservation(category_id, hashtag_id, take, page);
   }
 
   /**
@@ -63,7 +59,7 @@ export class ReservationController {
   ): Promise<ReservationGetResponseDto> {
     if (role !== UserRole.ADMIN && payload.menteeId !== userId)
       throw new UnauthorizedException('menteeID is not matched with session userID');
-    return await this.reservationService.create(payload);
+    return await this.reservationService.createReservation(payload);
   }
 
   /**
@@ -79,7 +75,7 @@ export class ReservationController {
   ): Promise<ReservationGetResponseDto> {
     if (id < 0) throw new BadRequestException('id is invalid');
     if (role !== UserRole.ADMIN) throw new UnauthorizedException('only for admin');
-    return await this.reservationService.update(id, payload);
+    return await this.reservationService.updateReservation(id, payload);
   }
 
   /**
@@ -93,15 +89,7 @@ export class ReservationController {
     @Param('id') id: number,
   ): Promise<ReservationGetResponseDto> {
     if (id < 0) throw new BadRequestException('id is invalid');
-    const reservation = await this.reservationService.findById(id);
-    if (!reservation) throw new NotFoundException('not exist reservation');
-    if (
-      role !== UserRole.ADMIN &&
-      userId !== reservation.menteeId &&
-      userId !== reservation.mentorId
-    )
-      throw new UnauthorizedException();
-    return reservation;
+    return await this.reservationService.findReservationById(id, role, userId);
   }
 
   /**
@@ -136,6 +124,19 @@ export class ReservationController {
      * */
     if (reservationId < 0) throw new BadRequestException('invalid id');
     return await this.reservationService.acceptReservation(reservationId, userId, role);
+  }
+
+  /**
+   * @access >= OWNER
+   * */
+  @Patch('/:id/check')
+  @UseGuards(JwtGuard)
+  async check(
+    @Param('id') reservationId: number,
+    @GetUserId() userId: number,
+    @GetUserRole() role: UserRole,
+  ): Promise<ReservationGetResponseDto> {
+    return await this.reservationService.checkReservationByMentee(reservationId, userId, role);
   }
 
   /**

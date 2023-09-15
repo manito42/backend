@@ -4,7 +4,7 @@
 generator client {
   provider      = "prisma-client-js"
   engineType    = "binary"
-  binaryTargets = ["debian-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
+  binaryTargets = ["debian-openssl-3.0.x", "linux-musl-openssl-3.0.x", "linux-musl-arm64-openssl-3.0.x"]
 }
 
 datasource db {
@@ -60,6 +60,7 @@ enum ReservationStatus {
   REQUEST
   ACCEPT
   CANCEL
+  MENTEE_CHECKED
   MENTEE_FEEDBACK
   DONE
 }

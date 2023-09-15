@@ -1,33 +1,22 @@
-export function getMentorProfilesWhereQuery(hashtagId?: number, categoryId?: number) {
+import { SelectAllType } from '../../../common/constants/selectAll.type';
+
+export function getMentorProfilesWhereQuery(
+  isHide: boolean | SelectAllType,
+  hashtagId?: number | SelectAllType,
+  categoryId?: number | SelectAllType,
+) {
   const whereObject = {};
-  if (hashtagId !== undefined) {
+  if (isHide !== SelectAllType.ALL) {
+    whereObject['isHide'] = isHide;
+  }
+  if (hashtagId !== SelectAllType.ALL) {
     whereObject['hashtags'] = {
       some: {
         id: hashtagId,
       },
     };
   }
-  if (categoryId !== undefined) {
-    whereObject['categories'] = {
-      some: {
-        id: categoryId,
-      },
-    };
-  }
-
-  return whereObject;
-}
-
-export function getMentorProfileRevealsWhereQuery(hashtagId?: number, categoryId?: number) {
-  const whereObject = { isHide: false };
-  if (hashtagId !== undefined) {
-    whereObject['hashtags'] = {
-      some: {
-        id: hashtagId,
-      },
-    };
-  }
-  if (categoryId !== undefined) {
+  if (categoryId !== SelectAllType.ALL) {
     whereObject['categories'] = {
       some: {
         id: categoryId,
@@ -41,10 +30,11 @@ export function getMentorProfileRevealsWhereQuery(hashtagId?: number, categoryId
 export function getMentorProfilesSearchWhereQuery(
   searchHashtag: boolean,
   searchNickname: boolean,
+  searchCategory: boolean,
   search: string,
 ) {
   const orArray = [];
-  const whereObject = { OR: orArray };
+  const whereObject = { isHide: false, OR: orArray };
   if (searchHashtag) {
     const hashtagWhereObject = {};
     hashtagWhereObject['hashtags'] = {
@@ -64,6 +54,17 @@ export function getMentorProfilesSearchWhereQuery(
       },
     };
     orArray.push(userWhereObject);
+  }
+  if (searchCategory) {
+    const categoryWhereObject = {};
+    categoryWhereObject['categories'] = {
+      some: {
+        name: {
+          contains: search,
+        },
+      },
+    };
+    orArray.push(categoryWhereObject);
   }
   return whereObject;
 }

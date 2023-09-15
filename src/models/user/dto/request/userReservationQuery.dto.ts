@@ -1,5 +1,7 @@
-import { IsBoolean, IsInt, IsOptional, Max, Min } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { ReservationStatus } from '@prisma/client';
+import { ReservationRole } from 'src/common/enums';
 
 export class GetUserReservationQueryDto {
   @Transform(({ value }) => {
@@ -19,23 +21,10 @@ export class GetUserReservationQueryDto {
   page?: number = 0;
 
   @IsOptional()
-  @IsBoolean({ message: "as_mentee must be 'true' or 'false'" })
-  @Transform(({ value }) => {
-    return value === 'true';
-  })
-  as_mentee?: boolean = true;
+  @IsEnum(ReservationRole)
+  role?: ReservationRole = ReservationRole.ALL;
 
-  @IsOptional()
-  @IsBoolean({ message: "as_mentor must be 'true' or 'false'" })
-  @Transform(({ value }) => {
-    return value === 'true';
-  })
-  as_mentor?: boolean = true;
-
-  @IsOptional()
-  @IsBoolean({ message: "all must be 'true' or 'false'" })
-  @Transform(({ value }) => {
-    return value === 'true';
-  })
-  active?: boolean = false;
+  @Transform(({ value }) => value.split(','))
+  @IsEnum(ReservationStatus, { each: true })
+  status?: ReservationStatus[] = Object.values(ReservationStatus);
 }
