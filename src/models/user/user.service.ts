@@ -5,7 +5,7 @@ import { UserGetResponseDto } from './dto/response/userGetResponse.dto';
 import { UserRepository } from '../../database/repository/user.repository';
 import { ReservationStatus } from '@prisma/client';
 import { UserReservationPaginationResponseDto } from './dto/response/userReservationPaginationResponse.dto';
-import { ReservationRole } from './dto/request/userReservationQuery.dto';
+import { ReservationRole } from 'src/common/enums';
 
 @Injectable()
 export class UserService {

@@ -1,5 +1,6 @@
 import { ReservationStatus } from '@prisma/client';
-import { ReservationRole } from '../dto/request/userReservationQuery.dto';
+import { ReservationRole } from 'src/common/enums';
+
 export const getUserReservationsWhereQuery = (
   id: number,
   role: ReservationRole,

@@ -7,7 +7,7 @@ import { UserUpdatePayloadDto } from '../../models/user/dto/request/userUpdatePa
 import { ReservationStatus } from '@prisma/client';
 import { ReservationSelectQuery } from '../../models/reservation/queries/reservationSelect.query';
 import { getUserReservationsWhereQuery } from 'src/models/user/queries/userReservationWhere.query';
-import { ReservationRole } from '../../models/user/dto/request/userReservationQuery.dto';
+import { ReservationRole } from 'src/common/enums';
 import { UserReservationPaginationResponseDto } from '../../models/user/dto/response/userReservationPaginationResponse.dto';
 
 @Injectable()
