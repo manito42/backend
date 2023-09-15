@@ -1,6 +1,10 @@
 # Dependency Install, Build, Start를 여기서 다합니다.
 
 name: Production Deploy to AWS
+
+on:
+  workflow_dispatch:
+
 on:
   push:
     branches:
