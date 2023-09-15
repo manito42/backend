@@ -5,8 +5,8 @@ import { MentorProfileService } from '../../models/mentorProfile/mentorProfile.s
 import { PrismaModule } from '../../database/services/prisma.module';
 
 @Module({
-  controllers: [SearchController, PrismaModule],
-  imports: [MentorProfileModule],
+  controllers: [SearchController],
+  imports: [MentorProfileModule, PrismaModule],
   providers: [MentorProfileService],
 })
 export class SearchModule {}
