@@ -722,7 +722,6 @@ paths:
           content:
             application/json:
               schema:
-                type: object
                 $ref: '#/components/schemas/HashtagPagination'
     post:
       summary: Create a new hashtag
