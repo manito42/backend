@@ -13,4 +13,4 @@ jobs:
 
         steps:
         - name: echo step
-          run: echo "사유: ${{ github.event.inputs.comment }}"
+            run: echo "사유: ${{ github.event.inputs.comment }}"
