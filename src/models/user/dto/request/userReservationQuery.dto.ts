@@ -1,12 +1,7 @@
 import { IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ReservationStatus } from '@prisma/client';
-
-export enum ReservationRole {
-  MENTOR = 'MENTOR',
-  MENTEE = 'MENTEE',
-  ALL = 'ALL',
-}
+import { ReservationRole } from 'src/common/enums';
 
 export class GetUserReservationQueryDto {
   @Transform(({ value }) => {
