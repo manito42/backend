@@ -4,13 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       comment:
-        description: "수동 trigger 사유"
-        default: "ex) 서버 설정 변경 등"
+        description: '수동 trigger 사유'
+        default: 'ex) 서버 설정 변경 등'
 
 jobs:
-    hello:
-        runs-on: ubuntu-latest
+  hello:
+    runs-on: ubuntu-latest
 
-        steps:
-        - name: echo step
-            run: echo "사유: ${{ github.event.inputs.comment }}"
+    steps:
+      - name: 'echo_step'
+        run: |
+          echo "사유: ${{ github.event.inputs.comment }}"
