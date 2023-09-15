@@ -8,8 +8,6 @@ import { ReservationStatus } from '@prisma/client';
 import { ReservationSelectQuery } from '../../models/reservation/queries/reservationSelect.query';
 import { getUserReservationsWhereQuery } from 'src/models/user/queries/userReservationWhere.query';
 import { ReservationRole } from '../../models/user/dto/request/userReservationQuery.dto';
-import { ReservationGetResponseDto } from '../../models/reservation/dto/response/reservationGetResponse.dto';
-import { IPaginationResponse } from '../../common/interfaces/api/common/IPaginationResponse.interface';
 import { UserReservationPaginationResponseDto } from '../../models/user/dto/response/userReservationPaginationResponse.dto';
 
 @Injectable()

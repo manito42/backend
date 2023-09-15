@@ -2,12 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { UserCreatePayloadDto } from './dto/request/userCreatePayload.dto';
 import { UserUpdatePayloadDto } from './dto/request/userUpdatePayload.dto';
 import { UserGetResponseDto } from './dto/response/userGetResponse.dto';
-import { UserReservationGetDto } from './dto/response/userReservationGet.dto';
 import { UserRepository } from '../../database/repository/user.repository';
 import { ReservationStatus } from '@prisma/client';
 import { UserReservationPaginationResponseDto } from './dto/response/userReservationPaginationResponse.dto';
 import { ReservationRole } from './dto/request/userReservationQuery.dto';
-import { ReservationGetResponseDto } from '../reservation/dto/response/reservationGetResponse.dto';
 
 @Injectable()
 export class UserService {
