@@ -64,12 +64,14 @@ paths:
           name: take
           description: take `take` Users (`min = 1, max = 100, default = 20`)
           schema:
+            default: 20
             type: integer
             format: int32
         - in: query
           name: page
           description: skip `take * page` Users and take `take` Users (`skip >= 0`)
           schema:
+            default: 0
             type: integer
             format: int32
       responses:
@@ -265,12 +267,14 @@ paths:
           name: take
           description: take `take` Users (min = 1, max = 100, default = 20)
           schema:
+            default: 20
             type: integer
             format: int32
         - in: query
           name: page
           description: skip `take * page` Users and take `take` Users (>= 0)
           schema:
+            default: 0
             type: integer
             format: int32
         - in: query
@@ -373,12 +377,14 @@ paths:
           name: take
           description: take `take` Users (min = 1, max = 100, default = 20)
           schema:
+            default: 20
             type: integer
             format: int32
         - in: query
           name: page
           description: skip `take * page` Users and take `take` Users (>= 0)
           schema:
+            default: 0
             type: integer
             format: int32
         - in: query
@@ -683,12 +689,14 @@ paths:
           name: take
           description: take `take` Users (min = 1, max = 100, default = 20)
           schema:
+            default: 20
             type: integer
             format: int32
         - in: query
           name: page
           description: skip `take * page` Users and take `take` Users (>= 0)
           schema:
+            default: 0
             type: integer
             format: int32
         - in: query
@@ -758,12 +766,14 @@ paths:
           name: take
           description: take `take` Users (min = 1, max = 100, default = 20)
           schema:
+            default: 20
             type: integer
             format: int32
         - in: query
           name: page
           description: skip `take * page` Users and take `take` Users (>= 0)
           schema:
+            default: 0
             type: integer
             format: int32
         - in: query
@@ -857,12 +867,14 @@ paths:
           name: take
           description: take `take` Users (min = 1, max = 100, default = 20)
           schema:
+            default: 20
             type: integer
             format: int32
         - in: query
           name: page
           description: skip `take * page` Users and take `take` Users (>= 0)
           schema:
+            default: 0
             type: integer
             format: int32
         - in: query
@@ -973,30 +985,35 @@ paths:
           name: take
           description: take `take` Users `min = 1, max = 100, default = 20`
           schema:
+            default: 20
             type: integer
             format: int32
         - in: query
           name: page
           description: skip `take * page` Users and take `take` Users `take >= 0`
           schema:
+            default: 0
             type: integer
             format: int32
         - in: query
           name: search_by_user_nickname
           description: search by nickname `default = true`
           schema:
+            default: true
             type: string
             format: "true | false"
         - in: query
           name: search_by_hashtag_name
           description: search by tag name `default = true`
           schema:
+            default: true
             type: string
             format: "true | false"
         - in: query
           name: search_by_category_name
           description: search by category name `default = true`
           schema:
+            default: true
             type: string
             format: "true | false"
       responses:
@@ -1018,12 +1035,14 @@ paths:
           name: take
           description: take `take` Users `min = 1, max = 100, default = 20`
           schema:
+            default: 20
             type: integer
             format: int32
         - in: query
           name: page
           description: skip `take * page` Users and take `take` Users `take >= 0`
           schema:
+            default: 0
             type: integer
             format: int32
       responses:
@@ -1049,12 +1068,14 @@ paths:
           name: take
           description: take `take` Users `min = 1, max = 100, default = 20`
           schema:
+            default: 20
             type: integer
             format: int32
         - in: query
           name: page
           description: skip `take * page` Users and take `take` Users `take >= 0`
           schema:
+            default: 0
             type: integer
             format: int32
         - in: path
