@@ -3,9 +3,6 @@
 name: Dev Deploy to AWS
 
 on:
-  workflow_dispatch:
-
-on:
   push:
     branches:
       - develop
