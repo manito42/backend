@@ -3,6 +3,12 @@
 name: Production Deploy to AWS
 
 on:
+  workflow_dispatch:
+    inputs:
+      comment:
+        description: '수동 trigger 사유'
+        default: 'ex) 서버 설정 변경 등'
+
   push:
     branches:
       - master
@@ -65,7 +71,7 @@ jobs:
         if: success()
         run: |
           zip --symlinks -r server.zip .
-          aws s3 put-object --bucket manito42-codedeploy-main-bucket --key server.zip --body server.zip
+          aws s3 cp server.zip s3://manito42-codedeploy-main-bucket/server.zip
 
       - name: Create CodeDeploy Deployment
         if: success()
