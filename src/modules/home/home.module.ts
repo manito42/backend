@@ -3,11 +3,11 @@ import { HomeController } from './home.controller';
 import { HomeService } from './home.service';
 import { MentorProfileModule } from '../../models/mentorProfile/mentorProfile.module';
 import { MentorProfileService } from '../../models/mentorProfile/mentorProfile.service';
-import { PrismaService } from '../../database/services/prisma.service';
+import { PrismaModule } from '../../database/services/prisma.module';
 
 @Module({
-  imports: [MentorProfileModule],
+  imports: [MentorProfileModule, PrismaModule],
   controllers: [HomeController],
-  providers: [HomeService, MentorProfileService, PrismaService],
+  providers: [HomeService, MentorProfileService],
 })
 export class HomeModule {}
