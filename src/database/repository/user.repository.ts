@@ -54,7 +54,9 @@ export class UserRepository {
       const user = await prisma.user.create({
         data: data,
       });
-      await prisma.mentorProfile.create({ data: { userId: user.id } });
+      await prisma.mentorProfile.create({
+        data: { userId: user.id, description: '', shortDescription: '' },
+      });
       return prisma.user.findUnique({ where: { id: user.id }, select: UserSelectQuery });
     });
   }

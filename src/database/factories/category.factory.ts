@@ -37,11 +37,26 @@ export class CategoryFactory {
   static getRealSeed(): Array<ICategoryRequest> {
     return [
       {
-        name: 'DEVELOPMENT',
+        name: '42',
       },
       {
-        name: 'HOBBY',
+        name: 'AI',
       },
+      {
+        name: '데이터 사이언스',
+      },
+      { name: '게임' },
+      { name: '그래픽스' },
+      { name: '네트워크' },
+      { name: '모바일' },
+      { name: '보안' },
+      { name: 'DB' },
+      { name: '웹 개발' },
+      { name: '취창업' },
+      { name: '클라우드' },
+      { name: '학문' },
+      { name: '예체능' },
+      { name: '블록체인' },
     ];
   }
 }

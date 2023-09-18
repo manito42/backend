@@ -44,8 +44,8 @@ model MentorProfile {
   id               Int        @id @default(autoincrement())
   user             User       @relation(fields: [userId], references: [id])
   userId           Int        @unique @map("user_id")
-  shortDescription String?    @db.VarChar(255)
-  description      String?    @db.Text
+  shortDescription String     @db.VarChar(255)
+  description      String     @db.Text
   isHide           Boolean    @default(true) @db.TinyInt
   mentoringCount   Int        @default(0) @map("mentoring_count") @db.Int
   hashtags         Hashtag[]  @relation("profiles_hashtags")
