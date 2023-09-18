@@ -2,7 +2,7 @@ import { ArrayMaxSize, IsOptional, MaxLength, MinLength } from 'class-validator'
 import { IMentorProfileUpdateRequest } from '../../../../common/interfaces/api/mentorProfile/mentorProfileRequest.interface';
 
 export class MentorProfileUpdatePayloadDto implements IMentorProfileUpdateRequest {
-  @MinLength(1, { message: 'shortDescription은 최소 1글자 이상이어야 합니다.' })
+  @MinLength(0, { message: 'shortDescription은 최소 1글자 이상이어야 합니다.' })
   @MaxLength(50, {
     message: 'shortDescription은 최대 50자 이하여야 합니다.',
   })
@@ -12,7 +12,7 @@ export class MentorProfileUpdatePayloadDto implements IMentorProfileUpdateReques
   @MaxLength(1000, {
     message: 'description은 최대 1000자 이하여야 합니다.',
   })
-  @MinLength(1, { message: 'description은 최소 1글자 이상이어야 합니다.' })
+  @MinLength(0, { message: 'description은 최소 1글자 이상이어야 합니다.' })
   @IsOptional()
   description?: string;
 
