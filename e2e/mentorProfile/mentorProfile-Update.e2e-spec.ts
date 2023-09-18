@@ -42,6 +42,8 @@ describe('PATCH /mentor-profiles description test', () => {
     mentorProfile = await prisma.mentorProfile.create({
       data: {
         userId: mentor.id,
+        shortDescription: 'shortDescription',
+        description: 'description',
       },
     });
 
@@ -84,7 +86,16 @@ describe('PATCH /mentor-profiles description test', () => {
       .set('Authorization', `Bearer ${mentorAccessToken}`)
       .send(mentorProfileUpdatePayload);
 
-    expect(response.status).toEqual(400);
+    expect(response.status).toEqual(200);
+
+    const updateResult = await prisma.mentorProfile.findUnique({
+      where: {
+        userId: mentor.id,
+      },
+    });
+
+    expect(updateResult.description).toEqual('');
+    expect(updateResult.shortDescription).toEqual('');
   });
 
   it('PATCH /mentor_profiles/:id description undefined test', async () => {
@@ -108,7 +119,7 @@ describe('PATCH /mentor-profiles description test', () => {
       },
     });
 
-    expect(updateResult.description).toEqual(null);
+    expect(updateResult.description).toEqual(mentorProfile.description);
   });
 
   it('PATCH /mentor_profiles/:id description length null test', async () => {
@@ -125,14 +136,14 @@ describe('PATCH /mentor-profiles description test', () => {
       .send(mentorProfileUpdatePayload)
       .set('Authorization', `Bearer ${mentorAccessToken}`);
 
-    expect(response.status).toEqual(200);
+    expect(response.status).toEqual(400);
 
     const updateResult = await prisma.mentorProfile.findUnique({
       where: {
         id: mentorProfile.id,
       },
     });
-    expect(updateResult.description).toEqual(null);
+    expect(updateResult.description).toEqual(mentorProfile.description);
   });
 
   it('PATCH /mentor_profiles/:id no description property test', async () => {
@@ -153,7 +164,7 @@ describe('PATCH /mentor-profiles description test', () => {
         id: mentorProfile.id,
       },
     });
-    expect(updateResult.description).toEqual(null);
+    expect(updateResult.description).toEqual(mentorProfile.description);
   });
 
   it('PATCH /mentor_profiles/:id description length > 0 test', async () => {
