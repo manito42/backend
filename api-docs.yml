@@ -331,7 +331,7 @@ paths:
         **NOTE**: **hashtags** and **categories** are replaced with the new ones  
         **사용법**: **description/shortDescription**   
           description이 **missing** **property** 인 경우, 무시(제외하고 업데이트)  
-          description이 **""** 인 경우, ""로 업데이트됩니다.
+          description이 **""** 인 경우, ""로 업데이트됩니다.  
           description이 **null**인 경우 400 response를 리턴합니다.
       tags:
         - Mentor Profiles
