@@ -327,8 +327,12 @@ paths:
     patch:
       summary: Update mentor profile
       description: |
-        update mentor profiles.
-        **NOTE**: **hashtags** and **categories** are replaced with the new ones
+        update mentor profiles.  
+        **NOTE**: **hashtags** and **categories** are replaced with the new ones  
+        **사용법**: **description/shortDescription**   
+          description이 **missing** **property** 인 경우, 무시(제외하고 업데이트)  
+          description이 **""** 인 경우, ""로 업데이트됩니다.
+          description이 **null**인 경우 400 response를 리턴합니다.
       tags:
         - Mentor Profiles
       security:
@@ -1571,10 +1575,10 @@ components:
           description: "optional, default false"
         shortDescription:
           type: string
-          description: 'optional, 0 < len < 50'
+          description: 'optional, 0 <= len < 50'
         description:
           type: string
-          description: 'optional, 0 < len < 1000'
+          description: 'optional, 0 <= len < 1000'
         hashtags:
           type: array
           description: 'optional, number of hashtag <= 5'
