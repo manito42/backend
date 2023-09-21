@@ -248,7 +248,7 @@ export class ReservationRepository {
       const reservation = await prisma.reservation.findUnique({
         where: { id: reservationId },
       });
-      if (!reservation || reservation.status !== ReservationStatus.ACCEPT)
+      if (!reservation || reservation.status !== ReservationStatus.MENTEE_FEEDBACK)
         throw new BadRequestException('invalid reservation for mentor_completion');
       if (role !== UserRole.ADMIN && reservation.mentorId !== userId)
         throw new UnauthorizedException('user is not mentor of this reservation');
