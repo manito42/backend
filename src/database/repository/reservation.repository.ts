@@ -222,6 +222,7 @@ export class ReservationRepository {
           menteeId: reservation.menteeId,
           mentorId: reservation.mentorId,
           content: payload.content,
+          rating: payload.rating,
         },
       });
       await prisma.user.update({
