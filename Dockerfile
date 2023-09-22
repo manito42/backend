@@ -14,4 +14,3 @@ RUN chmod +x /tmp/start.sh
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
 CMD ["/bin/ash", "/tmp/start.sh"]
-EXPOSE 3000
