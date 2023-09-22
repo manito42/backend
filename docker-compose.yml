@@ -2,7 +2,6 @@ version: '3.8'
 
 # 백엔드 개발 환경 구축용 도커 컨테이너들
 services:
-  # npm install 이 안되어있으면 작동 안함
   nestjs:
     build:
       context: .
@@ -11,14 +10,13 @@ services:
     depends_on:
       - mysql
     ports:
-      - "3000:3000"
+      - '3000:3000'
     networks:
       - backend
     volumes:
       - .:/app
     working_dir: /app
-    env_file:
-      .env
+    env_file: .env
     environment:
       - TZ=Asia/Seoul
 
@@ -32,7 +30,7 @@ services:
       MYSQL_USER: manito
       MYSQL_PASSWORD: 1234
     ports:
-      - "3306:3306"
+      - '3306:3306'
     networks:
       - backend
 
