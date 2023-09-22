@@ -222,6 +222,7 @@ export class ReservationRepository {
           menteeId: reservation.menteeId,
           mentorId: reservation.mentorId,
           content: payload.content,
+          rating: payload.rating,
         },
       });
       await prisma.user.update({
@@ -257,6 +258,7 @@ export class ReservationRepository {
           reservationId: reservationId,
           menteeId: reservation.menteeId,
           mentorId: reservation.mentorId,
+          rating: payload.rating,
         },
       });
       await prisma.mentorProfile.update({

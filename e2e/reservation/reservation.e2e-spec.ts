@@ -322,22 +322,35 @@ describe('Reservation - Request', () => {
           },
         });
         expect(res.status).toBe('MENTEE_FEEDBACK');
-      });
 
-      it('멘토가 피드백을 남긴다. (200)', async () => {
-        const response = await request(app.getHttpServer())
+        // 멘토가 피드백을 남긴다.
+        const response2 = await request(app.getHttpServer())
           .patch(`/reservations/${reservation.id}/mentor_completion`)
           .set('Authorization', `Bearer ${mentorAccessToken}`)
           .send({
             rating: 5,
           });
-        expect(response.status).toBe(200);
-        const res = await prisma.reservation.findUnique({
+        expect(response2.status).toBe(200);
+        const res2 = await prisma.reservation.findUnique({
           where: {
             id: reservation.id,
           },
         });
-        expect(res.status).toBe('DONE');
+        expect(res2.status).toBe('DONE');
+
+        const menteeFeedback = await prisma.menteeFeedback.findUnique({
+          where: {
+            reservationId: reservation.id,
+          },
+        });
+        expect(menteeFeedback.rating).toBe(5);
+
+        const mentorFeedback = await prisma.mentorFeedback.findUnique({
+          where: {
+            reservationId: reservation.id,
+          },
+        });
+        expect(mentorFeedback.rating).toBe(5);
       });
     });
 
