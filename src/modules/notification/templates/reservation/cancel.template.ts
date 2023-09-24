@@ -8,7 +8,10 @@ import { baseMailTemplate } from '../baseMail.template';
  * @param mentor
  */
 export const getCancelTemplate = (mentee: User, mentor: User, reservation: Reservation) => {
-  return baseMailTemplate(`
+  return baseMailTemplate(
+    '[42 Manito] 멘토링이 취소되었습니다.',
+    '멘토링 취소',
+    `
       <p> 멘토링 요청이 취소되었습니다.</p>
       <h3>멘토링 정보</h3>
       <p>
@@ -16,5 +19,7 @@ export const getCancelTemplate = (mentee: User, mentor: User, reservation: Reser
         멘티 : ${mentee.nickname}<br>
         요청 메시지 : ${reservation.requestMessage}<br>
       </p>
-    `);
+    `,
+    reservation.id,
+  );
 };
