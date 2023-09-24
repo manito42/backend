@@ -21,7 +21,12 @@ export class NotificationController {
   async handleReservationRequest(payload: IReservationEventPayload) {
     const { mentor, mentee, reservation } = payload;
     const sendTo: Array<User> = [mentor];
-    const content: string = getRequestTemplate(mentee, mentor, reservation.requestMessage);
+    const content: string = getRequestTemplate(
+      mentee,
+      mentor,
+      reservation,
+      reservation.requestMessage,
+    );
     const subject: string = '[42manito] 새로운 멘토링 요청이 들어왔습니다.';
 
     await this.notificationService.notify(sendTo, subject, content);
@@ -41,7 +46,7 @@ export class NotificationController {
   async handleReservationAccept(payload: IReservationEventPayload) {
     const { mentor, mentee, reservation } = payload;
     const sendTo: Array<User> = [mentee];
-    const content: string = getAcceptTemplate(mentee, mentor);
+    const content: string = getAcceptTemplate(mentee, mentor, reservation);
     const subject: string = '[42manito] 멘토링 요청이 수락되었습니다.';
 
     await this.notificationService.notify(sendTo, subject, content);
@@ -51,7 +56,7 @@ export class NotificationController {
   async handleReservationMenteeCompletion(payload: IReservationEventPayload) {
     const { mentor, mentee, reservation } = payload;
     const sendTo: Array<User> = [mentor];
-    const content: string = getMenteeCompletionTemplate(mentee, mentor);
+    const content: string = getMenteeCompletionTemplate(mentee, mentor, reservation);
     const subject: string = '[42manito] 멘토링이 완료되었습니다.';
 
     await this.notificationService.notify(sendTo, subject, content);
