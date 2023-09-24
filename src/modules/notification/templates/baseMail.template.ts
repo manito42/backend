@@ -1,4 +1,3 @@
-// TODO : 이메일 템플릿에서 관련 예약으로 넘어가도록.
 export const baseMailTemplate = (
   header: string,
   cardHeader: string,
