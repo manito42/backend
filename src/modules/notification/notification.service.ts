@@ -12,13 +12,11 @@ export class NotificationService {
       to: emails,
       subject: subject,
       html: content,
+      from: 'reservation.42manito.com',
     });
     this.logger.log(`Sent mail to ${emails}`);
   }
 
-  /**
-   * NOTE: 현재는 메일만 전송함.
-   */
   async notify(sendTo: Array<User>, subject: string, content: string) {
     const emails = sendTo.map((user) => user.email);
     await this.notifyByMail(emails, subject, content);
