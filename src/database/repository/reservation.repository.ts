@@ -58,34 +58,77 @@ export class ReservationRepository {
     });
   }
 
+  /**
+   * @brief 예약을 생성한다.
+   * @description 요청한 멘토의 프로필이 존재하는지 확인하고, 예약을 생성한다.
+   * @param ReservationCreatePayloadDto
+   * @return ReservationGetResponseDto
+   * @transaction
+   * 	- A 카테고리와 해시태그 기반 멘토의 프로필이 존재하는지 확인한다.
+   * 	- B 예약이 이미 존재하는지 확인한다.
+   * 	- C 카테고리와 해시태그로 예약을 생성한다.
+   * 	A<->C 사이에 시간이 지나면 멘토의 프로필이 변경될 수 있으므로,
+   * 	트랜잭션으로 묶어서 예약을 생성한다.
+   */
   async create(payload: ReservationCreatePayloadDto): Promise<ReservationGetResponseDto> {
     const { menteeId, mentorId } = payload;
+    // 스스로 예약을 할 수 없다.
     if (menteeId === mentorId) throw new BadRequestException('can not reserve myself');
-    const mentorProfile = await this.prismaService.mentorProfile.findUnique({
-      where: { userId: mentorId },
-    });
-    if (!mentorProfile || mentorProfile.isHide)
-      throw new BadRequestException('requested mentorID is not available');
-    const existMentoringCount = await this.prismaService.reservation.count({
-      where: {
-        mentorId: mentorId,
-        menteeId: menteeId,
-        OR: [{ status: 'ACCEPT' }, { status: 'REQUEST' }],
-      },
-    });
-    if (existMentoringCount !== 0) throw new ConflictException('already exists active reservation');
-
-    return this.prismaService.reservation.create({
-      data: {
-        menteeId: menteeId,
-        mentorId: mentorId,
-        categoryId: payload.categoryId,
-        requestMessage: payload.requestMessage,
-        hashtags: {
-          connect: payload.hashtags,
+    return await this.prismaService.$transaction(async (prisma) => {
+      const mentorProfile = await prisma.mentorProfile.findUnique({
+        where: {
+          userId: mentorId,
+          isHide: false,
+          categories: {
+            some: {
+              id: payload.categoryId,
+            },
+          },
+          hashtags: {
+            some: {
+              id: {
+                in: payload.hashtags.map((hashtag) => hashtag.id),
+              },
+            },
+          },
         },
-      },
-      select: ReservationSelectQuery,
+        include: {
+          hashtags: true,
+        },
+      });
+
+      //find many로 찾아서 mentorProfile을 중심으로 category와 hashtag를 검사한다.
+      //mentorProfile이 없거나, mentorProfile의 길이와 payload의 hashtag의 길이가 다르면 예외처리한다.
+      if (!mentorProfile) throw new BadRequestException('request is not vaild');
+
+      // //payload hashtag에 대해 mentorProfile hashtag에 없으면 예외처리한다.
+      const isAllHashtagExist = payload.hashtags.every((hashtag) =>
+        mentorProfile.hashtags.some((profileHashtag) => profileHashtag.id === hashtag.id),
+      );
+      if (!isAllHashtagExist) throw new BadRequestException('request is not vaild');
+
+      const existMentoringCount = await prisma.reservation.count({
+        where: {
+          mentorId: mentorId,
+          menteeId: menteeId,
+          OR: [{ status: 'ACCEPT' }, { status: 'REQUEST' }],
+        },
+      });
+      if (existMentoringCount !== 0)
+        throw new ConflictException('already exists active reservation');
+
+      return await prisma.reservation.create({
+        data: {
+          menteeId: menteeId,
+          mentorId: mentorId,
+          categoryId: payload.categoryId,
+          requestMessage: payload.requestMessage,
+          hashtags: {
+            connect: payload.hashtags,
+          },
+        },
+        select: ReservationSelectQuery,
+      });
     });
   }
 
