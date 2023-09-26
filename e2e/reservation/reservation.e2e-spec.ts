@@ -106,7 +106,7 @@ describe('Reservation - Request', () => {
       },
     });
 
-    await prisma.mentorProfile.create({
+    mentorProfile = await prisma.mentorProfile.create({
       data: {
         userId: mentor.id,
         shortDescription: 'ReservationMentorShortDescription',
@@ -306,6 +306,40 @@ describe('Reservation - Request', () => {
         });
 
       expect(response.status).toBe(400);
+    });
+
+    it('멘토 프로필이 isHide일 때, 예약 생성 시도 시 400 반환', async () => {
+      await prisma.mentorProfile.update({
+        data: {
+          isHide: true,
+        },
+        where: {
+          userId: mentor.id,
+        },
+      });
+
+      const response = await request(app.getHttpServer())
+        .post('/reservations')
+        .set('Authorization', `Bearer ${menteeAccessToken}`)
+        .send({
+          menteeId: mentee.id,
+          mentorId: mentor.id,
+          categoryId: category.id,
+          requestMessage: 'ReservationRequestMessage',
+          hashtags: [{ id: hashtag.id }],
+        });
+
+      expect(response.status).toBe(400);
+
+      // isHide를 false로 바꿔준다.
+      await prisma.mentorProfile.update({
+        data: {
+          isHide: false,
+        },
+        where: {
+          userId: mentor.id,
+        },
+      });
     });
 
     afterEach(async () => {
