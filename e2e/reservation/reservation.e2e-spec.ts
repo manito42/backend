@@ -20,7 +20,11 @@ describe('Reservation - Request', () => {
   let mentee: User;
   let dummyMentee: User;
   let category: Category;
+  let category2: Category;
+  let category3: Category;
   let hashtag: Hashtag;
+  let hashtag2: Hashtag;
+  let hashtag3: Hashtag;
   let mentorAccessToken: string;
   let menteeAccessToken: string;
   let dummyMenteeAccToken: string;
@@ -72,19 +76,63 @@ describe('Reservation - Request', () => {
       },
     });
 
+    category2 = await prisma.category.create({
+      data: {
+        name: 'ReservationTestCategory2',
+      },
+    });
+
+    category3 = await prisma.category.create({
+      data: {
+        name: 'ReservationTestCategory3',
+      },
+    });
+
     hashtag = await prisma.hashtag.create({
       data: {
         name: 'ReservationTestHashtag',
       },
     });
 
-    await prisma.mentorProfile.create({
+    hashtag2 = await prisma.hashtag.create({
+      data: {
+        name: 'ReservationTestHashtag2',
+      },
+    });
+
+    hashtag3 = await prisma.hashtag.create({
+      data: {
+        name: 'ReservationTestHashtag3',
+      },
+    });
+
+    mentorProfile = await prisma.mentorProfile.create({
       data: {
         userId: mentor.id,
         shortDescription: 'ReservationMentorShortDescription',
         description: 'ReservationMentorDescription',
         isHide: false,
         mentoringCount: 0,
+        categories: {
+          connect: [
+            {
+              id: category.id,
+            },
+            {
+              id: category2.id,
+            },
+          ],
+        },
+        hashtags: {
+          connect: [
+            {
+              id: hashtag.id,
+            },
+            {
+              id: hashtag2.id,
+            },
+          ],
+        },
       },
     });
 
@@ -132,13 +180,19 @@ describe('Reservation - Request', () => {
 
     await prisma.category.deleteMany({
       where: {
-        id: category.id,
+        OR: [{ id: category.id }, { id: category2.id }, { id: category3.id }],
       },
     });
 
     await prisma.hashtag.deleteMany({
       where: {
-        id: hashtag.id,
+        OR: [
+          { id: hashtag.id },
+          { id: hashtag2.id },
+          {
+            id: hashtag3.id,
+          },
+        ],
       },
     });
   });
@@ -148,7 +202,7 @@ describe('Reservation - Request', () => {
   });
 
   describe('Create Request', () => {
-    it('멘티가 예약을 생성한다.', async () => {
+    it('멘티가 예약을 생성한다 by category1', async () => {
       const response = await request(app.getHttpServer())
         .post('/reservations')
         .set('Authorization', `Bearer ${menteeAccessToken}`)
@@ -163,7 +217,132 @@ describe('Reservation - Request', () => {
       expect(response.status).toBe(201);
     });
 
-    afterAll(async () => {
+    it('멘티가 예약을 생성 by category2', async () => {
+      const response2 = await request(app.getHttpServer())
+        .post('/reservations')
+        .set('Authorization', `Bearer ${menteeAccessToken}`)
+        .send({
+          menteeId: mentee.id,
+          mentorId: mentor.id,
+          categoryId: category2.id,
+          requestMessage: 'ReservationRequestMessage',
+          hashtags: [{ id: hashtag.id }],
+        });
+
+      expect(response2.status).toBe(201);
+    });
+
+    it('멘티가 예약 생성 시, 해시태그가 여러개인 경우 201반환', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/reservations')
+        .set('Authorization', `Bearer ${menteeAccessToken}`)
+        .send({
+          menteeId: mentee.id,
+          mentorId: mentor.id,
+          categoryId: category.id,
+          requestMessage: 'ReservationRequestMessage',
+          hashtags: [{ id: hashtag.id }, { id: hashtag2.id }],
+        });
+
+      expect(response.status).toBe(201);
+      expect(response.body.hashtags.length).toBe(2);
+    });
+
+    it('멘티가 예약을 생성할 때, 없는 카테고리인 경우 400 반환', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/reservations')
+        .set('Authorization', `Bearer ${menteeAccessToken}`)
+        .send({
+          menteeId: mentee.id,
+          mentorId: mentor.id,
+          categoryId: category3.id,
+          requestMessage: 'ReservationRequestMessage',
+          hashtags: [{ id: hashtag.id }],
+        });
+
+      expect(response.status).toBe(400);
+    });
+
+    it('멘티가 예약 생성시, 없는 해시태그인 경우 400 반환', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/reservations')
+        .set('Authorization', `Bearer ${menteeAccessToken}`)
+        .send({
+          menteeId: mentee.id,
+          mentorId: mentor.id,
+          categoryId: category.id,
+          requestMessage: 'ReservationRequestMessage',
+          hashtags: [{ id: hashtag3.id }],
+        });
+
+      expect(response.status).toBe(400);
+    });
+
+    it('멘티가 예약 생성시, 해시태그가 없는 경우 400 반환', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/reservations')
+        .set('Authorization', `Bearer ${menteeAccessToken}`)
+        .send({
+          menteeId: mentee.id,
+          mentorId: mentor.id,
+          categoryId: category.id,
+          requestMessage: 'ReservationRequestMessage',
+          hashtags: [],
+        });
+
+      expect(response.status).toBe(400);
+    });
+
+    it('멘티가 예약 생성시, 해시태그가 여러개인 경우, 없는 해시태그가 있을때 400반환', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/reservations')
+        .set('Authorization', `Bearer ${menteeAccessToken}`)
+        .send({
+          menteeId: mentee.id,
+          mentorId: mentor.id,
+          categoryId: category.id,
+          requestMessage: 'ReservationRequestMessage',
+          hashtags: [{ id: hashtag.id }, { id: hashtag3.id }],
+        });
+
+      expect(response.status).toBe(400);
+    });
+
+    it('멘토 프로필이 isHide일 때, 예약 생성 시도 시 400 반환', async () => {
+      await prisma.mentorProfile.update({
+        data: {
+          isHide: true,
+        },
+        where: {
+          userId: mentor.id,
+        },
+      });
+
+      const response = await request(app.getHttpServer())
+        .post('/reservations')
+        .set('Authorization', `Bearer ${menteeAccessToken}`)
+        .send({
+          menteeId: mentee.id,
+          mentorId: mentor.id,
+          categoryId: category.id,
+          requestMessage: 'ReservationRequestMessage',
+          hashtags: [{ id: hashtag.id }],
+        });
+
+      expect(response.status).toBe(400);
+
+      // isHide를 false로 바꿔준다.
+      await prisma.mentorProfile.update({
+        data: {
+          isHide: false,
+        },
+        where: {
+          userId: mentor.id,
+        },
+      });
+    });
+
+    afterEach(async () => {
       await prisma.reservation.deleteMany({
         where: {
           mentorId: mentor.id,
