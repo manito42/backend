@@ -525,6 +525,12 @@ paths:
           schema:
             type: integer
             format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelReservation'
       responses:
         '200':
           description: Updated
@@ -1734,6 +1740,13 @@ components:
           description: "optional, hashtags item max 5"
           items:
             $ref: '#/components/schemas/HashtagUpdate'
+
+    CancelReservation:
+      type: object
+      properties:
+        content:
+          description: "Reason for Cancellation, (length <= 100)"
+          type: string
 
     CompleteReservationAsMentee:
       type: object
