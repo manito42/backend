@@ -12,10 +12,6 @@ export class DevController {
 
   @Get('/login/:id')
   async loginDev(@Param('id') id: number) {
-    /**
-     * @TODO
-     * - use dynamic module
-     * */
     if (process.env.NODE_ENV !== 'dev' && process.env.NODE_ENV !== 'test')
       throw new UnauthorizedException();
     const user = await this.userService.findById(id);
