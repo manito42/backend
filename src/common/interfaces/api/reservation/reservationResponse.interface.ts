@@ -2,6 +2,7 @@ import { IMentorFeedbackResponse } from '../mentorFeedback/mentorFeedbackRespons
 import { IMenteeFeedbackResponse } from '../menteeFeedback/menteeFeedbackResponse.interface';
 import { ICategoryResponse } from '../category/categoryResponse.interface';
 import { IHashtagResponse } from '../hashtag/hashtagResponse.interface';
+import { ICancelReasonResponse } from '../cancelReason/cancelReasonResponse.interface';
 
 export interface IReservationResponse {
   id: number;
@@ -13,6 +14,7 @@ export interface IReservationResponse {
   hashtags: IHashtagResponse[];
   mentorFeedback: IMentorFeedbackResponse;
   menteeFeedback: IMenteeFeedbackResponse;
+  cancelReason: ICancelReasonResponse;
   createdAt: Date;
   updatedAt: Date;
 }

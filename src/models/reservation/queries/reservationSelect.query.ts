@@ -36,6 +36,14 @@ export const ReservationSelectQuery = {
       updatedAt: true,
     },
   },
+  cancelReason: {
+    select: {
+      content: true,
+      createdAt: true,
+      requestedUserId: true,
+      reservationId: true,
+    },
+  },
   createdAt: true,
   updatedAt: true,
 };
