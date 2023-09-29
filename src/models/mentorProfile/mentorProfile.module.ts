@@ -2,12 +2,12 @@ import { Module } from '@nestjs/common';
 import { MentorProfileController } from './mentorProfile.controller';
 import { MentorProfileService } from './mentorProfile.service';
 import { PrismaModule } from '../../database/services/prisma.module';
-import { MentorProfileRepository } from '../../database/repository/mentorProfile.repository';
+import { JwtConfigModule } from 'src/config/jwt/config.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, JwtConfigModule],
   controllers: [MentorProfileController],
-  providers: [MentorProfileService, MentorProfileRepository],
-  exports: [MentorProfileService, MentorProfileRepository],
+  providers: [MentorProfileService],
+  exports: [MentorProfileService],
 })
 export class MentorProfileModule {}

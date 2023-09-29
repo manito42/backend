@@ -2,13 +2,11 @@ import { Module } from '@nestjs/common';
 import { MenteeFeedbackController } from './menteeFeedback.controller';
 import { MenteeFeedbackService } from './menteeFeedback.service';
 import { PrismaModule } from '../../database/services/prisma.module';
-import { MenteeFeedbackRepository } from '../../database/repository/menteeFeedback.repository';
-import { ReservationModule } from '../reservation/reservation.module';
+import { JwtConfigModule } from 'src/config/jwt/config.module';
 
 @Module({
-  imports: [PrismaModule, ReservationModule],
+  imports: [PrismaModule, JwtConfigModule],
   controllers: [MenteeFeedbackController],
-  providers: [MenteeFeedbackService, MenteeFeedbackRepository],
-  exports: [MenteeFeedbackRepository],
+  providers: [MenteeFeedbackService],
 })
 export class MenteeFeedbackModule {}

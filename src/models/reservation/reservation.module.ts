@@ -2,13 +2,11 @@ import { Module } from '@nestjs/common';
 import { ReservationController } from './reservation.controller';
 import { ReservationService } from './reservation.service';
 import { PrismaModule } from '../../database/services/prisma.module';
-import { ReservationRepository } from '../../database/repository/reservation.repository';
-import { UserModule } from '../user/user.module';
+import { JwtConfigModule } from 'src/config/jwt/config.module';
 
 @Module({
-  imports: [PrismaModule, UserModule],
+  imports: [PrismaModule, JwtConfigModule],
   controllers: [ReservationController],
-  providers: [ReservationService, ReservationRepository],
-  exports: [ReservationRepository],
+  providers: [ReservationService],
 })
 export class ReservationModule {}

@@ -2,12 +2,12 @@ import { Module } from '@nestjs/common';
 import { HashtagController } from './hashtag.controller';
 import { HashtagService } from './hashtag.service';
 import { PrismaModule } from '../../database/services/prisma.module';
-import { HashtagRepository } from '../../database/repository/hashtag.repository';
+import { JwtConfigModule } from 'src/config/jwt/config.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, JwtConfigModule],
   controllers: [HashtagController],
-  providers: [HashtagService, HashtagRepository],
-  exports: [HashtagService, HashtagRepository],
+  providers: [HashtagService],
+  exports: [HashtagService],
 })
 export class HashtagModule {}
