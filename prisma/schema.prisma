@@ -4,7 +4,7 @@
 generator client {
   provider      = "prisma-client-js"
   engineType    = "binary"
-  binaryTargets = ["debian-openssl-3.0.x", "linux-musl-openssl-3.0.x", "linux-musl-arm64-openssl-3.0.x"]
+  binaryTargets = ["debian-openssl-3.0.x", "darwin-arm64", "linux-musl-openssl-3.0.x", "linux-musl-arm64-openssl-3.0.x"]
 }
 
 datasource db {
@@ -35,6 +35,7 @@ model User {
   menteeFeedbacksFrom MentorFeedback[] @relation("MentorFeedbackFrom")
   mentorFeedbacksTo   MentorFeedback[] @relation("MentorFeedbackTo")
   mentorFeedbacksFrom MenteeFeedback[] @relation("MenteeFeedbackFrom")
+  cancelReasons       CancelReason[]   @relation("CancelReasons")
 
   @@map("users")
 }
@@ -81,6 +82,7 @@ model Reservation {
   hashtags       Hashtag[]         @relation("reservations_hashtags")
   mentorFeedback MentorFeedback?
   menteeFeedback MenteeFeedback?
+  cancelReason   CancelReason?
 
   @@map("reservations")
 }
@@ -138,6 +140,21 @@ model Category {
   reservations   Reservation[]
 
   @@map("categories")
+}
+
+// 취소 사유 모델
+model CancelReason {
+  content         String    @db.VarChar(150)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+
+  requestUser     User      @relation("CancelReasons", fields: [requestedUserId], references: [id])
+  requestedUserId Int       @map("requested_user_id")
+
+  reservation   Reservation @relation(fields: [reservationId], references: [id])
+  reservationId Int         @unique @map("reservation_id")
+
+  @@unique([reservationId, requestedUserId])//primary key
+  @@map("cancel_reasons")
 }
 
 // below are implicitlu created by prisma
