@@ -1,5 +1,4 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { HomeService } from './home.service';
 import { GetHomeQueryDto } from './dto/request/homeQuery.dto';
 import { MentorProfileService } from '../../models/mentorProfile/mentorProfile.service';
 import { MentorProfileGetResponseDto } from '../../models/mentorProfile/dto/response/mentorProfileGetResponse.dto';

@@ -4,6 +4,8 @@ import configuration from './configuration';
 import { JwtConfigService } from './config.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ENV_FILE } from '../envFile.constant';
+import { JwtStrategy } from 'src/common/guards/jwt/jwt.strategy';
+import { JwtGuard } from 'src/common/guards/jwt/jwt.guard';
 
 /**
  * Import and provide app configuration related classes.
@@ -22,7 +24,7 @@ import { ENV_FILE } from '../envFile.constant';
       }),
     }),
   ],
-  providers: [ConfigService, JwtConfigService],
-  exports: [ConfigService, JwtConfigService],
+  providers: [ConfigService, JwtConfigService, JwtStrategy, JwtGuard],
+  exports: [ConfigService, JwtConfigService, JwtGuard],
 })
 export class JwtConfigModule {}

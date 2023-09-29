@@ -14,6 +14,7 @@ import { ReservationService } from './reservation.service';
 import { ReservationGetResponseDto } from './dto/response/reservationGetResponse.dto';
 import { ReservationCreatePayloadDto } from './dto/request/reservationCreatePayload.dto';
 import {
+  ReservationCancelPayloadDto,
   ReservationCompleteAsMenteePayloadDto,
   ReservationCompleteAsMentorPayloadDto,
   ReservationUpdatePayloadDto,
@@ -101,12 +102,13 @@ export class ReservationController {
     @Param('id') reservationId: number,
     @GetUserId() userId: number,
     @GetUserRole() role: UserRole,
+    @Body() payload: ReservationCancelPayloadDto,
   ): Promise<ReservationGetResponseDto> {
     /**
      * @TODO: this validation should be done in pipes
      * */
     if (reservationId < 0) throw new BadRequestException('invalid id');
-    return await this.reservationService.cancelReservation(reservationId, userId, role);
+    return await this.reservationService.cancelReservation(reservationId, userId, role, payload);
   }
 
   /**

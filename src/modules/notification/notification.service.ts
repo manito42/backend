@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
-import { User } from '@prisma/client';
+import { UserGetResponseDto } from 'src/models/user/dto/response/userGetResponse.dto';
 
 @Injectable()
 export class NotificationService {
@@ -19,7 +19,7 @@ export class NotificationService {
   /**
    * NOTE: 현재는 메일만 전송함.
    */
-  async notify(sendTo: Array<User>, subject: string, content: string) {
+  async notify(sendTo: Array<UserGetResponseDto>, subject: string, content: string) {
     const emails = sendTo.map((user) => user.email);
     await this.notifyByMail(emails, subject, content);
   }

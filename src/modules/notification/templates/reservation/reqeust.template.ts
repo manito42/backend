@@ -1,6 +1,8 @@
 import { User } from '@prisma/client';
 import { baseMailTemplate } from '../baseMail.template';
 import { Reservation } from '.prisma/client';
+import { UserGetResponseDto } from 'src/models/user/dto/response/userGetResponse.dto';
+import { ReservationGetResponseDto } from 'src/models/reservation/dto/response/reservationGetResponse.dto';
 
 /**
  * NOTE: 내부 내용은 추후에 정립할 예정입니다.
@@ -11,9 +13,9 @@ import { Reservation } from '.prisma/client';
  * @param message
  */
 export const getRequestTemplate = (
-  mentee: User,
-  mentor: User,
-  reservation: Reservation,
+  mentee: UserGetResponseDto,
+  mentor: UserGetResponseDto,
+  reservation: ReservationGetResponseDto,
   message: string,
 ) => {
   return baseMailTemplate(

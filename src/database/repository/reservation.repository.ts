@@ -9,6 +9,7 @@ import { PrismaService } from '../services/prisma.service';
 import { ReservationStatus, UserRole } from '@prisma/client';
 import { ReservationSelectQuery } from '../../models/reservation/queries/reservationSelect.query';
 import {
+  ReservationCancelPayloadDto,
   ReservationCompleteAsMenteePayloadDto,
   ReservationCompleteAsMentorPayloadDto,
   ReservationUpdatePayloadDto,
@@ -152,7 +153,12 @@ export class ReservationRepository {
     });
   }
 
-  async cancelReservation(reservationId: number, userId: number, role: string) {
+  async cancelReservation(
+    reservationId: number,
+    userId: number,
+    role: string,
+    payload: ReservationCancelPayloadDto,
+  ) {
     return this.prismaService.$transaction(async (prisma) => {
       const reservation = await prisma.reservation.findUnique({
         where: { id: reservationId },
@@ -178,6 +184,15 @@ export class ReservationRepository {
         role !== UserRole.ADMIN
       )
         throw new UnauthorizedException('user is not mentor of this reservation');
+
+      await prisma.cancelReason.create({
+        data: {
+          content: payload.content,
+          requestedUserId: userId,
+          reservationId: reservationId,
+        },
+      });
+
       return prisma.reservation.update({
         where: { id: reservationId },
         data: { status: ReservationStatus.CANCEL },
