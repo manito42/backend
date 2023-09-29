@@ -379,6 +379,9 @@ describe('Reservation - Request', () => {
       it('없는 예약을 취소한다. (404)', async () => {
         const response = await request(app.getHttpServer())
           .patch(`/reservations/999/cancel`)
+          .send({
+            content: '취소 테스트',
+          })
           .set('Authorization', `Bearer ${menteeAccessToken}`);
 
         expect(response.status).toBe(400);
@@ -387,6 +390,9 @@ describe('Reservation - Request', () => {
       it('멘티가 예약 취소를 요청한다. (200)', async () => {
         const response = await request(app.getHttpServer())
           .patch(`/reservations/${reservation.id}/cancel`)
+          .send({
+            content: '취소 테스트2',
+          })
           .set('Authorization', `Bearer ${menteeAccessToken}`);
 
         expect(response.status).toBe(200);
@@ -403,6 +409,9 @@ describe('Reservation - Request', () => {
       it('멘토가 예약 취소를 요청한다. (200)', async () => {
         const response = await request(app.getHttpServer())
           .patch(`/reservations/${reservation.id}/cancel`)
+          .send({
+            content: '취소 테스트3',
+          })
           .set('Authorization', `Bearer ${mentorAccessToken}`);
 
         expect(response.status).toBe(200);
@@ -458,6 +467,9 @@ describe('Reservation - Request', () => {
       it('멘토가 예약을 취소한다.(200)', async () => {
         const response = await request(app.getHttpServer())
           .patch(`/reservations/${reservation.id}/cancel`)
+          .send({
+            content: '취소 테스트4',
+          })
           .set('Authorization', `Bearer ${mentorAccessToken}`);
 
         expect(response.status).toBe(200);
@@ -468,6 +480,9 @@ describe('Reservation - Request', () => {
       it('멘티가 예약을 취소한다.(401)', async () => {
         const response = await request(app.getHttpServer())
           .patch(`/reservations/${reservation.id}/cancel`)
+          .send({
+            content: '취소 테스트5',
+          })
           .set('Authorization', `Bearer ${menteeAccessToken}`);
 
         expect(response.status).toBe(401);
@@ -537,6 +552,9 @@ describe('Reservation - Request', () => {
       it('참여하지 않은 멘티가 예약을 확인한다.(401)', async () => {
         const response = await request(app.getHttpServer())
           .patch(`/reservations/${reservation.id}/check`)
+          .send({
+            content: '취소 테스트6',
+          })
           .set('Authorization', `Bearer ${dummyMenteeAccToken}`);
 
         expect(response.status).toBe(401);
