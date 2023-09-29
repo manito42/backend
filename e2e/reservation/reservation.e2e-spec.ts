@@ -160,6 +160,14 @@ describe('Reservation - Request', () => {
       },
     });
 
+    await prisma.cancelReason.deleteMany({
+      where: {
+        reservation: {
+          mentorId: mentor.id,
+        },
+      },
+    });
+
     await prisma.reservation.deleteMany({
       where: {
         mentorId: mentor.id,
@@ -368,6 +376,12 @@ describe('Reservation - Request', () => {
     });
 
     afterEach(async () => {
+      await prisma.cancelReason.deleteMany({
+        where: {
+          reservationId: reservation.id,
+        },
+      });
+
       await prisma.reservation.deleteMany({
         where: {
           mentorId: mentor.id,
@@ -419,8 +433,12 @@ describe('Reservation - Request', () => {
           where: {
             id: reservation.id,
           },
+          include: {
+            cancelReason: true,
+          },
         });
         expect(res.status).toBe('CANCEL');
+        expect(res.cancelReason.content).toBe('취소 테스트3');
       });
     });
 
