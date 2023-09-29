@@ -4,6 +4,8 @@ import configuration from './configuration';
 import { FtConfigService } from './config.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ENV_FILE } from '../envFile.constant';
+import { FtStrategy } from 'src/common/guards/ft/ft.strategy';
+import { FtGuard } from 'src/common/guards/ft/ft.guard';
 
 /**
  * Import and provide app configuration related classes.
@@ -23,7 +25,7 @@ import { ENV_FILE } from '../envFile.constant';
       }),
     }),
   ],
-  providers: [ConfigService, FtConfigService],
-  exports: [ConfigService, FtConfigService],
+  providers: [ConfigService, FtConfigService, FtStrategy, FtGuard],
+  exports: [ConfigService, FtConfigService, FtGuard],
 })
 export class FtConfigModule {}

@@ -3,15 +3,12 @@ import { ReservationController } from './reservation.controller';
 import { ReservationService } from './reservation.service';
 import { PrismaModule } from '../../database/services/prisma.module';
 import { ReservationRepository } from '../../database/repository/reservation.repository';
-import { JwtGuard } from '../../common/guards/jwt/jwt.guard';
-import { JwtStrategy } from '../../common/guards/jwt/jwt.strategy';
-import { JwtConfigModule } from '../../config/jwt/config.module';
-import { EventEmitterModule } from '@nestjs/event-emitter';
-import { UserRepository } from '../../database/repository/user.repository';
+import { UserModule } from '../user/user.module';
 
 @Module({
-  imports: [PrismaModule, JwtConfigModule, EventEmitterModule],
+  imports: [PrismaModule, UserModule],
   controllers: [ReservationController],
-  providers: [ReservationService, UserRepository, ReservationRepository, JwtGuard, JwtStrategy],
+  providers: [ReservationService, ReservationRepository],
+  exports: [ReservationRepository],
 })
 export class ReservationModule {}

@@ -8,5 +8,6 @@ import { CategoryRepository } from '../../database/repository/category.repositor
   imports: [PrismaModule],
   controllers: [CategoryController],
   providers: [CategoryService, CategoryRepository],
+  exports: [CategoryRepository],
 })
 export class CategoryModule {}

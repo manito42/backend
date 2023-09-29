@@ -3,11 +3,12 @@ import { MentorFeedbackController } from './mentorFeedback.controller';
 import { MentorFeedbackService } from './mentorFeedback.service';
 import { PrismaModule } from '../../database/services/prisma.module';
 import { MentorFeedbackRepository } from '../../database/repository/mentorFeedback.repository';
-import { ReservationRepository } from '../../database/repository/reservation.repository';
+import { ReservationModule } from '../reservation/reservation.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, ReservationModule],
   controllers: [MentorFeedbackController],
-  providers: [MentorFeedbackService, MentorFeedbackRepository, ReservationRepository],
+  providers: [MentorFeedbackService, MentorFeedbackRepository],
+  exports: [MentorFeedbackRepository],
 })
 export class MentorFeedbackModule {}

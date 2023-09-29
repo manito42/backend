@@ -3,11 +3,12 @@ import { MenteeFeedbackController } from './menteeFeedback.controller';
 import { MenteeFeedbackService } from './menteeFeedback.service';
 import { PrismaModule } from '../../database/services/prisma.module';
 import { MenteeFeedbackRepository } from '../../database/repository/menteeFeedback.repository';
-import { ReservationRepository } from '../../database/repository/reservation.repository';
+import { ReservationModule } from '../reservation/reservation.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, ReservationModule],
   controllers: [MenteeFeedbackController],
-  providers: [MenteeFeedbackService, MenteeFeedbackRepository, ReservationRepository],
+  providers: [MenteeFeedbackService, MenteeFeedbackRepository],
+  exports: [MenteeFeedbackRepository],
 })
 export class MenteeFeedbackModule {}
