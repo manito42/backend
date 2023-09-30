@@ -9,19 +9,19 @@ import { MenteeFeedbackModule } from './models/menteeFeedback/menteeFeedback.mod
 import { MentorProfileModule } from './models/mentorProfile/mentorProfile.module';
 import { ReservationModule } from './models/reservation/reservation.module';
 import { CategoryModule } from './models/category/category.module';
-import { AuthModule } from './modules/auth/auth.module';
 import { FtConfigModule } from './config/ft/config.module';
 import { JwtConfigModule } from './config/jwt/config.module';
 import { AppConfigModule } from './config/app/config.module';
 import { SearchModule } from './modules/search/search.module';
 import { HomeModule } from './modules/home/home.module';
-import { DevModule } from './modules/dev/dev.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { AuthDynamicModule } from './modules/auth/auth.dynamic.module';
 
 @Module({
   imports: [
     EventEmitterModule.forRoot(),
+    AuthDynamicModule.forRoot(),
     CategoryModule,
     HashtagModule,
     MenteeFeedbackModule,
@@ -34,8 +34,6 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     AppConfigModule,
     SearchModule,
     HomeModule,
-    AuthModule,
-    DevModule,
     NotificationModule,
   ],
   controllers: [AppController],
