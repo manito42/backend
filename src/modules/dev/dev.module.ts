@@ -7,11 +7,13 @@ import { PrismaModule } from '../../database/services/prisma.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtConfigModule } from '../../config/jwt/config.module';
 import { JwtConfigService } from '../../config/jwt/config.service';
+import { AppConfigModule } from 'src/config/app/config.module';
 
 @Module({
   imports: [
     UserModule,
     PrismaModule,
+    AppConfigModule,
     JwtModule.registerAsync({
       imports: [JwtConfigModule],
       useFactory: async (jwtConfigService: JwtConfigService) => ({
