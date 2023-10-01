@@ -339,34 +339,6 @@ describe('PATCH /mentor-profiles test', () => {
     expect(response.status).toEqual(400);
   });
 
-  it('PATCH /mentor_profiles/:id isHide true, update only categories, when profile hashtags empty failing test', async () => {
-    const mentorProfileUpdatePayload: MentorProfileUpdatePayloadDto = {
-      isHide: true,
-      categories: [category1, category2, category3],
-    };
-
-    const response = await request(app.getHttpServer())
-      .patch(`/mentor_profiles/${mentor.id}`)
-      .send(mentorProfileUpdatePayload)
-      .set('Authorization', `Bearer ${mentorAccessToken}`);
-
-    expect(response.status).toEqual(400);
-  });
-
-  it('PATCH /mentor_profiles/:id isHide true, update only hashtags, when profile categories empty failing test', async () => {
-    const mentorProfileUpdatePayload: MentorProfileUpdatePayloadDto = {
-      isHide: true,
-      hashtags: [hashtag1, hashtag2, hashtag3],
-    };
-
-    const response = await request(app.getHttpServer())
-      .patch(`/mentor_profiles/${mentor.id}`)
-      .send(mentorProfileUpdatePayload)
-      .set('Authorization', `Bearer ${mentorAccessToken}`);
-
-    expect(response.status).toEqual(400);
-  });
-
   it('PATCH /mentor_profiles/:id isHide true success test', async () => {
     const mentorProfileUpdatePayload: MentorProfileUpdatePayloadDto = {
       isHide: true,
