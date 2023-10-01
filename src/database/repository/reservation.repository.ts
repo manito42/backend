@@ -112,7 +112,12 @@ export class ReservationRepository {
         where: {
           mentorId: mentorId,
           menteeId: menteeId,
-          OR: [{ status: 'ACCEPT' }, { status: 'REQUEST' }],
+          OR: [
+            { status: ReservationStatus.REQUEST },
+            { status: ReservationStatus.ACCEPT },
+            { status: ReservationStatus.MENTEE_CHECKED },
+            { status: ReservationStatus.MENTEE_FEEDBACK },
+          ],
         },
       });
       if (existMentoringCount !== 0)

@@ -85,6 +85,7 @@ model Reservation {
   menteeFeedback MenteeFeedback?
   cancelReason   CancelReason?
 
+  @@index([mentorId, menteeId, status])
   @@map("reservations")
 }
 
