@@ -4,7 +4,7 @@
 generator client {
   provider      = "prisma-client-js"
   engineType    = "binary"
-  binaryTargets = ["debian-openssl-3.0.x", "darwin-arm64", "linux-musl-openssl-3.0.x", "linux-musl-arm64-openssl-3.0.x"]
+  binaryTargets = ["debian-openssl-3.0.x", "native","darwin-arm64", "linux-musl-openssl-3.0.x", "linux-musl-arm64-openssl-3.0.x"]
 }
 
 datasource db {
@@ -84,6 +84,7 @@ model Reservation {
   menteeFeedback MenteeFeedback?
   cancelReason   CancelReason?
 
+  @@index([mentorId, menteeId, status])
   @@map("reservations")
 }
 
