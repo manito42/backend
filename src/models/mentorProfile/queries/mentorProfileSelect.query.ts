@@ -26,4 +26,5 @@ export const MentorProfileSelectQuery = {
       profileImage: true,
     },
   },
+  socialLink: true,
 };

@@ -4,7 +4,7 @@
 generator client {
   provider      = "prisma-client-js"
   engineType    = "binary"
-  binaryTargets = ["debian-openssl-3.0.x", "native","darwin-arm64", "linux-musl-openssl-3.0.x", "linux-musl-arm64-openssl-3.0.x"]
+  binaryTargets = ["native","debian-openssl-3.0.x", "darwin-arm64", "linux-musl-openssl-3.0.x", "linux-musl-arm64-openssl-3.0.x"]
 }
 
 datasource db {
@@ -53,6 +53,7 @@ model MentorProfile {
   categories       Category[] @relation("profiles_categories")
   createdAt        DateTime   @default(now()) @map("created_at") @db.Timestamp(0)
   updatedAt        DateTime?  @updatedAt @map("updated_at") @db.Timestamp(0)
+  socialLink      String?    @db.VarChar(255)
 
   @@map("mentor_profiles")
 }

@@ -110,6 +110,7 @@ export class MentorProfileRepository {
           set: data.categories,
         },
         isHide: data.isHide,
+        socialLink: data.socialLink,
       },
       select: MentorProfileSelectQuery,
     });
