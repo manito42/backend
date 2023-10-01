@@ -6,9 +6,9 @@ import { AuthModule } from './auth.module';
 @Module({})
 export class AuthDynamicModule {
   static forRoot(): DynamicModule {
-    const isDev = process.env.NODE_ENV === 'dev';
+    const enableDevModule = process.env.NODE_ENV === 'dev' || process.env.NODE_ENV === 'test';
 
-    const imports = isDev ? [AuthModule, DevModule] : [AuthModule];
+    const imports = enableDevModule ? [AuthModule, DevModule] : [AuthModule];
 
     return {
       module: AuthDynamicModule,
