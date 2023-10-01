@@ -1,4 +1,4 @@
-import { ArrayMaxSize, IsOptional, MaxLength, MinLength } from 'class-validator';
+import { ArrayMaxSize, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 import { IMentorProfileUpdateRequest } from '../../../../common/interfaces/api/mentorProfile/mentorProfileRequest.interface';
 
 export class MentorProfileUpdatePayloadDto implements IMentorProfileUpdateRequest {
@@ -25,4 +25,9 @@ export class MentorProfileUpdatePayloadDto implements IMentorProfileUpdateReques
 
   @IsOptional()
   isHide?: boolean;
+
+  @IsOptional()
+  @IsString()
+  @Matches('https://42born2code.slack.com/team/[a-zA-Z0-9_]+')
+  socialLink?: string;
 }

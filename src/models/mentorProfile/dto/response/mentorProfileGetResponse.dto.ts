@@ -22,4 +22,5 @@ export class MentorProfileGetResponseDto implements IMentorProfileResponse {
     nickname: string;
     profileImage: string;
   };
+  socialLink: string;
 }

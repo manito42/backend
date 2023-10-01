@@ -61,14 +61,19 @@ export class MentorProfileController {
     @Body() data: MentorProfileUpdatePayloadDto,
   ): Promise<MentorProfileGetResponseDto> {
     if (id < 0) throw new BadRequestException();
+    if (role !== UserRole.ADMIN && tokenUserId !== id) throw new UnauthorizedException();
 
     if (data.description === null || data.shortDescription === null)
-      throw new BadRequestException("description and shortDescription can't be null");
+      throw new BadRequestException('Description과 ShortDescription은 null이 될 수 없습니다');
 
-    if (data.isHide === true && (data.hashtags?.length === 0 || data.categories?.length === 0))
-      throw new BadRequestException('hashtags and categories can not be empty when isHide is true');
-
-    if (role !== UserRole.ADMIN && tokenUserId !== id) throw new UnauthorizedException();
+    if (data.isHide === true) {
+      if (!data.socialLink || data.socialLink == null)
+        throw new BadRequestException('멘토 프로필 활성화를 위해선 소셜 링크를 입력해야 합니다');
+      if (data.hashtags?.length === 0 || data.categories?.length === 0)
+        throw new BadRequestException(
+          '멘토 프로필 활성화를 위해선 해시태그와 카테고리를 최소 1개 이상 입력해야 합니다',
+        );
+    }
 
     const updatedProfile = await this.mentorProfileService.update(id, data);
 
