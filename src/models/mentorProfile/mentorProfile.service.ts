@@ -49,7 +49,7 @@ export class MentorProfileService {
      * */
     if (data.isHide === true) {
       const profile = await this.mentorProfileRepository.findById(userId);
-      if (!profile) throw new NotFoundException();
+      if (!profile) throw new NotFoundException("mentor profile doesn't exist");
 
       // 현재 프로필에 카테고리가 없고, 업데이트할 카테고리가 property에 없는 경우
       if (profile.categories.length === 0 && !data.categories)
@@ -58,6 +58,10 @@ export class MentorProfileService {
       // 현재 프로필에 해시태그가 없고, 업데이트할 해시태그가 property에 없는 경우
       if (profile.hashtags.length === 0 && !data.hashtags)
         throw new BadRequestException('hashtags can not be empty');
+
+      // 현재 프로필에 소셜링크가 없고, 업데이트할 소셜링크가 property에 없는 경우
+      if (profile.socialLink.length === 0 && !data.socialLink)
+        throw new BadRequestException('socialLink can not be empty');
     }
 
     return this.mentorProfileRepository.update(userId, data);
