@@ -49,7 +49,7 @@ describe('PATCH /mentor-profiles description test', () => {
 
     // Get mentor access token
     const response = await request(app.getHttpServer()).get(`/dev/login/${mentor.id}`);
-    mentorAccessToken = response.body.accessToken;
+    mentorAccessToken = response.header['location'].split('token=')[1];
   });
 
   afterEach(async () => {
