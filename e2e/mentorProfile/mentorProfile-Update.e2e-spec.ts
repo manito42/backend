@@ -50,6 +50,7 @@ describe('PATCH /mentor-profiles test', () => {
         userId: mentor.id,
         shortDescription: 'shortDescription',
         description: 'description',
+        socialLink: '',
       },
     });
 
@@ -339,11 +340,28 @@ describe('PATCH /mentor-profiles test', () => {
     expect(response.status).toEqual(400);
   });
 
+  it('PATCH /mentor_profiles/:id socialLink invalid link failing test', async () => {
+    const mentorProfileUpdatePayload: MentorProfileUpdatePayloadDto = {
+      isHide: true,
+      hashtags: [hashtag1, hashtag2, hashtag3],
+      categories: [category1, category2, category3],
+      socialLink: '42born2code.slack.com/team/U035K1WFM6H',
+    };
+
+    const response = await request(app.getHttpServer())
+      .patch(`/mentor_profiles/${mentor.id}`)
+      .send(mentorProfileUpdatePayload)
+      .set('Authorization', `Bearer ${mentorAccessToken}`);
+
+    expect(response.status).toEqual(400);
+  });
+
   it('PATCH /mentor_profiles/:id isHide true success test', async () => {
     const mentorProfileUpdatePayload: MentorProfileUpdatePayloadDto = {
       isHide: true,
       hashtags: [hashtag1, hashtag2, hashtag3],
       categories: [category1, category2, category3],
+      socialLink: 'https://42born2code.slack.com/team/U035K1WFM6H',
     };
 
     const response = await request(app.getHttpServer())
