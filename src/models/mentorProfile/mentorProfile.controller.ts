@@ -61,11 +61,19 @@ export class MentorProfileController {
     @Body() data: MentorProfileUpdatePayloadDto,
   ): Promise<MentorProfileGetResponseDto> {
     if (id < 0) throw new BadRequestException();
+
     if (data.description === null || data.shortDescription === null)
       throw new BadRequestException("description and shortDescription can't be null");
+
+    if (data.isHide === true && (data.hashtags?.length === 0 || data.categories?.length === 0))
+      throw new BadRequestException('hashtags and categories can not be empty when isHide is true');
+
     if (role !== UserRole.ADMIN && tokenUserId !== id) throw new UnauthorizedException();
+
     const updatedProfile = await this.mentorProfileService.update(id, data);
+
     if (!updatedProfile) throw new NotFoundException();
+
     return updatedProfile;
   }
 }
