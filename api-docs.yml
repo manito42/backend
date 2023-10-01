@@ -1491,6 +1491,8 @@ components:
               type: string
             profileImage:
               type: string
+        socialLink:
+          type: string
 
     MentorProfilePagination:
       type: object
@@ -1602,6 +1604,9 @@ components:
               id:
                 type: integer
                 format: int32
+        socialLink:
+          type: string
+          description: 'optional, regex https://42born2code.slack.com/team/[a-zA-Z0-9_]+'
     ## Reservation
     ReservationCreate:
       type: object
