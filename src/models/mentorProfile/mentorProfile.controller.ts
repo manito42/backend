@@ -66,7 +66,7 @@ export class MentorProfileController {
     if (data.description === null || data.shortDescription === null)
       throw new BadRequestException('Description과 ShortDescription은 null이 될 수 없습니다');
 
-    if (data.isHide === true) {
+    if (data.isHide === false) {
       if (!data.socialLink || data.socialLink == null)
         throw new BadRequestException('멘토 프로필 활성화를 위해선 소셜 링크를 입력해야 합니다');
       if (data.hashtags?.length === 0 || data.categories?.length === 0)
