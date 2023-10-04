@@ -617,7 +617,7 @@ export const baseMailTemplate = (
                                                                                       'Segoe UI Emoji' !important;
                                                                                     padding: 0;
                                                                                   ">
-                                                                                <a href="https://42manito.com/reservations/${reservationId}"
+                                                                                <a href="https://42manito.com/reservation/${reservationId}"
                                                                                   rel="noopener noreferrer" style="
                                                                                       background-color: #1f883d !important;
                                                                                       box-sizing: border-box;

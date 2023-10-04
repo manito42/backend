@@ -8,5 +8,5 @@ export interface IMentorProfileUpdateRequest {
   hashtags?: { id: number }[];
   categories?: { id: number }[];
   isHide?: boolean;
-  socialLinks?: string;
+  socialLink?: string;
 }
