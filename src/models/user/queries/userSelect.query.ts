@@ -16,6 +16,7 @@ export const UserSelectQuery = {
       updatedAt: true,
       isHide: true,
       mentoringCount: true,
+      socialLink: true,
       hashtags: {
         select: {
           id: true,

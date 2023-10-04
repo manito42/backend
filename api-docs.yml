@@ -1531,6 +1531,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CategoryGet'
+        socialLink:
+          type: string
 
     HomeGet:
       type: object
