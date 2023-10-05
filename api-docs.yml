@@ -328,11 +328,11 @@ paths:
       summary: Update mentor profile
       description: |
         update mentor profiles.  
-        **NOTE**: **hashtags** and **categories** are replaced with the new ones  
+        **NOTE**: **hashtags** and **categories** are replaced with the new ones 
+        **NOTE**: 프로필 활성화 조건에 위배되는 경우 isHide가 해제됩니다.
         **사용법**: **description/shortDescription**   
           description이 **missing** **property** 인 경우, 무시(제외하고 업데이트)  
           description이 **""** 인 경우, ""로 업데이트됩니다.  
-          description이 **null**인 경우 400 response를 리턴합니다.
       tags:
         - Mentor Profiles
       security:
@@ -364,6 +364,43 @@ paths:
           description: Unauthorized
         '409':
           description: already exists
+
+  /mentor_profiles/{id}/activation:
+    patch:
+      summary: Activate or Deactivate mentorProfiles
+      description: |
+        mentorProfiled을 활성화/비활성화합니다.
+      tags:
+        - Mentor Profiles
+      security:
+        - OwnerUser: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: user id
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MentorProfileActivation'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MentorProfileGet'
+        '400':
+          description: Invalid request parameter
+        '404':
+          description: Mentor profile not found
+
+
 
   /reservations:
     get:
@@ -1534,6 +1571,12 @@ components:
         socialLink:
           type: string
 
+    MentorProfileActivation:
+      type: object
+      properties:
+        isHide:
+          type: boolean
+
     HomeGet:
       type: object
       properties:
@@ -1581,16 +1624,16 @@ components:
       properties:
         isHide:
           type: boolean
-          description: 'optional, default false'
+          description: 'default false'
         shortDescription:
           type: string
-          description: 'optional, 0 <= len < 50'
+          description: '0 <= len < 50'
         description:
           type: string
-          description: 'optional, 0 <= len < 1000'
+          description: '0 <= len < 1000'
         hashtags:
           type: array
-          description: 'optional, number of hashtag <= 5'
+          description: 'number of hashtag <= 5'
           items:
             type: object
             properties:
