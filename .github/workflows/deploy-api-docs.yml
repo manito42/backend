@@ -1,0 +1,20 @@
+name: Trigger Api-Docs deployer
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'api-docs.yml'
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: api-docs repository의 dispatcher를 트리거합니다.
+        run: |
+          curl -X POST \
+               -H "Authorization: token ${{ secrets.DISPATCHER_PAT_MYUKANG }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               https://api.github.com/repos/manito42/api-docs/actions/workflows/71662751/dispatches \
+               -d '{"ref":"master"}'

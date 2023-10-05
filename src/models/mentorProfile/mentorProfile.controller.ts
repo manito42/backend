@@ -19,6 +19,7 @@ import { GetUserRole } from '../../common/decorators/getUserRole.decorator';
 import { UserRole } from '@prisma/client';
 import { GetUserId } from '../../common/decorators/getUserId.decorator';
 import { MentorProfilePaginationResponseDto } from './dto/response/mentorProfilePaginationResponse.dto';
+import { MentorProfileActivateDto } from './dto/request/mentorProfileActivate.dto';
 
 @Controller('/mentor_profiles')
 export class MentorProfileController {
@@ -62,23 +63,22 @@ export class MentorProfileController {
   ): Promise<MentorProfileGetResponseDto> {
     if (id < 0) throw new BadRequestException();
     if (role !== UserRole.ADMIN && tokenUserId !== id) throw new UnauthorizedException();
+    return await this.mentorProfileService.update(id, data);
+  }
 
-    if (data.description === null || data.shortDescription === null)
-      throw new BadRequestException('Description과 ShortDescription은 null이 될 수 없습니다');
-
-    if (data.isHide === false) {
-      if (!data.socialLink || data.socialLink == null)
-        throw new BadRequestException('멘토 프로필 활성화를 위해선 소셜 링크를 입력해야 합니다');
-      if (data.hashtags?.length === 0 || data.categories?.length === 0)
-        throw new BadRequestException(
-          '멘토 프로필 활성화를 위해선 해시태그와 카테고리를 최소 1개 이상 입력해야 합니다',
-        );
-    }
-
-    const updatedProfile = await this.mentorProfileService.update(id, data);
-
-    if (!updatedProfile) throw new NotFoundException();
-
-    return updatedProfile;
+  /**
+   * @access >= OWNER
+   */
+  @Patch('/:id/activation')
+  @UseGuards(JwtGuard)
+  async activate(
+    @GetUserRole() role: UserRole,
+    @GetUserId() tokenUserId: number,
+    @Param('id') id: number,
+    @Body() data: MentorProfileActivateDto,
+  ): Promise<MentorProfileGetResponseDto> {
+    if (id < 0) throw new BadRequestException();
+    if (role !== UserRole.ADMIN && tokenUserId !== id) throw new UnauthorizedException();
+    return await this.mentorProfileService.activateMentorProfile(id, data);
   }
 }
