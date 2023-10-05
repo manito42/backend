@@ -31,5 +31,5 @@ export class MentorProfileUpdatePayloadDto implements IMentorProfileUpdateReques
   @IsString()
   @IsOptional()
   @Matches('https://42born2code.slack.com/team/[a-zA-Z0-9_-]+')
-  socialLink?: string;
+  socialLink: string;
 }
