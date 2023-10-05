@@ -53,7 +53,7 @@ model MentorProfile {
   categories       Category[] @relation("profiles_categories")
   createdAt        DateTime   @default(now()) @map("created_at") @db.Timestamp(0)
   updatedAt        DateTime?  @updatedAt @map("updated_at") @db.Timestamp(0)
-  socialLink      String?    @db.VarChar(255)
+  socialLink      String    @db.VarChar(255)
 
   @@map("mentor_profiles")
 }
