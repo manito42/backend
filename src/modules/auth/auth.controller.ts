@@ -1,9 +1,10 @@
-import { Controller, Get, InternalServerErrorException, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { FtGuard } from '../../common/guards/ft/ft.guard';
 import { JwtGuard } from '../../common/guards/jwt/jwt.guard';
 import { JwtPayloadInterface } from '../../common/interfaces/jwt/jwtPayload.interface';
 import { AppConfigService } from '../../config/app/config.service';
+import { Request, Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -18,13 +19,14 @@ export class AuthController {
 
   @UseGuards(FtGuard)
   @Get('42/callback')
-  async get42AuthCallback(@Req() req, @Res() res) {
+  async get42AuthCallback(@Req() req, @Res() res: Response) {
     if (!req.user || !req.user.nickname) {
       res.redirect(`${this.appConfigService.accessUrl}?uid=0`);
     }
+
     const user = await this.authService.verifyOrCreateUser(req.user);
-    if (!user) throw new InternalServerErrorException();
     const accessToken = await this.authService.createToken(user);
+
     res.redirect(`${this.appConfigService.accessUrl}/SignIn?uid=${user.id}&token=${accessToken}`);
   }
 

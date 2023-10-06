@@ -2,29 +2,25 @@ import { Injectable } from '@nestjs/common';
 import { UserGetResponseDto } from '../../models/user/dto/response/userGetResponse.dto';
 import { JwtPayloadInterface } from '../../common/interfaces/jwt/jwtPayload.interface';
 import { JwtService } from '@nestjs/jwt';
-import { UserRepository } from 'src/database/repository/user.repository';
-import { UserRole } from '@prisma/client';
+import { UserCreatePayloadDto } from 'src/models/user/dto/request/userCreatePayload.dto';
+import { UserService } from 'src/models/user/user.service';
+
 @Injectable()
 export class DevService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly userRepository: UserRepository,
+    private readonly userService: UserService,
   ) {}
 
-  async createOrGetUser(userId: number) {
-    // check if user exists
-    const user = await this.userRepository.findById(userId);
-    if (user) {
-      return user;
+  // fixed fake user for dev
+  async verifyOrCreateFakeUser(newFakeUser: UserCreatePayloadDto): Promise<UserGetResponseDto> {
+    const { nickname } = newFakeUser;
+    const userExist = await this.userService.findByNickname(nickname);
+    if (!userExist) {
+      return await this.userService.create(newFakeUser);
+    } else {
+      return await this.userService.updateLastLogin(userExist.id);
     }
-    // create user
-    const newUser = await this.userRepository.create({
-      nickname: `manitoDevUser${userId}`,
-      email: `42manito${userId}@gmail.com`,
-      profileImage: 'https://cdn.intra.42.fr/users/medium_manito.jpg',
-      role: UserRole.USER,
-    });
-    return newUser;
   }
 
   async createToken(user: UserGetResponseDto): Promise<string> {

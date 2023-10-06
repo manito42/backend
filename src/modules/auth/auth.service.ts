@@ -3,19 +3,23 @@ import { UserService } from '../../models/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayloadInterface } from '../../common/interfaces/jwt/jwtPayload.interface';
 import { UserGetResponseDto } from '../../models/user/dto/response/userGetResponse.dto';
+import { UserCreatePayloadDto } from 'src/models/user/dto/request/userCreatePayload.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService, private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+  ) {}
 
-  async verifyOrCreateUser(user: any): Promise<UserGetResponseDto> {
+  async verifyOrCreateUser(user: UserCreatePayloadDto): Promise<UserGetResponseDto> {
     const { nickname } = user;
-    let userExist = await this.userService.findByNickname(nickname);
+    const userExist = await this.userService.findByNickname(nickname);
     if (!userExist) {
-      await this.userService.create(user);
-      userExist = await this.userService.findByNickname(nickname);
+      return await this.userService.create(user);
+    } else {
+      return await this.userService.updateLastLogin(userExist.id);
     }
-    return userExist;
   }
 
   async createToken(user: UserGetResponseDto): Promise<string> {
