@@ -71,6 +71,18 @@ export class UserRepository {
     });
   }
 
+  async updateLastLogin(id: number): Promise<UserGetResponseDto> {
+    return this.prisma.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        updatedAt: new Date(),
+      },
+      select: UserSelectQuery,
+    });
+  }
+
   /**
    * @brief get reservation(mentee, mentor) by user id
    *

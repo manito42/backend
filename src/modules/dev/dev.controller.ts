@@ -1,6 +1,8 @@
 import { Controller, Get, Param, Res, UnauthorizedException } from '@nestjs/common';
-import * as process from 'process';
+import { UserRole } from '@prisma/client';
+import { Response } from 'express';
 import { AppConfigService } from 'src/config/app/config.service';
+import { UserCreatePayloadDto } from 'src/models/user/dto/request/userCreatePayload.dto';
 import { DevService } from './dev.service';
 
 @Controller('dev')
@@ -11,11 +13,22 @@ export class DevController {
   ) {}
 
   @Get('/login/:id')
-  async loginDev(@Param('id') id: number, @Res() res) {
+  async loginDev(@Param('id') id: number, @Res() res: Response) {
     if (process.env.NODE_ENV !== 'dev' && process.env.NODE_ENV !== 'test')
       throw new UnauthorizedException();
-    const user = await this.devService.createOrGetUser(id);
-    const accessToken = await this.devService.createToken(user);
-    res.redirect(`${this.appConfigService.accessUrl}/SignIn?uid=${user.id}&token=${accessToken}`);
+
+    // fixed fake user for dev
+    const newFakeUser: UserCreatePayloadDto = {
+      nickname: `manitoDevUser${id}`,
+      email: `42manito${id}@gmail.com`,
+      profileImage: 'https://cdn.intra.42.fr/users/medium_manito.jpg',
+      role: UserRole.USER,
+    };
+    const fakeUser = await this.devService.verifyOrCreateFakeUser(newFakeUser);
+    const accessToken = await this.devService.createToken(fakeUser);
+
+    res.redirect(
+      `${this.appConfigService.accessUrl}/SignIn?uid=${fakeUser.id}&token=${accessToken}`,
+    );
   }
 }
