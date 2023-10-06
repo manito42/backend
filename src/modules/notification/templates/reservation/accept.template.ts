@@ -21,6 +21,7 @@ export const getAcceptTemplate = (
     <p>${mentor.nickname} 님이 ${mentee.nickname} 님의 멘토링 요청을 수락하셨습니다.<br>
     ${mentor.nickname} 님과 멘토링을 시작해보세요!</p>
     <p><a href="https://profile.intra.42.fr/users/${mentor.nickname}">멘토 intra 프로필 조회하기</a></p>
+    <p><a href="${mentor.mentorProfile.socialLink}">멘토에게 슬랙 DM 하기</a></p>
     `,
     reservation.id,
   );
