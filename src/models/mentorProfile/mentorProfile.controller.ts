@@ -19,6 +19,7 @@ import { GetUserRole } from '../../common/decorators/getUserRole.decorator';
 import { UserRole } from '@prisma/client';
 import { GetUserId } from '../../common/decorators/getUserId.decorator';
 import { MentorProfilePaginationResponseDto } from './dto/response/mentorProfilePaginationResponse.dto';
+import { MentorProfileActivateDto } from './dto/request/mentorProfileActivate.dto';
 
 @Controller('/mentor_profiles')
 export class MentorProfileController {
@@ -62,8 +63,22 @@ export class MentorProfileController {
   ): Promise<MentorProfileGetResponseDto> {
     if (id < 0) throw new BadRequestException();
     if (role !== UserRole.ADMIN && tokenUserId !== id) throw new UnauthorizedException();
-    const updatedProfile = await this.mentorProfileService.update(id, data);
-    if (!updatedProfile) throw new NotFoundException();
-    return updatedProfile;
+    return await this.mentorProfileService.update(id, data);
+  }
+
+  /**
+   * @access >= OWNER
+   */
+  @Patch('/:id/activation')
+  @UseGuards(JwtGuard)
+  async activate(
+    @GetUserRole() role: UserRole,
+    @GetUserId() tokenUserId: number,
+    @Param('id') id: number,
+    @Body() data: MentorProfileActivateDto,
+  ): Promise<MentorProfileGetResponseDto> {
+    if (id < 0) throw new BadRequestException();
+    if (role !== UserRole.ADMIN && tokenUserId !== id) throw new UnauthorizedException();
+    return await this.mentorProfileService.activateMentorProfile(id, data);
   }
 }

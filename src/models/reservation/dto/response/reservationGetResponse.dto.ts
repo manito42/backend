@@ -3,6 +3,7 @@ import { IMentorFeedbackResponse } from '../../../../common/interfaces/api/mento
 import { IMenteeFeedbackResponse } from '../../../../common/interfaces/api/menteeFeedback/menteeFeedbackResponse.interface';
 import { ICategoryResponse } from '../../../../common/interfaces/api/category/categoryResponse.interface';
 import { IHashtagResponse } from '../../../../common/interfaces/api/hashtag/hashtagResponse.interface';
+import { ICancelReasonResponse } from '../../../../common/interfaces/api/cancelReason/cancelReasonResponse.interface';
 
 export class ReservationGetResponseDto implements IReservationResponse {
   id: number;
@@ -14,6 +15,7 @@ export class ReservationGetResponseDto implements IReservationResponse {
   hashtags: IHashtagResponse[];
   mentorFeedback: IMentorFeedbackResponse;
   menteeFeedback: IMenteeFeedbackResponse;
+  cancelReason: ICancelReasonResponse;
   createdAt: Date;
   updatedAt: Date;
 }

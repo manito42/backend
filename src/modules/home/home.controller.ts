@@ -1,5 +1,4 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { HomeService } from './home.service';
 import { GetHomeQueryDto } from './dto/request/homeQuery.dto';
 import { MentorProfileService } from '../../models/mentorProfile/mentorProfile.service';
 import { MentorProfileGetResponseDto } from '../../models/mentorProfile/dto/response/mentorProfileGetResponse.dto';
@@ -8,10 +7,7 @@ import { SelectAllType } from '../../common/constants/selectAll.type';
 
 @Controller('home')
 export class HomeController {
-  constructor(
-    private readonly homeService: HomeService,
-    private readonly mentorProfileService: MentorProfileService,
-  ) {}
+  constructor(private readonly mentorProfileService: MentorProfileService) {}
 
   @Get('/')
   async getHomeProfiles(
@@ -28,7 +24,7 @@ export class HomeController {
       hashtagId,
       categoryId,
     );
-    return this.homeService.random(profiles.content);
+    return profiles.content;
   }
 
   @Get('/:category_id')
@@ -47,6 +43,6 @@ export class HomeController {
       hashtagId,
       category_id,
     );
-    return this.homeService.random(profiles.content);
+    return profiles.content;
   }
 }

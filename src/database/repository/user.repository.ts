@@ -48,13 +48,14 @@ export class UserRepository {
     });
   }
 
-  // only for admin
   async create(data: UserCreatePayloadDto): Promise<UserGetResponseDto> {
     return this.prisma.$transaction(async (prisma) => {
       const user = await prisma.user.create({
         data: data,
       });
-      await prisma.mentorProfile.create({ data: { userId: user.id } });
+      await prisma.mentorProfile.create({
+        data: { userId: user.id, description: '', shortDescription: '', socialLink: '' },
+      });
       return prisma.user.findUnique({ where: { id: user.id }, select: UserSelectQuery });
     });
   }

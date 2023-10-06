@@ -26,6 +26,12 @@ export class ReservationUpdatePayloadDto implements IReservationUpdateRequest {
   status?: ReservationStatus;
 }
 
+export class ReservationCancelPayloadDto {
+  @IsString()
+  @MaxLength(100, { message: '취소 사유는 100자 이하로 입력해주세요.' })
+  content: string;
+}
+
 export class ReservationCompleteAsMentorPayloadDto {
   @IsNumber()
   @Min(0)

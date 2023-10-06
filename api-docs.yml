@@ -1,14 +1,14 @@
 openapi: 3.0.0
 servers:
   - description: 42 MANITO API DEV SERVER
-    url: "https://api.dev.42manito.com/"
+    url: 'https://api.dev.42manito.com/'
   - description: 42 MANITO API SERVER
-    url: "https://api.42manito.com/"
+    url: 'https://api.42manito.com/'
   - description: 42 MANITO API LOCAL TEST
-    url: "http://localhost:3000"
+    url: 'http://localhost:3000'
 
 info:
-  version: "1.0.0"
+  version: '1.0.0'
   title: 42-manito-api
   description: 42 manito api server
 
@@ -166,14 +166,14 @@ paths:
           description: Unauthorized
         '409':
           description: already exists
-  
+
   /users/{id}/reservations:
     get:
       summary: Get a user reservations by ID
       tags:
         - Users
       security:
-        - OwnerUser: [ ]
+        - OwnerUser: []
       parameters:
         - name: id
           in: path
@@ -261,7 +261,7 @@ paths:
       tags:
         - Mentor Profiles
       security:
-        - AdminUser: [ ]
+        - AdminUser: []
       parameters:
         - in: query
           name: take
@@ -327,8 +327,12 @@ paths:
     patch:
       summary: Update mentor profile
       description: |
-        update mentor profiles.
-        **NOTE**: **hashtags** and **categories** are replaced with the new ones
+        update mentor profiles.  
+        **NOTE**: **hashtags** and **categories** are replaced with the new ones 
+        **NOTE**: 프로필 활성화 조건에 위배되는 경우 isHide가 해제됩니다.
+        **사용법**: **description/shortDescription**   
+          description이 **missing** **property** 인 경우, 무시(제외하고 업데이트)  
+          description이 **""** 인 경우, ""로 업데이트됩니다.  
       tags:
         - Mentor Profiles
       security:
@@ -361,13 +365,50 @@ paths:
         '409':
           description: already exists
 
+  /mentor_profiles/{id}/activation:
+    patch:
+      summary: Activate or Deactivate mentorProfiles
+      description: |
+        mentorProfiled을 활성화/비활성화합니다.
+      tags:
+        - Mentor Profiles
+      security:
+        - OwnerUser: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: user id
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MentorProfileActivation'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MentorProfileGet'
+        '400':
+          description: Invalid request parameter
+        '404':
+          description: Mentor profile not found
+
+
+
   /reservations:
     get:
       summary: Get all reservations
       tags:
         - Reservations
       security:
-        - AdminUser: [ ]
+        - AdminUser: []
       description: |
         **ROLE**\
         \
@@ -447,7 +488,7 @@ paths:
         only for `OWNER` user
       parameters:
         - name: id
-          description: "reservation id"
+          description: 'reservation id'
           in: path
           required: true
           schema:
@@ -477,7 +518,7 @@ paths:
       parameters:
         - name: id
           in: path
-          description: "reservation id"
+          description: 'reservation id'
           required: true
           schema:
             type: integer
@@ -512,15 +553,21 @@ paths:
       tags:
         - Reservations
       security:
-        - OwnerUser: [ ]
+        - OwnerUser: []
       parameters:
         - name: id
           in: path
-          description: "reservation id"
+          description: 'reservation id'
           required: true
           schema:
             type: integer
             format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelReservation'
       responses:
         '200':
           description: Updated
@@ -545,12 +592,12 @@ paths:
       tags:
         - Reservations
       security:
-        - OwnerUser: [ ]
+        - OwnerUser: []
       parameters:
         - name: id
           in: path
           required: true
-          description: "reservation id"
+          description: 'reservation id'
           schema:
             type: integer
             format: int32
@@ -578,12 +625,12 @@ paths:
       tags:
         - Reservations
       security:
-        - OwnerUser: [ ]
+        - OwnerUser: []
       parameters:
         - name: id
           in: path
           required: true
-          description: "reservation id"
+          description: 'reservation id'
           schema:
             type: integer
             format: int32
@@ -611,12 +658,12 @@ paths:
       tags:
         - Reservations
       security:
-        - OwnerUser: [ ]
+        - OwnerUser: []
       parameters:
         - name: id
           in: path
           required: true
-          description: "reservation id"
+          description: 'reservation id'
           schema:
             type: integer
             format: int32
@@ -650,12 +697,12 @@ paths:
       tags:
         - Reservations
       security:
-        - OwnerUser: [ ]
+        - OwnerUser: []
       parameters:
         - name: id
           in: path
           required: true
-          description: "reservation id"
+          description: 'reservation id'
           schema:
             type: integer
             format: int32
@@ -853,7 +900,6 @@ paths:
         '404':
           description: Mentee feedback not found
 
-
   /mentor_feedbacks:
     get:
       summary: Get all mentor feedbacks
@@ -977,7 +1023,7 @@ paths:
         - in: path
           name: search_string
           required: true
-          description: "search mentor profiles that contains search string in nickname or hashtags"
+          description: 'search mentor profiles that contains search string in nickname or hashtags'
           schema:
             type: string
         - in: query
@@ -1000,21 +1046,21 @@ paths:
           schema:
             default: true
             type: string
-            format: "true | false"
+            format: 'true | false'
         - in: query
           name: search_by_hashtag_name
           description: search by tag name `default = true`
           schema:
             default: true
             type: string
-            format: "true | false"
+            format: 'true | false'
         - in: query
           name: search_by_category_name
           description: search by category name `default = true`
           schema:
             default: true
             type: string
-            format: "true | false"
+            format: 'true | false'
       responses:
         '200':
           description: OK
@@ -1061,7 +1107,7 @@ paths:
       summary: Get main page mentor profiles by category
       tags:
         - Home
-      description: "내부 알고리즘에 의해서 선정된 상위 프로필이 제공됩니다."
+      description: '내부 알고리즘에 의해서 선정된 상위 프로필이 제공됩니다.'
       parameters:
         - in: query
           name: take
@@ -1080,7 +1126,7 @@ paths:
         - in: path
           name: category_id
           required: true
-          description: "category id"
+          description: 'category id'
           schema:
             type: integer
       responses:
@@ -1330,13 +1376,13 @@ components:
       properties:
         id:
           type: number
-          description: "required"
+          description: 'required'
         nickname:
           type: string
-          description: "required"
+          description: 'required'
         profileImage:
           type: string
-          description: "required"
+          description: 'required'
         role:
           type: string
           format: enum
@@ -1348,27 +1394,27 @@ components:
       properties:
         uid:
           type: integer
-          description: "user id"
+          description: 'user id'
         accessToken:
           type: string
-          description: "required"
+          description: 'required'
     ## User
     UserCreate:
       type: object
-      description: "only for admin"
+      description: 'only for admin'
       properties:
         email:
           type: string
           format: email
-          description: "required"
+          description: 'required'
         nickname:
           type: string
-          description: "required"
+          description: 'required'
         profileImage:
           type: string
-          description: "required"
+          description: 'required'
         role:
-          description: "required"
+          description: 'required'
           type: string
           format: enum
           enum:
@@ -1380,7 +1426,7 @@ components:
       properties:
         profileImage:
           type: string
-          description: "optional"
+          description: 'optional'
 
     UsersGet:
       type: object
@@ -1396,7 +1442,7 @@ components:
         profileImage:
           type: string
         role:
-          description: "required"
+          description: 'required'
           type: string
           format: enum
           enum:
@@ -1439,7 +1485,7 @@ components:
         userId:
           type: integer
           format: int32
-          description: "required, user id"
+          description: 'required, user id'
 
     MentorProfileGet:
       type: object
@@ -1482,6 +1528,8 @@ components:
               type: string
             profileImage:
               type: string
+        socialLink:
+          type: string
 
     MentorProfilePagination:
       type: object
@@ -1520,6 +1568,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CategoryGet'
+        socialLink:
+          type: string
+
+    MentorProfileActivation:
+      type: object
+      properties:
+        isHide:
+          type: boolean
 
     HomeGet:
       type: object
@@ -1568,16 +1624,16 @@ components:
       properties:
         isHide:
           type: boolean
-          description: "optional, default false"
+          description: 'default false'
         shortDescription:
           type: string
-          description: 'optional, 0 < len < 50'
+          description: '0 <= len < 50'
         description:
           type: string
-          description: 'optional, 0 < len < 1000'
+          description: '0 <= len < 1000'
         hashtags:
           type: array
-          description: 'optional, number of hashtag <= 5'
+          description: 'number of hashtag <= 5'
           items:
             type: object
             properties:
@@ -1593,6 +1649,9 @@ components:
               id:
                 type: integer
                 format: int32
+        socialLink:
+          type: string
+          description: 'optional, regex https://42born2code.slack.com/team/[a-zA-Z0-9_]+'
     ## Reservation
     ReservationCreate:
       type: object
@@ -1600,21 +1659,21 @@ components:
         mentorId:
           type: integer
           format: int32
-          description: "required, mentor id"
+          description: 'required, mentor id'
         menteeId:
           type: integer
           format: int32
-          description: "required, mentee id"
+          description: 'required, mentee id'
         categoryId:
           type: integer
           format: int32
-          description: "required, category id"
+          description: 'required, category id'
         requestMessage:
           type: string
-          description: "optional, request message `length <= 1000`"
+          description: 'optional, request message `length <= 1000`'
         hashtags:
           type: array
-          description: "number of hashtag <= 5"
+          description: 'number of hashtag <= 5'
           items:
             $ref: '#/components/schemas/HashtagId'
       required:
@@ -1627,7 +1686,7 @@ components:
         id:
           type: integer
           format: int32
-          description: "reservation id"
+          description: 'reservation id'
         mentorId:
           type: integer
           format: int32
@@ -1642,15 +1701,17 @@ components:
           type: string
           format: enum
           enum:
-            - "REQUEST"
-            - "ACCEPT"
-            - "CANCEL"
-            - "PENDING"
-            - "COMPLETE"
+            - 'REQUEST'
+            - 'ACCEPT'
+            - 'CANCEL'
+            - 'PENDING'
+            - 'COMPLETE'
         mentorFeedback:
           $ref: '#/components/schemas/MentorFeedbackGet'
         menteeFeedback:
           $ref: '#/components/schemas/MenteeFeedbackGet'
+        cancelReason:
+          $ref: '#/components/schemas/CancelReasonGet'
         createdAt:
           type: string
           format: date-time
@@ -1677,7 +1738,7 @@ components:
         id:
           type: integer
           format: int32
-          description: "reservation id"
+          description: 'reservation id'
         mentorId:
           type: integer
           format: int32
@@ -1691,10 +1752,10 @@ components:
           type: string
           format: enum
           enum:
-            - "REQUESTED"
-            - "ACCEPTED"
-            - "FINISHED"
-            - "CANCELED"
+            - 'REQUESTED'
+            - 'ACCEPTED'
+            - 'FINISHED'
+            - 'CANCELED'
         createdAt:
           type: string
           format: date-time
@@ -1711,34 +1772,41 @@ components:
       properties:
         requestMessage:
           type: string
-          description: "optional, request message"
+          description: 'optional, request message'
         status:
-          description: "optional, status"
+          description: 'optional, status'
           type: string
           format: enum
           enum:
-            - "REQUESTED"
-            - "ACCEPTED"
-            - "FINISHED"
-            - "CANCELED"
+            - 'REQUESTED'
+            - 'ACCEPTED'
+            - 'FINISHED'
+            - 'CANCELED'
         categoryId:
           type: integer
           format: int32
-          description: "optional, category id"
+          description: 'optional, category id'
         hashtags:
           type: array
-          description: "optional, hashtags item max 5"
+          description: 'optional, hashtags item max 5'
           items:
             $ref: '#/components/schemas/HashtagUpdate'
+
+    CancelReservation:
+      type: object
+      properties:
+        content:
+          description: 'Reason for Cancellation, (length <= 100)'
+          type: string
 
     CompleteReservationAsMentee:
       type: object
       properties:
         rating:
           type: number
-          description: "rating, 0.5 * n, (0 <= n < 10) "
+          description: 'rating, 0.5 * n, (0 <= n < 10) '
         content:
-          description: "reservation feedback, (length <= 300)"
+          description: 'reservation feedback, (length <= 300)'
           type: string
 
     CompleteReservationAsMentor:
@@ -1746,7 +1814,7 @@ components:
       properties:
         rating:
           type: number
-          description: "rating, 0.5 * n, (0 <= n < 10) "
+          description: 'rating, 0.5 * n, (0 <= n < 10) '
 
     ## Hashtag
     HashtagGet:
@@ -1791,7 +1859,7 @@ components:
       properties:
         name:
           type: string
-          description: "required, 0 < len < 20"
+          description: 'required, 0 < len < 20'
       required:
         - name
 
@@ -1838,22 +1906,22 @@ components:
         menteeId:
           type: integer
           format: int32
-          description: "required, mentee id"
+          description: 'required, mentee id'
         mentorId:
           type: integer
           format: int32
-          description: "required, mentor id"
+          description: 'required, mentor id'
         reservationId:
           type: integer
           format: int32
-          description: "required, reservation id"
+          description: 'required, reservation id'
         rating:
           type: number
           format: float
-          description: "required, 0 <= rating <= 5"
+          description: 'required, 0 <= rating <= 5'
         content:
           type: string
-          description: "optional, 0 < len < 1000"
+          description: 'optional, 0 < len < 1000'
       required:
         - menteeId
         - mentorId
@@ -1910,28 +1978,43 @@ components:
         menteeId:
           type: integer
           format: int32
-          description: "required, mentee id"
+          description: 'required, mentee id'
         mentorId:
           type: integer
           format: int32
-          description: "required, mentor id"
+          description: 'required, mentor id'
         reservationId:
           type: integer
           format: int32
-          description: "required, reservation id"
+          description: 'required, reservation id'
         rating:
           type: number
           format: float
-          description: "required, 0 <= rating <= 5"
+          description: 'required, 0 <= rating <= 5'
         content:
           type: string
-          description: "optional, 0 < len < 1000"
+          description: 'optional, 0 < len < 1000'
       required:
         - menteeId
         - mentorId
         - reservationId
         - rating
- 
+
+    CancelReasonGet:
+      type: object
+      properties:
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        requestedUserId:
+          type: integer
+          format: int32
+        reservationId:
+          type: integer
+          format: int32
+
     ## Category
     CategoryGet:
       type: object
@@ -1969,14 +2052,14 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: "User Role >= USER"
+      description: 'User Role >= USER'
     OwnerUser:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: "User Role >= ResourceOwner"
+      description: 'User Role >= ResourceOwner'
     AdminUser:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: "User Role >= ADMIN"
+      description: 'User Role >= ADMIN'

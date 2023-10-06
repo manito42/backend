@@ -4,6 +4,7 @@ import { MentorProfileUpdatePayloadDto } from './dto/request/mentorProfileUpdate
 import { MentorProfileRepository } from '../../database/repository/mentorProfile.repository';
 import { SelectAllType } from '../../common/constants/selectAll.type';
 import { MentorProfilePaginationResponseDto } from './dto/response/mentorProfilePaginationResponse.dto';
+import { MentorProfileActivateDto } from './dto/request/mentorProfileActivate.dto';
 
 @Injectable()
 export class MentorProfileService {
@@ -44,5 +45,13 @@ export class MentorProfileService {
 
   async update(userId: number, data: MentorProfileUpdatePayloadDto) {
     return this.mentorProfileRepository.update(userId, data);
+  }
+
+  async activateMentorProfile(userId: number, data: MentorProfileActivateDto) {
+    if (data.isHide === false)
+      return await this.mentorProfileRepository.activateMentorProfile(userId);
+    else {
+      return await this.mentorProfileRepository.deActivateMentorProfile(userId);
+    }
   }
 }

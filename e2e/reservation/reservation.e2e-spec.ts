@@ -20,7 +20,11 @@ describe('Reservation - Request', () => {
   let mentee: User;
   let dummyMentee: User;
   let category: Category;
+  let category2: Category;
+  let category3: Category;
   let hashtag: Hashtag;
+  let hashtag2: Hashtag;
+  let hashtag3: Hashtag;
   let mentorAccessToken: string;
   let menteeAccessToken: string;
   let dummyMenteeAccToken: string;
@@ -72,19 +76,63 @@ describe('Reservation - Request', () => {
       },
     });
 
+    category2 = await prisma.category.create({
+      data: {
+        name: 'ReservationTestCategory2',
+      },
+    });
+
+    category3 = await prisma.category.create({
+      data: {
+        name: 'ReservationTestCategory3',
+      },
+    });
+
     hashtag = await prisma.hashtag.create({
       data: {
         name: 'ReservationTestHashtag',
       },
     });
 
-    await prisma.mentorProfile.create({
+    hashtag2 = await prisma.hashtag.create({
+      data: {
+        name: 'ReservationTestHashtag2',
+      },
+    });
+
+    hashtag3 = await prisma.hashtag.create({
+      data: {
+        name: 'ReservationTestHashtag3',
+      },
+    });
+
+    mentorProfile = await prisma.mentorProfile.create({
       data: {
         userId: mentor.id,
         shortDescription: 'ReservationMentorShortDescription',
         description: 'ReservationMentorDescription',
         isHide: false,
         mentoringCount: 0,
+        categories: {
+          connect: [
+            {
+              id: category.id,
+            },
+            {
+              id: category2.id,
+            },
+          ],
+        },
+        hashtags: {
+          connect: [
+            {
+              id: hashtag.id,
+            },
+            {
+              id: hashtag2.id,
+            },
+          ],
+        },
       },
     });
 
@@ -112,6 +160,14 @@ describe('Reservation - Request', () => {
       },
     });
 
+    await prisma.cancelReason.deleteMany({
+      where: {
+        reservation: {
+          mentorId: mentor.id,
+        },
+      },
+    });
+
     await prisma.reservation.deleteMany({
       where: {
         mentorId: mentor.id,
@@ -132,13 +188,19 @@ describe('Reservation - Request', () => {
 
     await prisma.category.deleteMany({
       where: {
-        id: category.id,
+        OR: [{ id: category.id }, { id: category2.id }, { id: category3.id }],
       },
     });
 
     await prisma.hashtag.deleteMany({
       where: {
-        id: hashtag.id,
+        OR: [
+          { id: hashtag.id },
+          { id: hashtag2.id },
+          {
+            id: hashtag3.id,
+          },
+        ],
       },
     });
   });
@@ -148,7 +210,7 @@ describe('Reservation - Request', () => {
   });
 
   describe('Create Request', () => {
-    it('멘티가 예약을 생성한다.', async () => {
+    it('멘티가 예약을 생성한다 by category1', async () => {
       const response = await request(app.getHttpServer())
         .post('/reservations')
         .set('Authorization', `Bearer ${menteeAccessToken}`)
@@ -163,7 +225,132 @@ describe('Reservation - Request', () => {
       expect(response.status).toBe(201);
     });
 
-    afterAll(async () => {
+    it('멘티가 예약을 생성 by category2', async () => {
+      const response2 = await request(app.getHttpServer())
+        .post('/reservations')
+        .set('Authorization', `Bearer ${menteeAccessToken}`)
+        .send({
+          menteeId: mentee.id,
+          mentorId: mentor.id,
+          categoryId: category2.id,
+          requestMessage: 'ReservationRequestMessage',
+          hashtags: [{ id: hashtag.id }],
+        });
+
+      expect(response2.status).toBe(201);
+    });
+
+    it('멘티가 예약 생성 시, 해시태그가 여러개인 경우 201반환', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/reservations')
+        .set('Authorization', `Bearer ${menteeAccessToken}`)
+        .send({
+          menteeId: mentee.id,
+          mentorId: mentor.id,
+          categoryId: category.id,
+          requestMessage: 'ReservationRequestMessage',
+          hashtags: [{ id: hashtag.id }, { id: hashtag2.id }],
+        });
+
+      expect(response.status).toBe(201);
+      expect(response.body.hashtags.length).toBe(2);
+    });
+
+    it('멘티가 예약을 생성할 때, 없는 카테고리인 경우 400 반환', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/reservations')
+        .set('Authorization', `Bearer ${menteeAccessToken}`)
+        .send({
+          menteeId: mentee.id,
+          mentorId: mentor.id,
+          categoryId: category3.id,
+          requestMessage: 'ReservationRequestMessage',
+          hashtags: [{ id: hashtag.id }],
+        });
+
+      expect(response.status).toBe(400);
+    });
+
+    it('멘티가 예약 생성시, 없는 해시태그인 경우 400 반환', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/reservations')
+        .set('Authorization', `Bearer ${menteeAccessToken}`)
+        .send({
+          menteeId: mentee.id,
+          mentorId: mentor.id,
+          categoryId: category.id,
+          requestMessage: 'ReservationRequestMessage',
+          hashtags: [{ id: hashtag3.id }],
+        });
+
+      expect(response.status).toBe(400);
+    });
+
+    it('멘티가 예약 생성시, 해시태그가 없는 경우 400 반환', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/reservations')
+        .set('Authorization', `Bearer ${menteeAccessToken}`)
+        .send({
+          menteeId: mentee.id,
+          mentorId: mentor.id,
+          categoryId: category.id,
+          requestMessage: 'ReservationRequestMessage',
+          hashtags: [],
+        });
+
+      expect(response.status).toBe(400);
+    });
+
+    it('멘티가 예약 생성시, 해시태그가 여러개인 경우, 없는 해시태그가 있을때 400반환', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/reservations')
+        .set('Authorization', `Bearer ${menteeAccessToken}`)
+        .send({
+          menteeId: mentee.id,
+          mentorId: mentor.id,
+          categoryId: category.id,
+          requestMessage: 'ReservationRequestMessage',
+          hashtags: [{ id: hashtag.id }, { id: hashtag3.id }],
+        });
+
+      expect(response.status).toBe(400);
+    });
+
+    it('멘토 프로필이 isHide일 때, 예약 생성 시도 시 400 반환', async () => {
+      await prisma.mentorProfile.update({
+        data: {
+          isHide: true,
+        },
+        where: {
+          userId: mentor.id,
+        },
+      });
+
+      const response = await request(app.getHttpServer())
+        .post('/reservations')
+        .set('Authorization', `Bearer ${menteeAccessToken}`)
+        .send({
+          menteeId: mentee.id,
+          mentorId: mentor.id,
+          categoryId: category.id,
+          requestMessage: 'ReservationRequestMessage',
+          hashtags: [{ id: hashtag.id }],
+        });
+
+      expect(response.status).toBe(400);
+
+      // isHide를 false로 바꿔준다.
+      await prisma.mentorProfile.update({
+        data: {
+          isHide: false,
+        },
+        where: {
+          userId: mentor.id,
+        },
+      });
+    });
+
+    afterEach(async () => {
       await prisma.reservation.deleteMany({
         where: {
           mentorId: mentor.id,
@@ -189,6 +376,12 @@ describe('Reservation - Request', () => {
     });
 
     afterEach(async () => {
+      await prisma.cancelReason.deleteMany({
+        where: {
+          reservationId: reservation.id,
+        },
+      });
+
       await prisma.reservation.deleteMany({
         where: {
           mentorId: mentor.id,
@@ -200,6 +393,9 @@ describe('Reservation - Request', () => {
       it('없는 예약을 취소한다. (404)', async () => {
         const response = await request(app.getHttpServer())
           .patch(`/reservations/999/cancel`)
+          .send({
+            content: '취소 테스트',
+          })
           .set('Authorization', `Bearer ${menteeAccessToken}`);
 
         expect(response.status).toBe(400);
@@ -208,6 +404,9 @@ describe('Reservation - Request', () => {
       it('멘티가 예약 취소를 요청한다. (200)', async () => {
         const response = await request(app.getHttpServer())
           .patch(`/reservations/${reservation.id}/cancel`)
+          .send({
+            content: '취소 테스트2',
+          })
           .set('Authorization', `Bearer ${menteeAccessToken}`);
 
         expect(response.status).toBe(200);
@@ -224,6 +423,9 @@ describe('Reservation - Request', () => {
       it('멘토가 예약 취소를 요청한다. (200)', async () => {
         const response = await request(app.getHttpServer())
           .patch(`/reservations/${reservation.id}/cancel`)
+          .send({
+            content: '취소 테스트3',
+          })
           .set('Authorization', `Bearer ${mentorAccessToken}`);
 
         expect(response.status).toBe(200);
@@ -231,8 +433,12 @@ describe('Reservation - Request', () => {
           where: {
             id: reservation.id,
           },
+          include: {
+            cancelReason: true,
+          },
         });
         expect(res.status).toBe('CANCEL');
+        expect(res.cancelReason.content).toBe('취소 테스트3');
       });
     });
 
@@ -279,6 +485,9 @@ describe('Reservation - Request', () => {
       it('멘토가 예약을 취소한다.(200)', async () => {
         const response = await request(app.getHttpServer())
           .patch(`/reservations/${reservation.id}/cancel`)
+          .send({
+            content: '취소 테스트4',
+          })
           .set('Authorization', `Bearer ${mentorAccessToken}`);
 
         expect(response.status).toBe(200);
@@ -289,6 +498,9 @@ describe('Reservation - Request', () => {
       it('멘티가 예약을 취소한다.(401)', async () => {
         const response = await request(app.getHttpServer())
           .patch(`/reservations/${reservation.id}/cancel`)
+          .send({
+            content: '취소 테스트5',
+          })
           .set('Authorization', `Bearer ${menteeAccessToken}`);
 
         expect(response.status).toBe(401);
@@ -322,22 +534,35 @@ describe('Reservation - Request', () => {
           },
         });
         expect(res.status).toBe('MENTEE_FEEDBACK');
-      });
 
-      it('멘토가 피드백을 남긴다. (200)', async () => {
-        const response = await request(app.getHttpServer())
+        // 멘토가 피드백을 남긴다.
+        const response2 = await request(app.getHttpServer())
           .patch(`/reservations/${reservation.id}/mentor_completion`)
           .set('Authorization', `Bearer ${mentorAccessToken}`)
           .send({
             rating: 5,
           });
-        expect(response.status).toBe(200);
-        const res = await prisma.reservation.findUnique({
+        expect(response2.status).toBe(200);
+        const res2 = await prisma.reservation.findUnique({
           where: {
             id: reservation.id,
           },
         });
-        expect(res.status).toBe('DONE');
+        expect(res2.status).toBe('DONE');
+
+        const menteeFeedback = await prisma.menteeFeedback.findUnique({
+          where: {
+            reservationId: reservation.id,
+          },
+        });
+        expect(menteeFeedback.rating).toBe(5);
+
+        const mentorFeedback = await prisma.mentorFeedback.findUnique({
+          where: {
+            reservationId: reservation.id,
+          },
+        });
+        expect(mentorFeedback.rating).toBe(5);
       });
     });
 
@@ -345,6 +570,9 @@ describe('Reservation - Request', () => {
       it('참여하지 않은 멘티가 예약을 확인한다.(401)', async () => {
         const response = await request(app.getHttpServer())
           .patch(`/reservations/${reservation.id}/check`)
+          .send({
+            content: '취소 테스트6',
+          })
           .set('Authorization', `Bearer ${dummyMenteeAccToken}`);
 
         expect(response.status).toBe(401);

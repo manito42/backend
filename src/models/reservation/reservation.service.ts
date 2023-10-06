@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/co
 import { ReservationGetResponseDto } from './dto/response/reservationGetResponse.dto';
 import { ReservationCreatePayloadDto } from './dto/request/reservationCreatePayload.dto';
 import {
+  ReservationCancelPayloadDto,
   ReservationCompleteAsMenteePayloadDto,
   ReservationCompleteAsMentorPayloadDto,
   ReservationUpdatePayloadDto,
@@ -83,8 +84,18 @@ export class ReservationService {
     return await this.reservationRepository.update(id, payload);
   }
 
-  async cancelReservation(reservationId: number, userId: number, role: string) {
-    const result = await this.reservationRepository.cancelReservation(reservationId, userId, role);
+  async cancelReservation(
+    reservationId: number,
+    userId: number,
+    role: string,
+    payload: ReservationCancelPayloadDto,
+  ) {
+    const result = await this.reservationRepository.cancelReservation(
+      reservationId,
+      userId,
+      role,
+      payload,
+    );
     const mentor = await this.userRepository.findById(result.mentorId);
     const mentee = await this.userRepository.findById(result.menteeId);
 

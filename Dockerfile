@@ -9,12 +9,8 @@ COPY start.sh /tmp/start.sh
 COPY package.json .
 COPY package-lock.json .
 
-RUN npm ci
-RUN npx prisma generate
-
 RUN chmod +x /tmp/start.sh
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
 CMD ["/bin/ash", "/tmp/start.sh"]
-EXPOSE 3000
