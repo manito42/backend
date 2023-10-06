@@ -10,6 +10,7 @@ import { ReservationRole } from 'src/common/enums';
 @Injectable()
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
+
   async findMany(take: number, page: number): Promise<Array<UserGetResponseDto>> {
     return this.userRepository.findMany(take, page);
   }
@@ -26,13 +27,16 @@ export class UserService {
     return this.userRepository.findByNickname(nickname);
   }
 
-  // only for admin
   async create(data: UserCreatePayloadDto): Promise<UserGetResponseDto> {
     return this.userRepository.create(data);
   }
 
   async update(id: number, data: UserUpdatePayloadDto): Promise<UserGetResponseDto> {
     return this.userRepository.update(id, data);
+  }
+
+  async updateLastLogin(id: number): Promise<UserGetResponseDto> {
+    return this.userRepository.updateLastLogin(id);
   }
 
   async findUserReservation(
