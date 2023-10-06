@@ -617,7 +617,7 @@ export const baseMailTemplate = (
                                                                                       'Segoe UI Emoji' !important;
                                                                                     padding: 0;
                                                                                   ">
-                                                                                <a href="https://42manito.com/reservation/${reservationId}"
+                                                                                <a href="https://42manito.com/Reservation/${reservationId}"
                                                                                   rel="noopener noreferrer" style="
                                                                                       background-color: #1f883d !important;
                                                                                       box-sizing: border-box;
@@ -644,7 +644,7 @@ export const baseMailTemplate = (
                                                                                         solid
                                                                                         #1f883d;
                                                                                     " target="_blank"
-                                                                                  data-saferedirecturl="https://42manito.com/reservations/${reservationId}">
+                                                                                  data-saferedirecturl="https://42manito.com/Reservation/${reservationId}">
                                                                                   예약 보러가기</a>
 
                                                                               </td>
