@@ -116,7 +116,6 @@ export class ReservationRepository {
             { status: ReservationStatus.REQUEST },
             { status: ReservationStatus.ACCEPT },
             { status: ReservationStatus.MENTEE_CHECKED },
-            { status: ReservationStatus.MENTEE_FEEDBACK },
           ],
         },
       });
