@@ -128,6 +128,7 @@ export class MentorProfileRepository {
       if (data.categories.length == 0) isHide = true;
       // 업데이트할 해시태그가 0개인 경우
       if (data.hashtags.length == 0) isHide = true;
+      if (data.socialLink == null) data.socialLink = '';
 
       return prisma.mentorProfile.update({
         where: {
