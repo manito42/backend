@@ -128,11 +128,7 @@ export class MentorProfileRepository {
       if (data.categories.length == 0) isHide = true;
       // 업데이트할 해시태그가 0개인 경우
       if (data.hashtags.length == 0) isHide = true;
-      // 업데이트할 소셜링크가 null인 경우
-      if (!data.socialLink) {
-        isHide = true;
-        data.socialLink = '';
-      }
+      if (data.socialLink == null) data.socialLink = '';
 
       return prisma.mentorProfile.update({
         where: {
@@ -162,7 +158,6 @@ export class MentorProfileRepository {
    * @detail 멘토 프로필을 활성화 시키는 함수입니다.
    * - 멘토 프로필 활성화위해선 카테고리가 최소 1개 이상 존재해야합니다.
    * - 멘토 프로필 활성화위해선 해시태그가 최소 1개 이상 존재해야합니다.
-   * - 멘토 프로필 활성화위해선 소셜링크가 최소 1개 이상 존재해야합니다.
    */
   async activateMentorProfile(userId: number) {
     return this.prisma.$transaction(async (prisma) => {
@@ -173,7 +168,6 @@ export class MentorProfileRepository {
         select: {
           hashtags: true,
           categories: true,
-          socialLink: true,
         },
       });
 
@@ -187,9 +181,6 @@ export class MentorProfileRepository {
       if (profile.hashtags.length === 0)
         throw new BadRequestException('해시태그는 최소 1개 이상 선택해주세요.');
 
-      // 현재 프로필에 소셜링크가 없는 경우
-      if (profile.socialLink.length === 0)
-        throw new BadRequestException('소셜 링크를 입력해주세요.');
       return prisma.mentorProfile.update({
         where: {
           userId: userId,

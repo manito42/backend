@@ -327,12 +327,9 @@ paths:
     patch:
       summary: Update mentor profile
       description: |
-        update mentor profiles.  
-        **NOTE**: **hashtags** and **categories** are replaced with the new ones 
-        **NOTE**: 프로필 활성화 조건에 위배되는 경우 isHide가 해제됩니다.
-        **사용법**: **description/shortDescription**   
-          description이 **missing** **property** 인 경우, 무시(제외하고 업데이트)  
-          description이 **""** 인 경우, ""로 업데이트됩니다.  
+        **NOTE**: **hashtags** and **categories** are replaced with the new ones  
+        **NOTE**: 프로필 활성화 조건에 위배되는 경우 isHide가 해제됩니다.  
+        **프로필 활성화 조건**: 해시태그와 카테고리가 1개 이상.  
       tags:
         - Mentor Profiles
       security:
@@ -369,7 +366,8 @@ paths:
     patch:
       summary: Activate or Deactivate mentorProfiles
       description: |
-        mentorProfiled을 활성화/비활성화합니다.
+        mentorProfile을 활성화/비활성화합니다.
+        활성화 하기 위해선 category/hashtag가 각각 1개 이상 등록되어있어야합니다.
       tags:
         - Mentor Profiles
       security:
@@ -396,11 +394,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/MentorProfileGet'
         '400':
-          description: Invalid request parameter
+          description: |
+            activation: 카테고리는 최소 1개 이상 선택해주세요.  
+            activation: 해시태그는 최소 1개 이상 선택해주세요.  
         '404':
-          description: Mentor profile not found
-
-
+          description: |
+            업데이트할 프로필이 없습니다.
 
   /reservations:
     get:

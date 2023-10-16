@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { DevController } from './dev.controller';
 import { DevService } from './dev.service';
-import { UserService } from '../../models/user/user.service';
 import { UserModule } from '../../models/user/user.module';
 import { PrismaModule } from '../../database/services/prisma.module';
 import { JwtModule } from '@nestjs/jwt';
@@ -28,6 +27,6 @@ import { AppConfigModule } from 'src/config/app/config.module';
     }),
   ],
   controllers: [DevController],
-  providers: [DevService, UserService],
+  providers: [DevService],
 })
 export class DevModule {}
